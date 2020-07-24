@@ -31,7 +31,7 @@ author = "Jesse P. Johnson"
 author-email = "jpj6652@gmail.com"
 home-page = "https://github.com/kuwv/python-argufier"
 requires = [
-    "invoke",
+    "docstring-parser",
 ]
 classifiers = ["License :: OSI Approved :: Apache Software License"]
 

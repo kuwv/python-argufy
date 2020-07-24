@@ -3,7 +3,7 @@ from inspect import getmembers, isfunction, signature
 
 from docstring_parser import parse
 
-from argufier.argufier import Argument, Parser
+from argufier import Argument, Parser
 
 module = sys.modules[__name__]
 

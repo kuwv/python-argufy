@@ -1,4 +1,22 @@
+# Licensed to the Apache Software Foundation (ASF) under one
+# or more contributor license agreements.  See the NOTICE file
+# distributed with this work for additional information
+# regarding copyright ownership.  The ASF licenses this file
+# to you under the Apache License, Version 2.0 (the
+# "License"); you may not use this file except in compliance
+# with the License.  You may obtain a copy of the License at
+#
+#   http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing,
+# software distributed under the License is distributed on an
+# "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+# KIND, either express or implied.  See the License for the
+# specific language governing permissions and limitations
+# under the License.
 '''Argufier is an inspection based CLI parser.'''
+# -*- coding: utf-8 -*-
+
 import inspect
 import textwrap
 from argparse import ArgumentParser
@@ -7,64 +25,10 @@ from argparse_color_formatter import ColorHelpFormatter, ColorTextWrapper
 from docstring_parser import parse
 
 from argufier import __version__
+from .argument import Argument
 
 # import re
 # import types
-
-
-class Argument:
-    '''Represent argparse arguments.'''
-
-    def __init__(self, parameters, docstring):
-        '''Initialize argparse argument.'''
-        self.attributes = {}
-        default = parameters.default
-        annotation = parameters.annotation
-
-        if default == inspect._empty:
-            self.attributes['name'] = [parameters.name]
-        else:
-            self.attributes['flags'] = ['--' + parameters.name]
-            self.attributes['default'] = default
-
-        self.__doc = docstring
-        self.annotation(annotation)
-        self.type(annotation)
-        self.help(annotation)
-
-    # const
-    # dest
-    # metavar
-    # required
-    # help
-
-    def action(self, annotation=None):
-        if self.attributes.get('default'):
-            self.attributes['action'] = 'store_false'
-        else:
-            self.attributes['action'] = 'store_true'
-
-    def annotation(self, annotation):
-        if annotation == list:
-            self.attributes['nargs'] = '*'
-        if annotation == bool:
-            self.action()
-
-    def type(self, annotation):
-        if annotation != inspect._empty:
-            self.attributes['type'] = annotation
-        elif self.__doc and self.__doc.type_name:
-            type_name = eval(self.__doc.type_name)
-            if type(type_name) == tuple:
-                self.attributes['type'] = type_name[0]
-                if type(type_name[1]) == set:
-                    self.attributes['choices'] = type_name[1]
-            else:
-                self.attributes['type'] = type_name
-
-    def help(self, help):
-        if self.__doc:
-            self.attributes['help'] = self.__doc.description
 
 
 class Parser(ArgumentParser):
@@ -110,6 +74,7 @@ class Parser(ArgumentParser):
 
     @staticmethod
     def message(msgs):
+        '''Generate CLI menu message.'''
         usg = textwrap.dedent(
             '''\
             command [OPTIONS] [SUB-COMMAND] [ARGUMENTS]
@@ -123,6 +88,7 @@ class Parser(ArgumentParser):
 
     @staticmethod
     def usage_message(instance):
+        '''Generate usage message.'''
         msgs = [
             {
                 'cmd': fn + ' ',
@@ -134,7 +100,7 @@ class Parser(ArgumentParser):
         return message(msgs)
 
     def check_menu(self, menu, command):
-        ''' Check if menu dispatch exists '''
+        '''Check if menu dispatch exists.'''
         if not hasattr(menu, command):
             self.__log.warning('Unrecognized command')
             self.print_help()
@@ -160,7 +126,7 @@ class Parser(ArgumentParser):
             argument = Argument(signature.parameters[arg], description)
 
     def dispatch(self, args=None, namespace=None):
-        print(args)
+        '''Dispatch CLI command.'''
         result = self.parse_args(args, namespace)
         fn = vars(result).pop('fn')
         return fn(**vars(result))
