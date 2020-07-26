@@ -3,7 +3,7 @@
 # :license: Apache 2.0, see LICENSE for more details.
 '''Test version.'''
 
-from argufier.__version__ import __version__
+from argufy.__version__ import __version__
 
 
 def test_version():

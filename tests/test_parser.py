@@ -4,7 +4,7 @@
 '''Test parser.'''
 import sys
 
-from argufier import Parser
+from argufy import Parser
 
 module = sys.modules[__name__]
 

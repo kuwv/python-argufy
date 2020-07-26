@@ -7,7 +7,7 @@ from inspect import getmembers, isfunction, signature
 
 from docstring_parser import parse
 
-from argufier import Argument
+from argufy import Argument
 
 module = sys.modules[__name__]
 

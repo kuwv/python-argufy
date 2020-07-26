@@ -19,7 +19,7 @@
 from invoke import call, task
 
 
-from argufier.__version__ import __version__
+from argufy.__version__ import __version__
 
 
 if 'dev' in __version__ or 'rc' in __version__:
@@ -73,7 +73,7 @@ def unit_test(ctx, capture=None):  # type: ignore
 def static_analysis(ctx):  # type: ignore
     '''Perform static code analysis on imports.'''
     ctx.run('safety check')
-    ctx.run('bandit -r argufier')
+    ctx.run('bandit -r argufy')
 
 
 @task

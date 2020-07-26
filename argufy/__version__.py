@@ -5,7 +5,7 @@
 
 __author__ = 'Jesse P. Johnson'
 __author_email__ = 'jpj6652@gmail.com'
-__title__ = 'argufier'
+__title__ = 'argufy'
 __description__ = 'Inspection based parser based on argparse.'
 __version__ = '0.1.0'
 __license__ = 'Apache-2.0'
