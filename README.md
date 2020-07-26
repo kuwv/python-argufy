@@ -9,3 +9,7 @@ python-argufy
 * Overview
 
 Inspection based parser based on argparse.
+
+** Install
+
+`pip install argufy`
