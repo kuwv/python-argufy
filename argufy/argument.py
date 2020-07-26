@@ -4,6 +4,7 @@
 '''Arguments for inspection based CLI parser.'''
 
 import inspect
+from ast import literal_eval
 from typing import Any, Dict, Type
 
 from docstring_parser.common import DocstringParam
@@ -19,8 +20,8 @@ class Argument:
     ) -> None:
         '''Initialize argparse argument.'''
         self.attributes: Dict[Any, Any] = {}
-        print(type(parameters))
-        print(type(docstring))
+        # print(type(parameters))
+        # print(type(docstring))
 
         self.__docstring = docstring
 
@@ -49,7 +50,7 @@ class Argument:
         if annotation != inspect._empty:  # type: ignore
             return annotation
         elif self.__docstring and self.__docstring.type_name:
-            annotation = eval(self.__docstring.type_name)
+            annotation = literal_eval(self.__docstring.type_name)
             return annotation
         else:
             return None
