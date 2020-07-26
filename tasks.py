@@ -29,7 +29,7 @@ else:
 
 
 @task
-def format(ctx, check=False):  # type: ignore
+def format(ctx, check=True):  # type: ignore
     '''Format project source code to PEP-8 standard.
 
     :param check: bool, optional

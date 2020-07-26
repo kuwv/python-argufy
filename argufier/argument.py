@@ -4,7 +4,7 @@
 '''Arguments for inspection based CLI parser.'''
 
 import inspect
-from typing import Any, Dict, List, Type
+from typing import Any, Dict, Type
 
 from docstring_parser.common import DocstringParam
 

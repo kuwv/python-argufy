@@ -6,12 +6,12 @@
 import inspect
 from argparse import ArgumentParser
 from types import ModuleType
-from typing import Any, Callable, Dict, Optional, Sequence, Type, TypeVar
+from typing import Any, Callable, Optional, Sequence, Type, TypeVar
 
 # from argparse_color_formatter import ColorHelpFormatter, ColorTextWrapper
 from docstring_parser import parse
 
-from .__version__ import __version__
+# from .__version__ import __version__
 from .argument import Argument
 
 F = TypeVar('F', bound=Callable[..., Any])
@@ -70,7 +70,9 @@ class Parser(ArgumentParser):
             description = next(
                 (d for d in docstring.params if d.arg_name == arg), None
             )
-            argument = Argument(signature.parameters[arg], description)  # type: ignore
+            argument = Argument(
+                signature.parameters[arg], description  # type: ignore
+            )
             name = argument.attributes.pop('name')
             parser.add_argument(*name, **argument.attributes)  # type: ignore
 
@@ -80,7 +82,6 @@ class Parser(ArgumentParser):
         '''Add subparsers.'''
         subparsers = self.add_subparsers()
         for name, fn in inspect.getmembers(module, inspect.isfunction):
-            subparse: Optional[Type[ArgumentParser]] = None
             if fn.__module__ == module.__name__ and not name.startswith(
                 exclude_prefix
             ):
