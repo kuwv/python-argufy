@@ -24,6 +24,7 @@ invoke = "^1.4.1"
 mkdocs-material = "^5.4.0"
 flit = "^2.3.0"
 black = "^19.10b0"
+mypy = "^0.782"
 
 [tool.flit.metadata]
 module = "argufier"
@@ -36,6 +37,7 @@ requires = [
 classifiers = ["License :: OSI Approved :: Apache Software License"]
 
 [tool.black]
+line-length = 79
 include = '\.pyi?$'
 exclude = '''
 
@@ -46,6 +48,7 @@ exclude = '''
     | \.pytest_cache
     | \.vagrant
     | _build
+    | build
     | dist
   )
 )

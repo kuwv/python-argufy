@@ -1,4 +1,9 @@
-from argufier import __version__
+# -*- coding: utf-8 -*-
+# :copyright: (c) 2020 by Jesse Johnson.
+# :license: Apache 2.0, see LICENSE for more details.
+'''Test version.'''
+
+from argufier.__version__ import __version__
 
 
 def test_version():

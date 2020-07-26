@@ -16,10 +16,10 @@
 # under the License.
 
 '''Test Task-Runner.'''
-from invoke import call, task  # type: ignore
+from invoke import call, task
 
 
-from argufier import __version__
+from argufier.__version__ import __version__
 
 
 if 'dev' in __version__ or 'rc' in __version__:
@@ -29,7 +29,7 @@ else:
 
 
 @task
-def format(ctx, check=False):
+def format(ctx, check=False):  # type: ignore
     '''Format project source code to PEP-8 standard.
 
     :param check: bool, optional
@@ -44,13 +44,13 @@ def format(ctx, check=False):
 
 
 @task
-def lint(ctx):
+def lint(ctx):  # type: ignore
     '''Check project source code for linting errors.'''
     ctx.run('flake8')
 
 
 @task
-def type_check(ctx, path='.'):
+def type_check(ctx, path='.'):  # type: ignore
     '''Check project source types.
 
     :param path: str, optional
@@ -61,7 +61,7 @@ def type_check(ctx, path='.'):
 
 
 @task
-def unit_test(ctx, capture=None):
+def unit_test(ctx, capture=None):  # type: ignore
     '''Perform unit tests.'''
     args = []
     if capture:
@@ -70,14 +70,14 @@ def unit_test(ctx, capture=None):
 
 
 @task
-def static_analysis(ctx):
+def static_analysis(ctx):  # type: ignore
     '''Perform static code analysis on imports.'''
     ctx.run('safety check')
     ctx.run('bandit -r argufier')
 
 
 @task
-def coverage(ctx, report=None):
+def coverage(ctx, report=None):  # type: ignore
     '''Perform coverage checks for tests.'''
     args = ['--cov=argufier']
     if report:
@@ -86,13 +86,13 @@ def coverage(ctx, report=None):
 
 
 @task(pre=[format, lint, unit_test, static_analysis, coverage])
-def test(ctx):
+def test(ctx):  # type: ignore
     '''Run all tests.'''
     pass
 
 
 @task
-def build(ctx, format=None):
+def build(ctx, format=None):  # type: ignore
     '''Build wheel package.'''
     if format:
         ctx.run("flit build --format={}".format(format))
@@ -101,19 +101,21 @@ def build(ctx, format=None):
 
 
 @task(pre=[call(build, format='wheel')])
-def dev(ctx):
+def dev(ctx):  # type: ignore
     '''Perform development runtime environment setup.'''
     ctx.run('flit install --symlink --python python3')
 
 
 @task
-def install(ctx, symlink=True):
+def install(ctx, symlink=True):  # type: ignore
     '''Install in development environment.'''
     ctx.run('flit install -s')
 
 
 @task
-def version(ctx, part=part, tag=False, commit=False, message=None):
+def version(  # type: ignore
+    ctx, part=part, tag=False, commit=False, message=None
+):
     '''Update project version and apply tags.
 
     :param tag: bool, optional
@@ -141,13 +143,13 @@ def version(ctx, part=part, tag=False, commit=False, message=None):
 
 
 @task
-def publish(ctx):
+def publish(ctx):  # type: ignore
     '''Publish project distribution.'''
     ctx.run('flit publish')
 
 
 @task
-def clean(ctx):
+def clean(ctx):  # type: ignore
     '''Clean project dependencies and build.'''
     paths = ['dist', 'logs']
     paths.append('**/__pycache__')
