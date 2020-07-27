@@ -79,7 +79,7 @@ def static_analysis(ctx):  # type: ignore
 @task
 def coverage(ctx, report=None):  # type: ignore
     '''Perform coverage checks for tests.'''
-    args = ['--cov=argufier']
+    args = ['--cov=argufy']
     if report:
         args.append('--cov-report={}'.format(report))
     ctx.run("pytest {} ./tests/".format(' '.join(args)))
@@ -154,6 +154,6 @@ def clean(ctx):  # type: ignore
     paths = ['dist', 'logs']
     paths.append('**/__pycache__')
     paths.append('**/*.pyc')
-    paths.append('argufier.egg-info')
+    paths.append('argufy.egg-info')
     for path in paths:
         ctx.run("rm -rf {}".format(path))

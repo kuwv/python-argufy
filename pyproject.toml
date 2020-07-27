@@ -27,10 +27,10 @@ black = "^19.10b0"
 mypy = "^0.782"
 
 [tool.flit.metadata]
-module = "argufier"
+module = "argufy"
 author = "Jesse P. Johnson"
 author-email = "jpj6652@gmail.com"
-home-page = "https://github.com/kuwv/python-argufier"
+home-page = "https://github.com/kuwv/python-argufy"
 requires = [
     "docstring-parser",
 ]
