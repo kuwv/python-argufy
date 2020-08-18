@@ -5,7 +5,9 @@
 
 import sys
 from inspect import getmembers, isfunction, signature
+
 from docstring_parser import parse
+
 from argufy import Argument
 
 module = sys.modules[__name__]
@@ -41,7 +43,9 @@ def example_choice(choice_check: str = 'A'):
 
 def test_argument_simple():
     '''Test simple argument.'''
-    name, fn = [x for x in getmembers(module, isfunction) if x[0] == 'example_simple'][0]
+    name, fn = [
+        x for x in getmembers(module, isfunction) if x[0] == 'example_simple'
+    ][0]
     sig = signature(fn)
     docstring = parse(fn.__doc__)
     arguments = []
@@ -57,7 +61,9 @@ def test_argument_simple():
 
 
 def test_argument_bool():
-    name, fn = [x for x in getmembers(module, isfunction) if x[0] == 'example_bool'][0]
+    name, fn = [
+        x for x in getmembers(module, isfunction) if x[0] == 'example_bool'
+    ][0]
     sig = signature(fn)
     docstring = parse(fn.__doc__)
     arguments = []
@@ -73,7 +79,9 @@ def test_argument_bool():
 
 
 def test_argument_choice():
-    name, fn = [x for x in getmembers(module, isfunction) if x[0] == 'example_choice'][0]
+    name, fn = [
+        x for x in getmembers(module, isfunction) if x[0] == 'example_choice'
+    ][0]
     sig = signature(fn)
     document = parse(fn.__doc__)
     arguments = []
