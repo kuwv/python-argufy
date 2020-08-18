@@ -34,14 +34,14 @@ def example_choice(choice_check: str = 'A'):
     pass
 
 
-def test_subparser():
-    '''Do main function for CLI.'''
-    parser = Parser()
-    parser.add_subcommands(module, 'test_')
-    parser.dispatch()
+# def test_help_subparser():
+#     '''Do help function for CLI.'''
+#     parser = Parser()
+#     parser.add_subcommands(module, 'test_')
+#     parser.dispatch()
 
 
-def test_subparser():
+def test_choice_subparser():
     '''Do main function for CLI.'''
     parser = Parser()
     parser.add_subcommands(module, 'test_')
