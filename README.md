@@ -12,3 +12,68 @@ Inspection based parser built on argparse.
 ## Install
 
 `pip install argufy`
+
+## Create a parser
+
+```
+from argufy import Parser
+from . import cli
+
+def main():
+    '''Do main function for CLI.'''
+    parser = Parser()
+    parser.add_subcommands(cli)
+    parser.dispatch()
+
+if __name__ == '__main__':
+    main()
+```
+
+## Create the command line subcommands and arguments.
+
+```
+'''Example module named CLI.'''
+
+def _ignored():
+    '''This function is ignored.'''
+    pass
+
+def example(argument: bool = False):
+    '''Provide an example command.
+
+    Parameters
+    ----------
+    argument: bool, optional
+        Provide an example argument.
+
+    '''
+    if argument:
+        print('This is a true argument')
+    else:
+        print('This is a false argument')
+```
+
+## Example help message.
+
+```
+$ command --help
+usage: command [-h] {example} ...
+
+positional arguments:
+  {example}
+    example             Provide and example command.
+
+optional arguments:
+  -h, --help            show this help message and exit
+```
+
+## Example command help message.
+
+```
+$ command example --help
+usage: command [-h] [--argument ARGUMENT]
+
+optional arguments:
+  -h, --help           show this help message and exit
+  --argument ARGUMENT  Provide an example argument.
+```
