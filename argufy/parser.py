@@ -94,7 +94,7 @@ class Parser(ArgumentParser):
 
     def dispatch(
         self,
-        args: Optional[Sequence[str]] = None,
+        args: Sequence[str] = ['--help'],
         namespace: Optional[str] = None,
     ) -> Callable[[F], F]:
         '''Call command with arguments.'''
