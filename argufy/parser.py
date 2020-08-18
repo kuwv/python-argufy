@@ -11,9 +11,9 @@ from typing import Any, Callable, Optional, Sequence, Type, TypeVar
 # from argparse_color_formatter import ColorHelpFormatter, ColorTextWrapper
 from docstring_parser import parse
 
-# from .__version__ import __version__
 from .argument import Argument
 
+# Define function as parameters for MyPy
 F = TypeVar('F', bound=Callable[..., Any])
 
 
@@ -56,6 +56,8 @@ class Parser(ArgumentParser):
         '''
         # self.__log = Logger(__name__)
         # self.__log.info("Loading command line tool settings")
+        if 'version' in kwargs:
+            self.version = kwargs.pop('version')
         super().__init__(*args, **kwargs)  # type: ignore
 
     def add_arguments(
@@ -97,5 +99,8 @@ class Parser(ArgumentParser):
     ) -> Callable[[F], F]:
         '''Call command with arguments.'''
         result = self.parse_args(args, namespace)
-        fn = vars(result).pop('fn')
-        return fn(**vars(result))
+        if 'fn' in vars(result):
+            fn = vars(result).pop('fn')
+            return fn(**vars(result))
+        else:
+            print(vars(result))

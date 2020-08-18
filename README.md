@@ -7,7 +7,7 @@
 
 ## Overview
 
-Inspection based parser based on argparse.
+Inspection based parser built on argparse.
 
 ## Install
 

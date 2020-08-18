@@ -11,5 +11,4 @@ from .parser import Parser  # noqa
 
 __all__: List[str] = ['Parser']
 
-
 logging.getLogger(__name__).addHandler(logging.NullHandler())

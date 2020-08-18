@@ -1,12 +1,11 @@
 # -*- coding: utf-8 -*-
 # :copyright: (c) 2020 by Jesse Johnson.
 # :license: Apache 2.0, see LICENSE for more details.
-'''Tests arguments.'''
+'''Test arguments.'''
+
 import sys
 from inspect import getmembers, isfunction, signature
-
 from docstring_parser import parse
-
 from argufy import Argument
 
 module = sys.modules[__name__]
@@ -42,7 +41,7 @@ def example_choice(choice_check: str = 'A'):
 
 def test_argument_simple():
     '''Test simple argument.'''
-    name, fn = [x for x in getmembers(module, isfunction)][0]
+    name, fn = [x for x in getmembers(module, isfunction) if x[0] == 'example_simple'][0]
     sig = signature(fn)
     docstring = parse(fn.__doc__)
     arguments = []
@@ -54,11 +53,11 @@ def test_argument_simple():
             Argument(parameters=sig.parameters[arg], docstring=document)
         )
     # print('Arguments: ', arguments[0].__dict__)
-    # assert arguments[0].attributes['default'] is None
+    assert arguments[0].attributes.get('default', None) is None
 
 
 def test_argument_bool():
-    name, fn = [x for x in getmembers(module, isfunction)][0]
+    name, fn = [x for x in getmembers(module, isfunction) if x[0] == 'example_bool'][0]
     sig = signature(fn)
     docstring = parse(fn.__doc__)
     arguments = []
@@ -74,7 +73,7 @@ def test_argument_bool():
 
 
 def test_argument_choice():
-    name, fn = [x for x in getmembers(module, isfunction)][1]
+    name, fn = [x for x in getmembers(module, isfunction) if x[0] == 'example_choice'][0]
     sig = signature(fn)
     document = parse(fn.__doc__)
     arguments = []
