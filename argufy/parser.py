@@ -118,7 +118,6 @@ class Parser(ArgumentParser):
             print('sig:', signature.parameters[arg])
             name = argument.attributes.pop('name')
             parser.add_argument(*name, **argument.attributes)  # type: ignore
-        return self
 
     def add_subcommands(
         self, module: ModuleType, exclude_prefix: list = __exclude_prefixes__
@@ -139,7 +138,6 @@ class Parser(ArgumentParser):
                 )
                 subparser.set_defaults(fn=fn)
                 self.add_arguments(fn, subparser)  # type: ignore
-        return self
 
     def dispatch(
         self, args: Sequence[str] = [], namespace: Optional[str] = None,
