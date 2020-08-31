@@ -18,9 +18,7 @@
 '''Test Task-Runner.'''
 from invoke import call, task
 
-
 from argufy.__version__ import __version__
-
 
 if 'dev' in __version__ or 'rc' in __version__:
     part = 'build'

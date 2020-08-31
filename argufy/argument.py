@@ -20,9 +20,6 @@ class Argument:
     ) -> None:
         '''Initialize argparse argument.'''
         self.attributes: Dict[Any, Any] = {}
-        # print(type(parameters))
-        # print(type(docstring))
-
         self.__docstring = docstring
 
         # Define attribute defaults
