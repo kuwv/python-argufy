@@ -72,33 +72,34 @@ class Parser(ArgumentParser):
             module = None
 
         super().__init__(**kwargs)  # type: ignore
-        self.subparsers = None
+        # self.subparsers = None
 
         if module:
-            parameters = {}
-            for name, value in inspect.getmembers(module):
-                if not name.startswith(__exclude_prefixes__):
-                    if inspect.ismodule(value):
-                        continue
-                    elif inspect.isclass(value):
-                        continue
-                    elif inspect.isfunction(value):
-                        continue
-                    elif isinstance(
-                        value, (float, int, str, list, dict, tuple)
-                    ):
-                        parameters['default'] = getattr(module, name)
-                        description = next(
-                            (
-                                d.description
-                                for d in docstring.params
-                                if d.arg_name == name
-                            ),
-                            None,
-                        )
-                        print(name, parameters, description)
-                        # argument = Argument(parameters, description)
-                        # self.add_argument(name, **parameters)
+            self.add_parser_arguments(module, docstring)
+
+    def add_parser_arguments(self, module: Any, docstring):
+        parameters = {}
+        for name, value in inspect.getmembers(module):
+            if not name.startswith(__exclude_prefixes__):
+                if inspect.ismodule(value):
+                    continue
+                elif inspect.isclass(value):
+                    continue
+                elif inspect.isfunction(value):
+                    continue
+                elif isinstance(value, (float, int, str, list, dict, tuple)):
+                    parameters['default'] = getattr(module, name)
+                    description = next(
+                        (
+                            d.description
+                            for d in docstring.params
+                            if d.arg_name == name
+                        ),
+                        None,
+                    )
+                    # print(name, parameters, description)
+                    # argument = Argument(parameters, description)
+                    self.add_argument('--' + name, help=description)
 
     def add_arguments(
         self, obj: Any, parser: Optional[Type[ArgumentParser]] = None
@@ -115,16 +116,16 @@ class Parser(ArgumentParser):
             argument = Argument(
                 signature.parameters[arg], description  # type: ignore
             )
-            print('sig:', signature.parameters[arg])
+            # print('sig:', signature.parameters[arg])
             name = argument.attributes.pop('name')
             parser.add_argument(*name, **argument.attributes)  # type: ignore
 
     def add_subcommands(
-        self, module: ModuleType, exclude_prefix: list = __exclude_prefixes__
+        self, module: ModuleType, exclude_prefix: list = ['@', '_']
     ) -> None:
         '''Add subparsers.'''
-        if not self.subparsers:
-            self.subparsers = self.add_subparsers()
+        # if not subparsers:
+        subparsers = self.add_subparsers()
         if inspect.isclass(module):
             inspect_type = inspect.ismodule
         else:
@@ -133,19 +134,19 @@ class Parser(ArgumentParser):
             if module.__name__ == fn.__module__ and not name.startswith(
                 (', '.join(exclude_prefix))
             ):
-                subparser = self.subparsers.add_parser(
+                subparser = subparsers.add_parser(
                     name, help=parse(fn.__doc__).short_description
                 )
                 subparser.set_defaults(fn=fn)
                 self.add_arguments(fn, subparser)  # type: ignore
 
     def dispatch(
-        self, args: Sequence[str] = [], namespace: Optional[str] = None,
+        self, args: Sequence[str] = None, namespace: Optional[str] = None,
     ) -> Callable[[F], F]:
         '''Call command with arguments.'''
         result = self.parse_args(args, namespace)
         if 'fn' in vars(result):
             fn = vars(result).pop('fn')
             return fn(**vars(result))
-        # else:
-        #     print(vars(result))
+        else:
+            print(vars(result))
