@@ -7,16 +7,13 @@ from argufy import Parser
 
 from . import example
 
-local_variable = 'local_result'
+example_variable = 'ex_var'
 
 
 def main():
-    '''Do main function for CLI.'''
     parser = Parser()
-    parser.add_subcommands(example)
+    parser.add_commands(example)
     parser.dispatch()
 
-
 if __name__ == '__main__':
-    '''Execute main.'''
     main()

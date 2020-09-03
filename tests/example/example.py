@@ -5,8 +5,8 @@
 
 Attributes
 ----------
-check_attribute: bool
-    Check document attributes
+example_variable: str
+    Example variable for testing
 
 '''
 
@@ -19,7 +19,7 @@ def example_bool(bool_check: bool = False):
     Parameters
     ----------
     bool_check: bool, optional
-        list packages and version
+        example boolean
 
     '''
     print(bool_check)
