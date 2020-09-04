@@ -167,25 +167,26 @@ class Parser(ArgumentParser):
         '''Separe module arguments from functions.'''
         args = []
         signature = inspect.signature(obj)
+        # Separate namespace from other variables
         args = [
             vars(ns).pop(k)
             for k in list(vars(ns).keys()).copy()
             if not signature.parameters.get(k)
         ]
-        print('set_vars:', args)
+        # print('set_vars:', args)
         return ns
 
-    def dispatch(
+    def retrieve(
         self, args: Sequence[str] = None, ns: Optional[str] = None,
     ) -> Callable[[F], F]:
-        '''Call command with arguments.'''
+        '''Retrieve values from CLI call.'''
         if sys.argv[1:] == [] and args is None:
             args = ['--help']
         main_ns, main_args = self.parse_known_args(args, ns)
         print(main_ns, main_args)
         if main_args == []:
             namespace = main_ns
-            arguments = main_args 
+            arguments = main_args
         else:
             sub_ns, sub_args = self._subcommands[
                 'example.example'
@@ -194,4 +195,11 @@ class Parser(ArgumentParser):
             arguments = sub_args
         fn = vars(namespace).pop('fn')
         namespace = self.__set_module_arguments(fn, namespace)
+        return fn, arguments, namespace
+
+    def dispatch(
+        self, args: Sequence[str] = None, ns: Optional[str] = None,
+    ) -> Callable[[F], F]:
+        '''Call command with arguments.'''
+        fn, arguments, namespace = self.retrieve(args, ns)
         return fn(**vars(namespace))
