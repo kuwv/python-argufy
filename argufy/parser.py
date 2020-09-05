@@ -52,7 +52,7 @@ class Parser(ArgumentParser):
             The strategy for resolving conflicting optionals
         add_help: str
             Add a -h/--help option to the parser
-       allow_abbrev: bool
+        allow_abbrev: bool
             Allows long options to be abbreviated if the abbreviation is
             unambiguous
 
@@ -60,13 +60,8 @@ class Parser(ArgumentParser):
         if 'version' in kwargs:
             self.version = kwargs.pop('version')
 
-        module = None
-        stack = inspect.stack()
-        stack_frame = stack[1]
-
-        # TODO: subparsers should have the same capability later
-        if stack_frame.function != 'add_parser':
-            module = inspect.getmodule(stack_frame[0])
+        module = self.__get_parent_module()
+        if module:
             docstring = parse(module.__doc__)
             if not kwargs.get('description'):
                 kwargs['description'] = docstring.short_description
@@ -76,31 +71,18 @@ class Parser(ArgumentParser):
             self._subcommands = {}
 
         if module:
-            self.add_parser_arguments(module, docstring)
+            self.__update_parser(module)
 
-    def add_parser_arguments(self, module: Any, docstring):
-        parameters = {}
-        for name, value in inspect.getmembers(module):
-            if not name.startswith(__exclude_prefixes__):
-                if inspect.ismodule(value):
-                    continue
-                elif inspect.isclass(value):
-                    continue
-                elif inspect.isfunction(value):
-                    continue
-                elif isinstance(value, (float, int, str, list, dict, tuple)):
-                    parameters['default'] = getattr(module, name)
-                    description = next(
-                        (
-                            d.description
-                            for d in docstring.params
-                            if d.arg_name == name
-                        ),
-                        None,
-                    )
-                    # print(name, parameters, description)
-                    # argument = Argument(parameters, description)
-                    self.add_argument('--' + name, help=description)
+    @staticmethod
+    def __get_parent_module():
+        module = None
+        stack = inspect.stack()
+        stack_frame = stack[1]
+
+        # TODO: subparsers should have the same capability later
+        if stack_frame.function != 'add_parser':
+            module = inspect.getmodule(stack_frame[0])
+        return module
 
     def add_arguments(
         self, obj: Any, parser: Optional[Type[ArgumentParser]] = None
@@ -122,35 +104,54 @@ class Parser(ArgumentParser):
             parser.add_argument(*name, **argument.attributes)  # type: ignore
         return self
 
-    def __add_commands(
+    def __update_parser(
         self,
-         module: ModuleType,
-         parser: ArgumentParser,
-         exclude_prefix: list = ['@', '_']
-    ) -> None:
-        '''Add command.'''
-        if inspect.isclass(module):
-            inspect_type = inspect.ismodule
-        else:
-            inspect_type = inspect.isfunction
-
-        for name, fn in inspect.getmembers(module, inspect_type):
-            if module.__name__ == fn.__module__ and not name.startswith(
-                (', '.join(exclude_prefix))
-            ):
-                command = parser.add_parser(
-                    name, help=parse(fn.__doc__).short_description
-                )
-                command.set_defaults(fn=fn)
-                self.add_arguments(fn, command)  # type: ignore
+        obj: Any,
+        parser: Optional[Type[ArgumentParser]] = None,
+        exclude_prefix: list = ['@', '_']
+    ):
+        '''Add arguments to parser/subparser.'''
+        if not parser:
+            parser = self  # type: ignore
+        docstring = parse(obj.__doc__)
+        parameters = {}
+        for name, value in inspect.getmembers(obj):
+            # TODO: Possible singledispatch candidate
+            if not name.startswith(__exclude_prefixes__):
+                if inspect.ismodule(value):
+                    continue
+                elif inspect.isclass(value):
+                    continue
+                elif inspect.isfunction(value) or inspect.ismethod(value):
+                    if obj.__name__ == value.__module__ and not name.startswith(
+                        (', '.join(__exclude_prefixes__))
+                    ):
+                        command = parser.add_parser(
+                            name.replace('_', '-'),
+                            help=parse(value.__doc__).short_description
+                        )
+                        command.set_defaults(fn=value)
+                        self.add_arguments(value, command)  # type: ignore
+                elif isinstance(value, (float, int, str, list, dict, tuple)):
+                    parameters['default'] = getattr(obj, name)
+                    description = next(
+                        (
+                            d.description
+                            for d in docstring.params
+                            if d.arg_name == name
+                        ),
+                        None,
+                    )
+                    # print(name, parameters, description)
+                    # argument = Argument(parameters, description)
+                    self.add_argument('--' + name, help=description)
 
     def add_commands(
         self, module: ModuleType, exclude_prefix: list = ['@', '_']
     ) -> None:
         '''Add subparsers.'''
         commands = self.add_subparsers()
-        self.__add_commands(module, commands, exclude_prefix)
-        # print(self._commands)
+        self.__update_parser(module, commands, exclude_prefix)
         return self
 
     def add_subcommands(
@@ -160,7 +161,7 @@ class Parser(ArgumentParser):
         # print(module)
         self._subcommands[module.__name__] = Parser()
         subcommands = self._subcommands[module.__name__].add_subparsers()
-        self.__add_commands(module, subcommands, exclude_prefix)
+        self.__update_parser(module, commands, exclude_prefix)
         return self
 
     def __set_module_arguments(self, obj, ns):
@@ -179,7 +180,7 @@ class Parser(ArgumentParser):
     def retrieve(
         self, args: Sequence[str] = None, ns: Optional[str] = None,
     ) -> Callable[[F], F]:
-        '''Retrieve values from CLI call.'''
+        '''Retrieve values from CLI.'''
         if sys.argv[1:] == [] and args is None:
             args = ['--help']
         main_ns, main_args = self.parse_known_args(args, ns)
