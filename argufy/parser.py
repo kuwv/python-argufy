@@ -73,6 +73,17 @@ class Parser(ArgumentParser):
         if module:
            self.__update_parser(module)
 
+    @staticmethod
+    def __get_parent_module():
+        module = None
+        stack = inspect.stack()
+        stack_frame = stack[1]
+
+        # TODO: subparsers should have the same capability later
+        if stack_frame.function != 'add_parser':
+            module = inspect.getmodule(stack_frame[0])
+        return module
+
     def __update_parser(
         self,
         obj: Any,
@@ -100,7 +111,7 @@ class Parser(ArgumentParser):
                 elif isinstance(value, (float, int, str, list, dict, tuple)):
                     '''Add module arguments.'''
                     # TODO: Turn module attributes to inspect.parameters
-                    print('attribute:', name, value)
+                    # print('attribute:', name, value)
                     self.__add_module_arguments(
                         name, value, obj, parser, docstring, exclude_prefix
                     )
@@ -203,49 +214,55 @@ class Parser(ArgumentParser):
         self._subcommands[module_name].add_commands(module)
         return self
 
+    def __clean_function_arguments(self, obj: Any, ns: Optional[Namespace] = None):
+        '''Separate module arguments from functions.'''
+        args = []
+        signature = inspect.signature(obj)
+        # Separate namespace from other variables
+        args = [
+            vars(ns).pop(k)
+            for k in list(vars(ns).keys()).copy()
+            if not signature.parameters.get(k)
+        ]
+        # print('set_vars:', args)
+        return ns
+
     def __set_module_arguments(self, obj: Any, ns: Optional[Namespace] = None):
         '''Separate module arguments from functions.'''
         args = []
-        for k, v in inspect.getmembers(obj):
-            if not k.startswith(__exclude_prefixes__):
-                if inspect.isclass(v):
-                    # print('class:', v.__name__)
-                    continue
-                elif inspect.isfunction(v) or inspect.ismethod(v):
-                    print('functions:', v.__name__)
-                    signature = inspect.signature(obj)
-                    # Separate namespace from other variables
-                    args = [ 
-                        vars(ns).pop(k)
-                        for k in list(vars(ns).keys()).copy()
-                        if not signature.parameters.get(k)
-                    ]
-                    # print('set_vars:', args)
-                elif isinstance(v, (float, int, str, list, dict, tuple)):
-                    args.append({k: v})
-        # if inspect.ismodule(obj):
+        results = []
         # Separate namespace from other variables
-        print('module', obj.__name__, args)
-        results = [
-            vars(ns).pop(k)
-            for k in list(vars(ns).keys()).copy()
-            if k not in args
-        ]
-        print('set_vars:', results)
-        # for k, v in results:
-        #     obj[k] = v
+        print('object', obj.__name__)
+        if inspect.ismodule(obj):
+            for name, value in inspect.getmembers(obj):
+                if not name.startswith(__exclude_prefixes__):
+                    if inspect.isclass(value):
+                        print('class:', value.__name__)
+                        continue
+                    elif inspect.isfunction(value) or inspect.ismethod(value):
+                        print('functions:', value.__name__)
+                    elif isinstance(value, (float, int, str, list, dict, tuple)):
+                        print('parameter:', name, value)
+                        args.append({name: value})
+            print('module', obj.__name__, args)
+            # Separate namespace from other variables
+            results = [
+                {name: vars(ns).pop(name)}
+                for name in list(vars(ns).keys()).copy()
+                if name not in args
+            ]
+        elif inspect.isfunction(obj) or inspect.ismethod(obj):
+            print('functions:', obj.__name__)
+            results, ns = self.__get_function_arguments(obj, ns)
+
+        print('results', results)
+        # Set variables in module
+        for x in results:
+            for k, v in x.items():
+                obj.__dict__[k] = v
+
+        # Return clean namespace
         return ns
-
-    @staticmethod
-    def __get_parent_module():
-        module = None
-        stack = inspect.stack()
-        stack_frame = stack[1]
-
-        # TODO: subparsers should have the same capability later
-        if stack_frame.function != 'add_parser':
-            module = inspect.getmodule(stack_frame[0])
-        return module
 
     def retrieve(
         self, args: Sequence[str] = None,
@@ -286,6 +303,7 @@ class Parser(ArgumentParser):
         ### testing
         if inspect.isfunction(obj) or inspect.ismethod(obj):
             print(obj.__module__)
-        ###
-        namespace = self.__set_module_arguments(obj, namespace)
+            namespace = self.__clean_function_arguments(obj, namespace)
+        if inspect.ismodule(obj):
+            namespace = self.__set_module_arguments(obj, namespace)
         return obj(**vars(namespace))
