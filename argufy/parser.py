@@ -195,28 +195,13 @@ class Parser(ArgumentParser):
         '''Add subparsers.'''
         # TODO: need to append modules as commands
         # print(module)
-        commands = self.add_subparsers()
+        module_name = module.__name__.split('.')[-1]
+        commands = self.add_subparsers(dest=module_name)
         self.__add_module_command(module, commands, exclude_prefix)
 
-        module_name = module.__name__.split('.')[-1]
-        self._subcommands[module_name] = Parser()
+        self._subcommands[module_name] = Parser(prog=module_name)
         self._subcommands[module_name].add_commands(module)
-        # subcommands = self._subcommands[module_name].add_subparsers()
-        # self.__update_parser(module, subcommands, exclude_prefix)
         return self
-
-    # def __set_module_arguments(self, obj: Any, ns: Optional[Namespace] = None):
-    #     '''Separate module arguments from functions.'''
-    #     args = []
-    #     signature = inspect.signature(obj)
-    #     # Separate namespace from other variables
-    #     args = [
-    #         vars(ns).pop(k)
-    #         for k in list(vars(ns).keys()).copy()
-    #         if not signature.parameters.get(k)
-    #     ]
-    #     # print('set_vars:', args)
-    #     return ns
 
     def __set_module_arguments(self, obj: Any, ns: Optional[Namespace] = None):
         '''Separate module arguments from functions.'''
@@ -270,12 +255,17 @@ class Parser(ArgumentParser):
         main_ns, main_args = self.parse_known_args(args, ns)
         print('parsed:', main_ns, main_args)
         if main_args == []:
-            namespace = main_ns
-            arguments = main_args
+            if 'mod' in main_ns:
+                sub_ns, sub_args = self._subcommands[
+                    vars(main_ns)['mod'].__name__.split('.')[-1]
+                ].parse_known_args(['--help'])
+            else:
+                namespace = main_ns
+                arguments = main_args
         else:
             # TODO: implement iterator for CLI paths
             sub_ns, sub_args = self._subcommands[
-                vars(main_ns)['fn'].__module__.split('.')[-1]
+                vars(main_ns)['mod'].__name__.split('.')[-1]
             ].parse_known_args(main_args)
             namespace = sub_ns
             arguments = sub_args
