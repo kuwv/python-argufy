@@ -5,14 +5,14 @@
 
 from argufy import Parser
 
-from . import example
+from . import command
 
 example_variable = 'ex_var'
 
 
 def main():
     parser = Parser()
-    parser.add_commands(example)
+    parser.add_commands(command)
     parser.dispatch()
 
 
