@@ -70,8 +70,8 @@ class Parser(ArgumentParser):
         if not hasattr(self, 'subcommands'):
             self._subcommands = {}
 
-        if module:
-            self.__update_parser(module)
+        # if module:
+        #     self._load_module(module)
 
     @staticmethod
     def __get_parent_module():
@@ -104,36 +104,41 @@ class Parser(ArgumentParser):
             parser.add_argument(*name, **argument.attributes)  # type: ignore
         return self
 
-    def __update_parser(
+    def add_commands(
         self,
-        obj: Any,
+        module: ModuleType,
         parser: Optional[Type[ArgumentParser]] = None,
-        exclude_prefix: list = ['@', '_']
-    ):
-        '''Add arguments to parser/subparser.'''
+        exclude_prefix: list = ['@', '_'],
+    ) -> None:
+        '''Add commands.'''
         if not parser:
             parser = self  # type: ignore
-        docstring = parse(obj.__doc__)
+        module_name = module.__name__.split('.')[-1]
+        docstring = parse(module.__doc__)
         parameters = {}
-        for name, value in inspect.getmembers(obj):
+
+        command_parser = parser.add_subparsers(dest=module_name)
+        # self._load_module(module, command_parser, exclude_prefix)
+        for name, value in inspect.getmembers(module):
             # TODO: Possible singledispatch candidate
             if not name.startswith(__exclude_prefixes__):
-                if inspect.ismodule(value):
-                    continue
-                elif inspect.isclass(value):
+                if inspect.isclass(value):
                     continue
                 elif inspect.isfunction(value) or inspect.ismethod(value):
-                    if obj.__name__ == value.__module__ and not name.startswith(
-                        (', '.join(__exclude_prefixes__))
-                    ):
-                        command = parser.add_parser(
-                            name.replace('_', '-'),
-                            help=parse(value.__doc__).short_description
+                    if (
+                        module.__name__ == value.__module__
+                        and not name.startswith(
+                            (', '.join(__exclude_prefixes__))
                         )
-                        command.set_defaults(fn=value)
-                        self.add_arguments(value, command)  # type: ignore
+                    ):
+                        cmd = command_parser.add_parser(
+                            name.replace('_', '-'),
+                            help=docstring.short_description,
+                        )
+                        cmd.set_defaults(fn=value)
+                        self.add_arguments(value, cmd)
                 elif isinstance(value, (float, int, str, list, dict, tuple)):
-                    parameters['default'] = getattr(obj, name)
+                    parameters['default'] = getattr(module, name)
                     description = next(
                         (
                             d.description
@@ -144,63 +149,73 @@ class Parser(ArgumentParser):
                     )
                     # print(name, parameters, description)
                     # argument = Argument(parameters, description)
-                    self.add_argument('--' + name, help=description)
-
-    def add_commands(
-        self, module: ModuleType, exclude_prefix: list = ['@', '_']
-    ) -> None:
-        '''Add subparsers.'''
-        commands = self.add_subparsers()
-        self.__update_parser(module, commands, exclude_prefix)
+                    parser.add_argument(
+                        '--' + name.replace('_', '-'), help=description
+                    )
         return self
 
     def add_subcommands(
-        self, module: ModuleType, exclude_prefix: list = ['@', '_']
+        self,
+        module: ModuleType,
+        parser: Optional[Type[ArgumentParser]] = None,
+        exclude_prefix: list = ['@', '_'],
     ) -> None:
-        '''Add subparsers.'''
-        # print(module)
-        self._subcommands[module.__name__] = Parser()
-        subcommands = self._subcommands[module.__name__].add_subparsers()
-        self.__update_parser(module, commands, exclude_prefix)
+        '''Add subcommands.'''
+        if not parser:
+            parser = self  # type: ignore
+        module_name = module.__name__.split('.')[-1]
+        docstring = parse(module.__doc__)
+
+        command_parser = parser.add_subparsers(dest=module.__name__)
+        subcommand_parser = command_parser.add_parser(
+            module_name.replace('_', '-'), help=docstring.short_description,
+        )
+        subcommand_parser.set_defaults(mod=module)
+        self.add_commands(module, subcommand_parser)
         return self
 
-    def __set_module_arguments(self, obj, ns):
+    def __set_module_arguments(self, fn, ns):
         '''Separe module arguments from functions.'''
-        args = []
-        signature = inspect.signature(obj)
+        if 'mod' in ns:
+            mod = vars(ns).pop('mod')
+        else:
+            mod = None
+        signature = inspect.signature(fn)
         # Separate namespace from other variables
         args = [
-            vars(ns).pop(k)
+            {k: vars(ns).pop(k)}
             for k in list(vars(ns).keys()).copy()
             if not signature.parameters.get(k)
         ]
-        # print('set_vars:', args)
+        print(args)
+        if mod:
+            for arg in args:
+                for k, v in arg.items():
+                    mod.__dict__[k] = v
         return ns
 
     def retrieve(
         self, args: Sequence[str] = None, ns: Optional[str] = None,
     ) -> Callable[[F], F]:
         '''Retrieve values from CLI.'''
-        if sys.argv[1:] == [] and args is None:
-            args = ['--help']
         main_ns, main_args = self.parse_known_args(args, ns)
-        print(main_ns, main_args)
-        if main_args == []:
-            namespace = main_ns
-            arguments = main_args
+        if main_args == [] and 'fn' in vars(main_ns):
+            return main_args, main_ns
         else:
-            sub_ns, sub_args = self._subcommands[
-                'example.example'
-            ].parse_known_args(main_args)
-            namespace = sub_ns
-            arguments = sub_args
-        fn = vars(namespace).pop('fn')
-        namespace = self.__set_module_arguments(fn, namespace)
-        return fn, arguments, namespace
+            if 'mod' in vars(main_ns):
+                a = []
+                a.append(vars(main_ns)['mod'].__name__.split('.')[-1])
+                a.append('--help')
+            self.parse_args(a)
 
     def dispatch(
         self, args: Sequence[str] = None, ns: Optional[str] = None,
     ) -> Callable[[F], F]:
         '''Call command with arguments.'''
-        fn, arguments, namespace = self.retrieve(args, ns)
-        return fn(**vars(namespace))
+        if sys.argv[1:] == [] and args is None:
+            args = ['--help']
+        arguments, namespace = self.retrieve(args, ns)
+        if 'fn' in namespace:
+            fn = vars(namespace).pop('fn')
+            namespace = self.__set_module_arguments(fn, namespace)
+            return fn(**vars(namespace))

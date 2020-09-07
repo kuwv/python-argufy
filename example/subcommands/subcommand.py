@@ -12,6 +12,7 @@ example_variable: str
 example_variable1 = 'test1'
 example_variable2 = 'test2'
 
+
 def example_bool(bool_check: bool = False):
     '''Example bool.
 

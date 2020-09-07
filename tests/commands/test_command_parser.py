@@ -15,7 +15,7 @@ import sys
 from argufy import Parser
 
 module = sys.modules[__name__]
-check_attribute = 'test-attr'
+# check_attribute = 'test-attr'
 
 
 def example_bool(bool_check: bool = False):
@@ -27,7 +27,7 @@ def example_bool(bool_check: bool = False):
         list packages and version
 
     '''
-    pass
+    assert bool_check is True
 
 
 def example_choice(choice_check: str = 'A'):
@@ -39,7 +39,7 @@ def example_choice(choice_check: str = 'A'):
         example choice
 
     '''
-    pass
+    assert choice_check == 'B'
 
 
 # def test_help():
@@ -53,11 +53,11 @@ def test_bool():
     '''Do main function for CLI.'''
     parser = Parser()
     parser.add_commands(module, ['test_'])
-    parser.dispatch(['example_bool'])
+    parser.dispatch(['example-bool', '--bool-check', 'True'])
 
 
 def test_choice():
     '''Do main function for CLI.'''
     parser = Parser()
     parser.add_commands(module, ['test_'])
-    parser.dispatch(['example_choice'])
+    parser.dispatch(['example-choice', '--choice-check', 'B'])

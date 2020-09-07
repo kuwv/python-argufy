@@ -25,10 +25,11 @@ class Argument:
         self.nargs_type = '+'
 
         default = parameters.default
+        name = parameters.name.replace('_', '-')
         if default == inspect._empty:  # type: ignore
-            self.attributes['name'] = [parameters.name]
+            self.attributes['name'] = [name]
         else:
-            self.attributes['name'] = ['--' + parameters.name]
+            self.attributes['name'] = ['--' + name]
             self.attributes['default'] = default
 
         self.set_attributes(self.get_annotations(parameters.annotation))
