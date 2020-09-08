@@ -180,11 +180,7 @@ class Parser(ArgumentParser):
     ):
         parameters = {}
         description = next(
-            (
-                d.description
-                for d in docstring.params
-                if d.arg_name == name
-            ),
+            (d.description for d in docstring.params if d.arg_name == name),
             None,
         )
         parameters['default'] = getattr(obj, name)
@@ -203,8 +199,7 @@ class Parser(ArgumentParser):
         docstring = parse(obj.__doc__)
         if not name.startswith(', '.join(__exclude_prefixes__)):
             command = parser.add_parser(
-                name.replace('_', '-'),
-                help=docstring.short_description,
+                name.replace('_', '-'), help=docstring.short_description,
             )
             command.set_defaults(mod=obj)
             # self.__add_command_arguments(value, command)  # type: ignore
@@ -240,9 +235,9 @@ class Parser(ArgumentParser):
         args = [
             {k: vars(ns).pop(k)}
             for k in list(vars(ns).keys()).copy()
-            if k not in args
+            if k not in signature.parameters.get(k)
         ]
-        print(args)
+        # print(args)
         if mod:
             for arg in args:
                 for k, v in arg.items():
