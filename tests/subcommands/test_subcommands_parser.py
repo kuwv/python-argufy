@@ -45,19 +45,29 @@ def example_choice(choice_check: str = 'A'):
 # def test_help():
 #     '''Do help function for CLI.'''
 #     parser = Parser()
-#     parser.add_commands(module, ['test_'])
+#     parser.add_commands(module, None, ['test_'])
 #     parser.dispatch()
 
 
 def test_bool():
     '''Do main function for CLI.'''
     parser = Parser()
-    parser.add_subcommands(module, ['test_'])
-    parser.dispatch(['example-bool', '--bool-check', 'True'])
+    parser.add_subcommands(module, None, ['test_'])
+    parser.dispatch([
+        'test-subcommands-parser',
+        'example-bool',
+        '--bool-check',
+        'True'
+    ])
 
 
 def test_choice():
     '''Do main function for CLI.'''
     parser = Parser()
-    parser.add_subcommands(module, ['test_'])
-    parser.dispatch(['example-choice', '--choice-check', 'B'])
+    parser.add_subcommands(module, None, ['test_'])
+    parser.dispatch([
+        'test-subcommands-parser',
+        'example-choice',
+        '--choice-check',
+        'B'
+    ])
