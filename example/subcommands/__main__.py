@@ -5,14 +5,15 @@
 
 from argufy import Parser
 
-from . import subcommand
+from . import cmd1, cmd2
 
 # example_variable = 'ex_var'
 
 
 def main():
     parser = Parser()
-    parser.add_subcommands(subcommand)
+    parser.add_subcommands(cmd1)
+    parser.add_subcommands(cmd2)
     parser.dispatch()
 
 

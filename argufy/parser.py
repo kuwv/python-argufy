@@ -67,8 +67,8 @@ class Parser(ArgumentParser):
                 kwargs['description'] = docstring.short_description
 
         super().__init__(**kwargs)  # type: ignore
-        if not hasattr(self, 'subcommands'):
-            self._subcommands = {}
+        if not hasattr(self, '_commands'):
+            self._commands = None
 
         # if module:
         #     self._load_module(module)
@@ -107,8 +107,8 @@ class Parser(ArgumentParser):
     def add_commands(
         self,
         module: ModuleType,
-        parser: Optional[Type[ArgumentParser]] = None,
         exclude_prefix: list = ['@', '_'],
+        parser: Optional[Type[ArgumentParser]] = None,
     ) -> None:
         '''Add commands.'''
         if not parser:
@@ -117,8 +117,11 @@ class Parser(ArgumentParser):
         docstring = parse(module.__doc__)
         parameters = {}
 
-        command_parser = parser.add_subparsers(dest=module_name)
-        # self._load_module(module, command_parser, exclude_prefix)
+        if not parser._commands:
+            parser._commands = parser.add_subparsers(dest=module_name)
+        command = parser._commands
+
+        # self._load_module(module, command, exclude_prefix)
         for name, value in inspect.getmembers(module):
             # TODO: Possible singledispatch candidate
             if not name.startswith(__exclude_prefixes__):
@@ -131,13 +134,14 @@ class Parser(ArgumentParser):
                             (', '.join(__exclude_prefixes__))
                         )
                     ):
-                        cmd = command_parser.add_parser(
+                        cmd = command.add_parser(
                             name.replace('_', '-'),
                             help=docstring.short_description,
                         )
                         cmd.set_defaults(fn=value)
                         self.add_arguments(value, cmd)
                 elif isinstance(value, (float, int, str, list, dict, tuple)):
+                    # TODO: Reconcile inspect parameters with dict
                     parameters['default'] = getattr(module, name)
                     description = next(
                         (
@@ -157,8 +161,8 @@ class Parser(ArgumentParser):
     def add_subcommands(
         self,
         module: ModuleType,
-        parser: Optional[Type[ArgumentParser]] = None,
         exclude_prefix: list = ['@', '_'],
+        parser: Optional[Type[ArgumentParser]] = None,
     ) -> None:
         '''Add subcommands.'''
         if not parser:
@@ -166,12 +170,15 @@ class Parser(ArgumentParser):
         module_name = module.__name__.split('.')[-1]
         docstring = parse(module.__doc__)
 
-        command_parser = parser.add_subparsers(dest=module.__name__)
-        subcommand_parser = command_parser.add_parser(
+        if not parser._commands:
+            parser._commands = parser.add_subparsers(dest=module_name)
+        command = parser._commands
+
+        subcommand = command.add_parser(
             module_name.replace('_', '-'), help=docstring.short_description,
         )
-        subcommand_parser.set_defaults(mod=module)
-        self.add_commands(module, subcommand_parser)
+        subcommand.set_defaults(mod=module)
+        self.add_commands(module, exclude_prefix, subcommand)
         return self
 
     def __set_module_arguments(self, fn, ns):
@@ -187,7 +194,6 @@ class Parser(ArgumentParser):
             for k in list(vars(ns).keys()).copy()
             if not signature.parameters.get(k)
         ]
-        print(args)
         if mod:
             for arg in args:
                 for k, v in arg.items():
