@@ -25,6 +25,7 @@ mkdocs-material = "^5.4.0"
 flit = "^2.3.0"
 black = "^19.10b0"
 mypy = "^0.782"
+mkdocstrings = "^0.13.2"
 
 [tool.flit.metadata]
 module = "argufy"
