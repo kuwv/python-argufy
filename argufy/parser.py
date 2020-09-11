@@ -5,7 +5,7 @@
 
 import inspect
 import sys
-from argparse import ArgumentParser
+from argparse import ArgumentParser, Namespace, _SubParsersAction
 from types import ModuleType
 from typing import Any, Callable, Optional, Sequence, Type, TypeVar
 
@@ -17,11 +17,11 @@ from .argument import Argument
 # Define function as parameters for MyPy
 F = TypeVar('F', bound=Callable[..., Any])
 
-__exclude_prefixes__ = ('@', '_')
-
 
 class Parser(ArgumentParser):
     '''Provide CLI parser for function.'''
+
+    __exclude_prefixes__ = ('@', '_')
 
     def __init__(self, *args: str, **kwargs: str) -> None:
         '''Initialize parser.
@@ -57,36 +57,36 @@ class Parser(ArgumentParser):
             unambiguous
 
         '''
-        if 'version' in kwargs:
-            self.version = kwargs.pop('version')
-
         module = self.__get_parent_module()
         if module:
             docstring = parse(module.__doc__)
             if not kwargs.get('description'):
                 kwargs['description'] = docstring.short_description
 
+        if 'prog' not in kwargs:
+            kwargs['prog'] = module.__name__.split('.')[0]
+
+        if 'version' in kwargs:
+            self.version = kwargs.pop('version')
+
         super().__init__(**kwargs)  # type: ignore
-        if not hasattr(self, '_commands'):
-            self._commands = None
+        # if not hasattr(self, '_commands'):
+        #     self._commands = None
 
         # if module:
         #     self._load_module(module)
 
     @staticmethod
-    def __get_parent_module():
+    def __get_parent_module() -> ModuleType:
         module = None
         stack = inspect.stack()
         stack_frame = stack[1]
-
-        # TODO: subparsers should have the same capability later
-        if stack_frame.function != 'add_parser':
-            module = inspect.getmodule(stack_frame[0])
+        module = inspect.getmodule(stack_frame[0])
         return module
 
     def add_arguments(
         self, obj: Any, parser: Optional[Type[ArgumentParser]] = None
-    ) -> None:
+    ) -> Type[ArgumentParser]:
         '''Add arguments to parser/subparser.'''
         if not parser:
             parser = self  # type: ignore
@@ -109,29 +109,32 @@ class Parser(ArgumentParser):
         module: ModuleType,
         exclude_prefix: list = ['@', '_'],
         parser: Optional[Type[ArgumentParser]] = None,
-    ) -> None:
+    ) -> Type[ArgumentParser]:
         '''Add commands.'''
-        if not parser:
-            parser = self  # type: ignore
         module_name = module.__name__.split('.')[-1]
         docstring = parse(module.__doc__)
         parameters = {}
 
-        if not parser._commands:
-            parser._commands = parser.add_subparsers(dest=module_name)
-        command = parser._commands
+        if not parser:
+            parser = self  # type: ignore
+        if not any(isinstance(x, _SubParsersAction) for x in parser._actions):
+            parser.add_subparsers(dest=module_name)
+        command = next(
+            (x for x in parser._actions if isinstance(x, _SubParsersAction)),
+            None,
+        )
 
         # self._load_module(module, command, exclude_prefix)
         for name, value in inspect.getmembers(module):
             # TODO: Possible singledispatch candidate
-            if not name.startswith(__exclude_prefixes__):
+            if not name.startswith(self.__exclude_prefixes__):
                 if inspect.isclass(value):
                     continue
                 elif inspect.isfunction(value) or inspect.ismethod(value):
                     if (
                         module.__name__ == value.__module__
                         and not name.startswith(
-                            (', '.join(__exclude_prefixes__))
+                            (', '.join(self.__exclude_prefixes__))
                         )
                     ):
                         cmd = command.add_parser(
@@ -142,20 +145,20 @@ class Parser(ArgumentParser):
                         self.add_arguments(value, cmd)
                 elif isinstance(value, (float, int, str, list, dict, tuple)):
                     # TODO: Reconcile inspect parameters with dict
-                    parameters['default'] = getattr(module, name)
+                    parameters = inspect.Parameter(
+                        name,
+                        inspect._ParameterKind.POSITIONAL_OR_KEYWORD,
+                        default=getattr(module, name),
+                        annotation=inspect._empty,  # TODO: Inspect type
+                    )
                     description = next(
-                        (
-                            d.description
-                            for d in docstring.params
-                            if d.arg_name == name
-                        ),
+                        (d for d in docstring.params if d.arg_name == name),
                         None,
                     )
                     # print(name, parameters, description)
-                    # argument = Argument(parameters, description)
-                    parser.add_argument(
-                        '--' + name.replace('_', '-'), help=description
-                    )
+                    argument = Argument(parameters, description)
+                    name = argument.attributes.pop('name')
+                    parser.add_argument(*name, **argument.attributes)
         return self
 
     def add_subcommands(
@@ -163,16 +166,19 @@ class Parser(ArgumentParser):
         module: ModuleType,
         exclude_prefix: list = ['@', '_'],
         parser: Optional[Type[ArgumentParser]] = None,
-    ) -> None:
+    ) -> Type[ArgumentParser]:
         '''Add subcommands.'''
-        if not parser:
-            parser = self  # type: ignore
         module_name = module.__name__.split('.')[-1]
         docstring = parse(module.__doc__)
 
-        if not parser._commands:
-            parser._commands = parser.add_subparsers(dest=module_name)
-        command = parser._commands
+        if not parser:
+            parser = self  # type: ignore
+        if not any(isinstance(x, _SubParsersAction) for x in parser._actions):
+            parser.add_subparsers(dest=module_name)
+        command = next(
+            (x for x in parser._actions if isinstance(x, _SubParsersAction)),
+            None,
+        )
 
         subcommand = command.add_parser(
             module_name.replace('_', '-'), help=docstring.short_description,
@@ -181,7 +187,9 @@ class Parser(ArgumentParser):
         self.add_commands(module, exclude_prefix, subcommand)
         return self
 
-    def __set_module_arguments(self, fn, ns):
+    def __set_module_arguments(
+        self, fn: Callable[[F], F], ns: Namespace
+    ) -> Namespace:
         '''Separe module arguments from functions.'''
         if 'mod' in ns:
             mod = vars(ns).pop('mod')
@@ -202,7 +210,7 @@ class Parser(ArgumentParser):
 
     def retrieve(
         self, args: Sequence[str] = None, ns: Optional[str] = None,
-    ) -> Callable[[F], F]:
+    ) -> None:
         '''Retrieve values from CLI.'''
         main_ns, main_args = self.parse_known_args(args, ns)
         if main_args == [] and 'fn' in vars(main_ns):
@@ -213,6 +221,7 @@ class Parser(ArgumentParser):
                 a.append(vars(main_ns)['mod'].__name__.split('.')[-1])
                 a.append('--help')
             self.parse_args(a)
+            return None
 
     def dispatch(
         self, args: Sequence[str] = None, ns: Optional[str] = None,

@@ -5,8 +5,10 @@
 
 Attributes
 ----------
-example_variable: str
-    Example variable for testing
+example_variable1: str
+    first example variable for testing
+example_variable2: str
+    second example variable for testing
 
 '''
 example_variable1 = 'test1'

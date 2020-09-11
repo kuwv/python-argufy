@@ -7,8 +7,6 @@ from argufy import Parser
 
 from . import cmd1, cmd2
 
-# example_variable = 'ex_var'
-
 
 def main():
     parser = Parser()
