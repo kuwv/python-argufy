@@ -1,58 +1,60 @@
 # Welcome to Argufy
 
-Argufy is a command line interface (CLI) written in Python.
+Inspection-based command line interface (CLI) written in Python.
 
 ## Overview
 
+Argufy is built around Argparse to create CLI's. First, inspection is used
+to determine each command and arguments to be created. Next, docstrings
+are parsed to fill in any additional settings.
+
 ## Motivation
 
-Argufy was created because there wasn't a parser that built on what I believed are
-some real strenths of Python. Inspection is a really powerfull tool and I wanted
-a CLI that would be updated with minimal effort. Argufy does this by building
-CLI's from the functions directly. It then parses docstrings to fill in any
-additional content to create a parser.
+This parser was created because there wasn't a parser that built on what I
+believed are some real strenths of Python. Inspection is a really powerfull
+tool and I wanted a CLI that would be updated with minimal effort. Argufy
+does this by building CLI's from the functions directly. It then parses
+docstrings to fill in any additional content to create a parser.
 
 In short, the more code-complete your application is the more complete the CLI.
 
 ## Features
 
-- [x] Dispatch commands arguments to requests functions.
 - [x] Generate commands from functions within modules
-    - [x] Docstrings
-        - [x] Arguments
-        - [x] Defaults
-        - [x] Help
-        - [x] Types
+    - [x] Dispatch commands arguments to functions
+    - [x] Create arguments from function
     - [x] Type Hints
-        - [x] Arguments
+        - [x] Defaults
+        - [x] Help (N/A)
+        - [x] Types
+    - [x] Docstrings
         - [x] Defaults
         - [x] Help
         - [x] Types
 
 - [x] Generate subcommands / arguments from modules
+    - [ ] Create subcommand arguments from module arguments
     - [ ] Set module arguments
-    - [ ] Docstrings
-        - [x] Arguments
-        - [ ] Defaults
-        - [x] Help
-        - [ ] Types
     - [ ] Type Hints
-        - [ ] Arguments
         - [x] Defaults
         - [ ] Help (N/A)
         - [ ] Types
+    - [ ] Docstrings
+        - [ ] Defaults
+        - [x] Help
+        - [ ] Types
 
 - [ ] Generate subcommands / arguments from objects
+    - [ ] Dispatch commands arguments to functions
+    - [ ] Create subcommand arguments from instance arguments
     - [ ] Set instance arguments
-    - [ ] Docstrings
-        - [ ] Arguments
+    - [ ] Type Hints
         - [ ] Defaults
         - [ ] Help
         - [ ] Types
-    - [ ] Type Hints
-        - [ ] Arguments
+    - [ ] Docstrings
         - [ ] Defaults
-        - [ ] Help (N/A)
+        - [ ] Help
         - [ ] Types
 
 ## Alternatives
