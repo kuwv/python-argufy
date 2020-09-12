@@ -14,7 +14,7 @@ example_variable = 'ex_var'
 
 
 def example_bool(bool_check: bool = False):
-    '''Example bool.
+    '''Demonstate example bool.
 
     Parameters
     ----------
@@ -26,7 +26,7 @@ def example_bool(bool_check: bool = False):
 
 
 def example_choice(choice_check: str = 'A'):
-    '''Example choice.
+    '''Demonstrate example choice.
 
     Parameters
     ----------

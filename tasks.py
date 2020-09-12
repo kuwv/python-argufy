@@ -141,6 +141,23 @@ def version(  # type: ignore
 
 
 @task
+def doc_lint(ctx):
+    '''Check code for documentation errors.'''
+    ctx.run('pydocstyle')
+
+@task
+def doc_coverage(ctx):
+    '''Ensure all code is documented.'''
+    ctx.run('docstr-coverage **/*.py')
+
+
+@task
+def doc_publish(ctx):
+    '''Publish project documentation.'''
+    ctx.run('mkdocs gh-deploy')
+
+
+@task
 def publish(ctx):  # type: ignore
     '''Publish project distribution.'''
     ctx.run('flit publish')

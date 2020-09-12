@@ -14,6 +14,7 @@ module = sys.modules[__name__]
 
 
 def example_simple(check):
+    '''Example demonstrating minimal CLI.'''
     pass
 
 
@@ -61,6 +62,7 @@ def test_argument_simple():
 
 
 def test_argument_bool():
+    '''Test simple boolean.'''
     name, fn = [
         x for x in getmembers(module, isfunction) if x[0] == 'example_bool'
     ][0]
@@ -79,6 +81,7 @@ def test_argument_bool():
 
 
 def test_argument_choice():
+    '''Test simple character.'''
     name, fn = [
         x for x in getmembers(module, isfunction) if x[0] == 'example_choice'
     ][0]

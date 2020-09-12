@@ -78,6 +78,7 @@ class Parser(ArgumentParser):
 
     @staticmethod
     def __get_parent_module() -> ModuleType:
+        '''Get parent name importing this module.'''
         module = None
         stack = inspect.stack()
         stack_frame = stack[1]

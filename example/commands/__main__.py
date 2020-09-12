@@ -11,6 +11,7 @@ example_variable = 'ex_var'
 
 
 def main():
+    '''Demonstrate main with CLI.'''
     parser = Parser()
     parser.add_commands(command)
     parser.dispatch()
