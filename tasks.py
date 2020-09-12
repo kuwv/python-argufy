@@ -42,6 +42,12 @@ def format(ctx, check=True):  # type: ignore
 
 
 @task
+def doc_lint(ctx):
+    '''Check code for documentation errors.'''
+    ctx.run('pydocstyle')
+
+
+@task(post=[doc_lint])
 def lint(ctx):  # type: ignore
     '''Check project source code for linting errors.'''
     ctx.run('flake8')
@@ -75,12 +81,24 @@ def static_analysis(ctx):  # type: ignore
 
 
 @task
+def doc_coverage(ctx):
+    '''Ensure all code is documented.'''
+    ctx.run('docstr-coverage **/*.py')
+
+
+@task(post=[doc_coverage])
 def coverage(ctx, report=None):  # type: ignore
     '''Perform coverage checks for tests.'''
     args = ['--cov=argufy']
     if report:
         args.append('--cov-report={}'.format(report))
     ctx.run("pytest {} ./tests/".format(' '.join(args)))
+
+
+@task(pre=[doc_lint], post=[doc_coverage])
+def doc_test(ctx):
+    '''Test documentation build.'''
+    ctx.run('mkdocs build')
 
 
 @task(pre=[format, lint, unit_test, static_analysis, coverage])
@@ -90,6 +108,12 @@ def test(ctx):  # type: ignore
 
 
 @task
+def doc_build(ctx):
+    '''Build documentation site.'''
+    ctx.run('mkdocs build')
+
+
+@task(post=[doc_build])
 def build(ctx, format=None):  # type: ignore
     '''Build wheel package.'''
     if format:
@@ -145,11 +169,6 @@ def doc_lint(ctx):
     '''Check code for documentation errors.'''
     ctx.run('pydocstyle')
 
-@task
-def doc_coverage(ctx):
-    '''Ensure all code is documented.'''
-    ctx.run('docstr-coverage **/*.py')
-
 
 @task
 def doc_publish(ctx):
@@ -157,7 +176,7 @@ def doc_publish(ctx):
     ctx.run('mkdocs gh-deploy')
 
 
-@task
+@task(post=[doc_publish])
 def publish(ctx):  # type: ignore
     '''Publish project distribution.'''
     ctx.run('flit publish')
