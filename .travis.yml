@@ -6,6 +6,7 @@ stages:
   - test
   - name: deploy
     if: tag IS present
+  - docsite
   - coverage
 
 before_install:
@@ -19,10 +20,11 @@ jobs:
   fast_finish: true
   include:
     - stage: test
-      script: inv format --check
-    - script: inv lint
-    - script: inv unit-test
-    - script: inv static-analysis
+      script:
+        - inv qa.format --check
+        - inv qa.lint
+        - inv qa.unit-test
+        - inv qa.static-analysis
 
     - stage: deploy
       script: poetry config pypi-token.pypi $PYPI_TOKEN
@@ -34,7 +36,20 @@ jobs:
         on:
           tags: true
 
+    - stage: docsite
+      script:
+        - inv doc.lint
+        - inv doc.test
+        - inv doc.coverage  
+      deploy:
+        provider: pages
+        github_token: $GITHUB_TOKEN
+        skip_cleanup: true
+        keep_history: true
+        on:
+          branch: master
+
     - stage: coverage
       script:
-        - inv coverage --report=xml
+        - inv qa.coverage --report=xml
         - bash <(curl -s https://codecov.io/bash)

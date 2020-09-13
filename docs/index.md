@@ -18,45 +18,6 @@ docstrings to fill in any additional content to create a parser.
 
 In short, the more code-complete your application is the more complete the CLI.
 
-## Features
-
-- [x] Generate commands from functions within modules
-    - [x] Dispatch commands arguments to functions
-    - [x] Create arguments from function
-    - [x] Type Hints
-        - [x] Defaults
-        - [x] Help (N/A)
-        - [x] Types
-    - [x] Docstrings
-        - [x] Defaults
-        - [x] Help
-        - [x] Types
-
-- [x] Generate subcommands / arguments from modules
-    - [ ] Create subcommand arguments from module arguments
-    - [ ] Set module arguments
-    - [ ] Type Hints
-        - [x] Defaults
-        - [ ] Help (N/A)
-        - [ ] Types
-    - [ ] Docstrings
-        - [ ] Defaults
-        - [x] Help
-        - [ ] Types
-
-- [ ] Generate subcommands / arguments from objects
-    - [ ] Dispatch commands arguments to functions
-    - [ ] Create subcommand arguments from instance arguments
-    - [ ] Set instance arguments
-    - [ ] Type Hints
-        - [ ] Defaults
-        - [ ] Help
-        - [ ] Types
-    - [ ] Docstrings
-        - [ ] Defaults
-        - [ ] Help
-        - [ ] Types
-
 ## Alternatives
 
 There are multiple alternatives such as Click and Docpopt. These are
