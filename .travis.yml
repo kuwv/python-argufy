@@ -3,10 +3,10 @@ language: python
 cache: pip
 
 stages:
-  - test
+  - quality-assurance
   - name: deploy
     if: tag IS present
-  - docsite
+  - documentation
   - coverage
 
 before_install:
@@ -19,7 +19,7 @@ install:
 jobs:
   fast_finish: true
   include:
-    - stage: test
+    - stage: quality-assurance
       script:
         - inv qa.autoformat --check
         - inv qa.lint
@@ -36,14 +36,16 @@ jobs:
         on:
           tags: true
 
-    - stage: docsite
+    - stage: documentation
       script:
         - inv doc.lint
         - inv doc.test
-        - inv doc.coverage  
+        - inv doc.coverage
+        - inc doc.build
       deploy:
         provider: pages
         github_token: $GITHUB_TOKEN
+        local_dir: site
         skip_cleanup: true
         keep_history: true
         on:
