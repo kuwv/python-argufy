@@ -41,7 +41,7 @@ jobs:
         - inv doc.lint
         - inv doc.test
         - inv doc.coverage
-        - inc doc.build
+        - inv doc.build
       deploy:
         provider: pages
         github_token: $GITHUB_TOKEN
