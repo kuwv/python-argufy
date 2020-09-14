@@ -11,10 +11,10 @@ are parsed to fill in any additional settings.
 ## Motivation
 
 This parser was created because there wasn't a parser that built on what I
-believed are some real strenths of Python. Inspection is a really powerfull
-tool and I wanted a CLI that would be updated with minimal effort. Argufy
-does this by building CLI's from the functions directly. It then parses
-docstrings to fill in any additional content to create a parser.
+believed are some real strenths of Python.
+
+Inspection is a really powerfull tool and I wanted a CLI that would be updated with minimal effort. Argufy
+does this by building CLI's from the functions directly. It then parses docstrings to fill in any additional content to create a parser.
 
 In short, the more code-complete your application is the more complete the CLI.
 
@@ -36,7 +36,7 @@ great options but each have their own trade-offs.
     requires that your code be wrapped with the decorators. This is
     less usefull when needing the tools to function also as a library.
 
-=== "Dockopt"
+=== "Docopt"
     Docopt is another great option for CLI parsers and is similar in
     scope to Argufy. It works by parsing docstrings directly in the 
     main module of an applications. A CLI is created by adding the 

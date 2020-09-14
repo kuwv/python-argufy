@@ -1,5 +1,4 @@
 # python-argufy
----------------
 
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 [![Build Status](https://travis-ci.org/kuwv/python-argufy.svg?branch=master)](https://travis-ci.org/kuwv/python-argufy)
@@ -7,11 +6,15 @@
 
 ## Overview
 
-Inspection based parser built on argparse. Build complex CLI interfaces by writing more code-complete applications.
+Inspection based parser built on argparse. Build complex CLI interfaces by  
+writing more code-complete applications.
 
 ## Motivation
 
-Argufy is designed to be an alternative to decorator based parsers such as Click. Decorators have limitations that prevent effective use of inspection without drawbacks. This parser easilly allows a CLI to be created with minimal effort while enabling inspection.
+Argufy is designed to be an alternative to decorator based parsers such as  
+Click. Decorators have limitations that prevent effective use of inspection  
+without drawbacks. This parser easilly allows a CLI to be created with minimal  
+effort while enabling inspection.
 
 ## Install
 

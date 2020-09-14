@@ -38,13 +38,14 @@ plugins:
 
 nav:
   - Overview: index.md
-  - Roadmap: roadmap.md
+  - Getting Started: getting-started.md
   - Parsers:
       - commands.md
       - subcommands.md
   - Arguments:
       - type-hints.md
       - docstrings.md
+  - Roadmap: roadmap.md
   - Development:
       - development/parser.md
       - development/argument.md
