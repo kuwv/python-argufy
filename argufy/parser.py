@@ -102,7 +102,7 @@ class Parser(ArgumentParser):
             )
             # print('sig:', signature.parameters[arg])
             name = argument.attributes.pop('name')
-            parser.add_argument(*name, **argument.attributes)  # type: ignore
+            parser.add_argument(*name, **argument.attributes)
         return self
 
     def add_commands(
