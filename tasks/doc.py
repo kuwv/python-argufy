@@ -3,34 +3,34 @@
 # license: Apache 2.0, see LICENSE for more details.
 '''Provide documentation tasks.'''
 
-from invoke import Context, task
+from invoke import task
 
 
 @task
-def lint(ctx: Context) -> None:
+def lint(ctx):  # type: ignore
     '''Check code for documentation errors.'''
     ctx.run('pydocstyle')
 
 
 @task
-def coverage(ctx: Context) -> None:
+def coverage(ctx):  # type: ignore
     '''Ensure all code is documented.'''
     ctx.run('docstr-coverage **/*.py')
 
 
 @task(pre=[lint], post=[coverage])
-def test(ctx: Context) -> None:
+def test(ctx):  # type: ignore
     '''Test documentation build.'''
     ctx.run('mkdocs build')
 
 
 @task
-def build(ctx: Context) -> None:
+def build(ctx):  # type: ignore
     '''Build documentation site.'''
     ctx.run('mkdocs build')
 
 
 @task
-def publish(ctx: Context) -> None:
+def publish(ctx):  # type: ignore
     '''Publish project documentation.'''
     ctx.run('mkdocs gh-deploy')
