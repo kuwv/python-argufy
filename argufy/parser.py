@@ -140,7 +140,7 @@ class Parser(ArgumentParser):
                     ):
                         cmd = command.add_parser(
                             name.replace('_', '-'),
-                            help=docstring.short_description,
+                            help=parse(value.__doc__).short_description,
                         )
                         cmd.set_defaults(fn=value)
                         self.add_arguments(value, cmd)

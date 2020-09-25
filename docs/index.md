@@ -4,9 +4,11 @@ Inspection-based command line interface (CLI) written in Python.
 
 ## Overview
 
-Argufy is built around Argparse to create CLI's. First, inspection is used
-to determine each command and arguments to be created. Next, docstrings
-are parsed to fill in any additional settings.
+Argufy is built around Argparse to create CLI's.
+
+First, inspection is used to determine each command and arguments to be created.
+
+Next, docstrings are parsed to fill in any additional settings.
 
 ## Motivation
 
