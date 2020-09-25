@@ -1,14 +1,15 @@
-from argufy import Parser
 import sys
+
+from argufy import Parser
 
 module = sys.modules[__name__]
 
 
-def example_bool(bool_check = False):
+def example_bool(bool_check=False):
     print(bool_check)
 
 
-def example_choice(choice_check = 'A'):
+def example_choice(choice_check='A'):
     print(choice_check)
 
 
