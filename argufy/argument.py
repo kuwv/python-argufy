@@ -81,17 +81,17 @@ class Argument:
     @metavar.setter
     def metavar(self, metavar: str) -> None:
         '''Set argparse argument metavar.'''
-        if self.attributes['type'] != bool or self.__type != bool:
-            self.attributes['metavar'] = metavar
-            self.__metavar = metavar
+        # if self.attributes.get('type', None) != bool:
+        self.attributes['metavar'] = metavar
+        self.__metavar = metavar
 
     @property
-    def type(self) -> str:
+    def type(self) -> Any:
         '''Get argparse argument type.'''
         return self.__type
 
     @type.setter
-    def type(self, kind: str) -> None:
+    def type(self, kind: Any) -> None:
         '''Set argparse argument type.'''
         self.attributes['type'] = kind
         self.__type = kind
