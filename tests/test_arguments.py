@@ -102,10 +102,10 @@ def test_argument_choice():
     assert arguments[0].default == 'A'
 
 
-def argument_full(
+def argument_all(
     string_check: str = 'A',
     bool_check: bool = False,
-    integer_check = 1,
+    integer_check=1,
     float_check: float = 1.5,
     list_check: list = ['A'],
     set_check: set = {'a'},
@@ -135,10 +135,10 @@ def argument_full(
     pass
 
 
-def test_argument_full():
+def test_argument_all():
     '''Test full type set.'''
     name, fn = [
-        x for x in getmembers(module, isfunction) if x[0] == 'argument_full'
+        x for x in getmembers(module, isfunction) if x[0] == 'argument_all'
     ][0]
     sig = signature(fn)
     document = parse(fn.__doc__)

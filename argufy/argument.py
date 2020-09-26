@@ -31,6 +31,7 @@ class Argument:
         else:
             annotation = None
 
+        print(annotation)
         if type(annotation) == bool:
             # NOTE: these store type internally
             if self.attributes.get('default'):
