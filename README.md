@@ -68,7 +68,7 @@ usage: command [-h] {example} ...
 
 positional arguments:
   {example}
-    example             Provide and example command.
+    example             Provide an example command.
 
 optional arguments:
   -h, --help            show this help message and exit
