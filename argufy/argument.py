@@ -31,8 +31,8 @@ class Argument:
         else:
             annotation = None
 
-        print(annotation)
-        if type(annotation) == bool:
+        # print('prematched annotation:', annotation)
+        if annotation == bool:
             # NOTE: these store type internally
             if self.attributes.get('default'):
                 self.action = 'store_false'
@@ -45,13 +45,17 @@ class Argument:
             self.type = annotation
             self.nargs = '+'
         elif type(annotation) == tuple:
+            print('tuple executed')
             self.type = annotation[0]
             if type(annotation[1]) == set:
                 self.choices = annotation[1]
         else:
+            # print('unmatched annotation:', annotation)
             self.type = annotation
 
-        self.metavar = (parameters.name).upper()
+        if annotation:
+            self.metavar = (annotation.__name__).upper()
+
         if docstring:
             self.help = docstring.description
 
@@ -66,6 +70,7 @@ class Argument:
         if 'default' not in self.attributes:
             self.attributes['name'] = [name]
             self.__name = [name]
+            self.__positional_argument = True
         else:
             names = ['--' + name]
             if '-' not in name:
@@ -73,6 +78,7 @@ class Argument:
                 names.append('-' + name[:1])
             self.attributes['name'] = names
             self.__name = names
+            self.__positional_argument = False
 
     @property
     def metavar(self) -> str:
@@ -83,8 +89,9 @@ class Argument:
     def metavar(self, metavar: str) -> None:
         '''Set argparse argument metavar.'''
         # if self.attributes.get('type', None) != bool:
-        self.attributes['metavar'] = metavar
-        self.__metavar = metavar
+        if self.__positional_argument:
+            self.attributes['metavar'] = metavar
+            self.__metavar = metavar
 
     @property
     def type(self) -> Any:

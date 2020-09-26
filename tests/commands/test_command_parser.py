@@ -53,7 +53,7 @@ def test_bool():
     '''Do main function for CLI.'''
     parser = Parser()
     parser.add_commands(module, ['test_'])
-    parser.dispatch(['example-bool', '--bool-check', 'True'])
+    parser.dispatch(['example-bool', '--bool-check'])
 
 
 def test_choice():

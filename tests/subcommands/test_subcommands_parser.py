@@ -56,8 +56,7 @@ def test_bool():
     parser.dispatch([
         'test-subcommands-parser',
         'example-bool',
-        '--bool-check',
-        'True'
+        '--bool-check'
     ])
 
 
