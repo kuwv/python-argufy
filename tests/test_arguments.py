@@ -105,7 +105,7 @@ def test_argument_choice():
 def argument_full(
     string_check: str = 'A',
     bool_check: bool = False,
-    integer_check: int = 1,
+    integer_check = 1,
     float_check: float = 1.5,
     list_check: list = ['A'],
     set_check: set = {'a'},

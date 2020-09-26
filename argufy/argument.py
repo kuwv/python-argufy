@@ -32,15 +32,15 @@ class Argument:
             annotation = None
 
         if type(annotation) == bool:
-            # Note: these store type internally
+            # NOTE: these store type internally
             if self.attributes.get('default'):
                 self.action = 'store_false'
             else:
                 self.action = 'store_true'
-        elif type(annotation) == int:
+        elif annotation == int:
             self.type = annotation
             self.action = 'append'
-        elif type(annotation) == list:
+        elif annotation == list:
             self.type = annotation
             self.nargs = '+'
         elif type(annotation) == tuple:
