@@ -615,7 +615,8 @@ __init__<span class="p">(</span><span class="bp">self</span><span class="p">,</s
 52
 53
 54
-55</pre>
+55
+56</pre>
 </div>
 </td>
 <td class="code">
@@ -639,16 +640,17 @@ __init__<span class="p">(</span><span class="bp">self</span><span class="p">,</s
     <span class="k">else</span><span class="p">:</span>
         <span class="n">annotation</span> <span class="o">=</span> <span class="kc">None</span>
 
+    <span class="nb">print</span><span class="p">(</span><span class="n">annotation</span><span class="p">)</span>
     <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">annotation</span><span class="p">)</span> <span class="o">==</span> <span class="nb">bool</span><span class="p">:</span>
-        <span class="c1"># Note: these store type internally</span>
+        <span class="c1"># NOTE: these store type internally</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">attributes</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'default'</span><span class="p">):</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">action</span> <span class="o">=</span> <span class="s1">'store_false'</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">action</span> <span class="o">=</span> <span class="s1">'store_true'</span>
-    <span class="k">elif</span> <span class="nb">type</span><span class="p">(</span><span class="n">annotation</span><span class="p">)</span> <span class="o">==</span> <span class="nb">int</span><span class="p">:</span>
+    <span class="k">elif</span> <span class="n">annotation</span> <span class="o">==</span> <span class="nb">int</span><span class="p">:</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">type</span> <span class="o">=</span> <span class="n">annotation</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">action</span> <span class="o">=</span> <span class="s1">'append'</span>
-    <span class="k">elif</span> <span class="nb">type</span><span class="p">(</span><span class="n">annotation</span><span class="p">)</span> <span class="o">==</span> <span class="nb">list</span><span class="p">:</span>
+    <span class="k">elif</span> <span class="n">annotation</span> <span class="o">==</span> <span class="nb">list</span><span class="p">:</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">type</span> <span class="o">=</span> <span class="n">annotation</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">nargs</span> <span class="o">=</span> <span class="s1">'+'</span>
     <span class="k">elif</span> <span class="nb">type</span><span class="p">(</span><span class="n">annotation</span><span class="p">)</span> <span class="o">==</span> <span class="nb">tuple</span><span class="p">:</span>
