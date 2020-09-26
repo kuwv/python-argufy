@@ -57,7 +57,8 @@ def test_argument_simple():
         arguments.append(
             Argument(parameters=sig.parameters[arg], docstring=document)
         )
-    # print('Arguments: ', arguments[0].__dict__)
+    print('Arguments: ', arguments[0].__dict__)
+    assert arguments[0].attributes.get('metavar') == 'CHECK'
     assert arguments[0].attributes.get('default', None) is None
 
 
@@ -76,7 +77,7 @@ def test_argument_bool():
         arguments.append(
             Argument(parameters=sig.parameters[arg], docstring=document)
         )
-    # print(arguments[0].__dict__)
+    print(arguments[0].__dict__)
     assert arguments[0].attributes['default'] is False
 
 
@@ -95,5 +96,7 @@ def test_argument_choice():
         arguments.append(
             Argument(parameters=sig.parameters[arg], docstring=docstring)
         )
-    # print(arguments[0].__dict__)
+    print(arguments[0].__dict__) 
+    assert arguments[0].attributes['metavar'] == 'CHOICE_CHECK'
+    assert arguments[0].attributes['help'] == 'example choice'
     assert arguments[0].attributes['default'] == 'A'

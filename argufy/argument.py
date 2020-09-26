@@ -69,7 +69,7 @@ class Argument:
             names = ['--' + name]
             if '-' not in name:
                 # TODO: check against default names
-                names.append(name[:1])
+                names.append('-' + name[:1])
             self.attributes['name'] = names
             self.__name = names
 
