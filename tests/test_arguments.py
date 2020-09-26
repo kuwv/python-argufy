@@ -158,7 +158,7 @@ def test_argument_full():
     print(arguments[1].__dict__)
     assert arguments[1].metavar == 'BOOL_CHECK'
     assert arguments[1].help == 'argument bool'
-    assert arguments[1].default == False
+    assert arguments[1].default is False
 
     print(arguments[2].__dict__)
     assert arguments[2].metavar == 'INTEGER_CHECK'
