@@ -30,11 +30,9 @@ class Argument:
             annotation = parameters.annotation
             self.type = annotation
         if docstring and docstring.type_name:
-            print(docstring.type_name)
+            # print(docstring.type_name)
             if ',' in docstring.type_name:
                 args = docstring.type_name.split(',', 1)
-                for x in args:
-                    print(x)
                 if not annotation:
                     a = args.pop(0)
                     if a in types:
@@ -49,8 +47,9 @@ class Argument:
         # if docstring:
         #     print('docstring:', docstring.__dict__)
 
-        # if annotation:
-        #     self.metavar = (annotation.__name__).upper()
+        if annotation:
+            print('metavar annotation:', annotation)
+            self.metavar = (annotation.__name__).upper()
 
         if docstring:
             self.help = docstring.description
@@ -86,9 +85,11 @@ class Argument:
     def metavar(self, metavar: str) -> None:
         '''Set argparse argument metavar.'''
         # if self.attributes.get('type', None) != bool:
+        print(self.__positional_argument)
         if self.__positional_argument:
             self.attributes['metavar'] = metavar
             self.__metavar = metavar
+            print('metavar:', self.__metavar)
 
     @property
     def type(self) -> Any:
@@ -123,8 +124,6 @@ class Argument:
             # print('unmatched annotation:', annotation)
             self.attributes['type'] = annotation
             self.__type = annotation
-        if annotation != bool:
-            print(self.__type)
 
     @property
     def const(self) -> str:
