@@ -103,7 +103,7 @@ def test_argument_choice():
 
 
 def argument_full(
-    string_check: str = 'A',
+    string_check='A',
     bool_check: bool = False,
     integer_check: int = 1,
     float_check: float = 1.5,
@@ -155,32 +155,32 @@ def test_argument_full():
     assert arguments[0].help == 'argument string'
     assert arguments[0].default == 'A'
 
-    print(arguments[1].__dict__)
+    # print(arguments[1].__dict__)
     # assert arguments[1].metavar == 'BOOL_CHECK'
     assert arguments[1].help == 'argument bool'
     assert arguments[1].default is False
 
-    print(arguments[2].__dict__)
+    # print(arguments[2].__dict__)
     # assert arguments[2].metavar == 'INTEGER_CHECK'
     assert arguments[2].help == 'argument int'
     assert arguments[2].default == 1
 
-    print(arguments[3].__dict__)
+    # print(arguments[3].__dict__)
     # assert arguments[3].metavar == 'FLOAT_CHECK'
     assert arguments[3].help == 'argument float'
     assert arguments[3].default == 1.5
 
-    print(arguments[4].__dict__)
+    # print(arguments[4].__dict__)
     # assert arguments[4].metavar == 'LIST_CHECK'
     assert arguments[4].help == 'argument list'
     assert arguments[4].default == ['A']
 
-    print(arguments[5].__dict__)
+    # print(arguments[5].__dict__)
     # assert arguments[5].metavar == 'SET_CHECK'
     assert arguments[5].help == 'argument set'
     assert arguments[5].default == {'a'}
 
-    print(arguments[6].__dict__)
+    # print(arguments[6].__dict__)
     # assert arguments[6].metavar == 'TUPLE_CHECK'
     assert arguments[6].help == 'argument tuple'
     assert arguments[6].default == ('A',)

@@ -12,6 +12,8 @@ from docstring_parser.common import DocstringParam
 class Argument:
     '''Represent argparse arguments.'''
 
+    types = ('float', 'int', 'str', 'list', 'dict', 'tuple', 'set')
+
     def __init__(
         self,
         parameters: Type[inspect.Parameter],
@@ -23,38 +25,30 @@ class Argument:
         self.default = parameters.default
         self.name = parameters.name.replace('_', '-')  # type: ignore
 
+        annotation = None
         if parameters.annotation != inspect._empty:  # type: ignore
             annotation = parameters.annotation
-        elif docstring and docstring.type_name:
-            # TODO: There has to be a cleaner way
-            annotation = eval(docstring.type_name)  # nosec
-        else:
-            annotation = None
+            self.type = annotation
+        if docstring and docstring.type_name:
+            print(docstring.type_name)
+            if ',' in docstring.type_name:
+                args = docstring.type_name.split(',', 1)
+                for x in args:
+                    print(x)
+                if not annotation:
+                    a = args.pop(0)
+                    if a in self.types:
+                        annotation = eval(a)
+                        self.type = annotation
+            if not annotation:
+                # TODO: There has to be a cleaner way
+                annotation = eval(docstring.type_name)  # nosec
 
-        # print('prematched annotation:', annotation)
-        if annotation == bool:
-            # NOTE: these store type internally
-            if self.attributes.get('default'):
-                self.action = 'store_false'
-            else:
-                self.action = 'store_true'
-        elif annotation == int:
-            self.type = annotation
-            self.action = 'append'
-        elif annotation == list:
-            self.type = annotation
-            self.nargs = '+'
-        elif type(annotation) == tuple:
-            print('tuple executed')
-            self.type = annotation[0]
-            if type(annotation[1]) == set:
-                self.choices = annotation[1]
-        else:
-            # print('unmatched annotation:', annotation)
-            self.type = annotation
+        # if docstring:
+        #     print('docstring:', docstring.__dict__)
 
-        if annotation:
-            self.metavar = (annotation.__name__).upper()
+        # if annotation:
+        #     self.metavar = (annotation.__name__).upper()
 
         if docstring:
             self.help = docstring.description
@@ -73,9 +67,10 @@ class Argument:
             self.__positional_argument = True
         else:
             names = ['--' + name]
-            if '-' not in name:
-                # TODO: check against default names
-                names.append('-' + name[:1])
+            # TODO: Need to check other conflicting variables
+            # if '-' not in name:
+            #     # TODO: check against default names
+            #     names.append('-' + name[:1])
             self.attributes['name'] = names
             self.__name = names
             self.__positional_argument = False
@@ -99,10 +94,35 @@ class Argument:
         return self.__type
 
     @type.setter
-    def type(self, kind: Any) -> None:
+    def type(self, annotation: Any) -> None:
         '''Set argparse argument type.'''
-        self.attributes['type'] = kind
-        self.__type = kind
+        # print('prematched annotation:', annotation)
+        if annotation == bool:
+            # NOTE: these store bool type internally
+            if self.attributes.get('default'):
+                self.action = 'store_false'
+            else:
+                self.action = 'store_true'
+        elif annotation == int:
+            self.attributes['type'] = annotation
+            self.__type = annotation
+            self.action = 'append'
+        elif annotation == list:
+            self.attributes['type'] = annotation
+            self.__type = annotation
+            self.nargs = '+'
+        elif annotation == tuple:
+            self.attributes['type'] = annotation
+            self.__type = annotation
+        elif annotation == set:
+            self.attributes['type'] = annotation
+            self.__type = annotation
+        else:
+            # print('unmatched annotation:', annotation)
+            self.attributes['type'] = annotation
+            self.__type = annotation
+        if annotation != bool:
+            print(self.__type)
 
     @property
     def const(self) -> str:
