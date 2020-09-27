@@ -542,16 +542,7 @@ add_arguments<span class="p">(</span><span class="bp">self</span><span class="p"
 <tr>
 <td class="linenos">
 <div class="linenodiv">
-<pre><span></span> 88
- 89
- 90
- 91
- 92
- 93
- 94
- 95
- 96
- 97
+<pre><span></span> 97
  98
  99
 100
@@ -560,7 +551,17 @@ add_arguments<span class="p">(</span><span class="bp">self</span><span class="p"
 103
 104
 105
-106</pre>
+106
+107
+108
+109
+110
+111
+112
+113
+114
+115
+116</pre>
 </div>
 </td>
 <td class="code">
@@ -581,8 +582,9 @@ add_arguments<span class="p">(</span><span class="bp">self</span><span class="p"
             <span class="n">signature</span><span class="o">.</span><span class="n">parameters</span><span class="p">[</span><span class="n">arg</span><span class="p">],</span> <span class="n">description</span>  <span class="c1"># type: ignore</span>
         <span class="p">)</span>
         <span class="c1"># print('sig:', signature.parameters[arg])</span>
-        <span class="n">name</span> <span class="o">=</span> <span class="n">argument</span><span class="o">.</span><span class="n">attributes</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">'name'</span><span class="p">)</span>
-        <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="o">*</span><span class="n">name</span><span class="p">,</span> <span class="o">**</span><span class="n">argument</span><span class="o">.</span><span class="n">attributes</span><span class="p">)</span>
+        <span class="n">arguments</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__get_args</span><span class="p">(</span><span class="n">argument</span><span class="p">)</span>
+        <span class="n">name</span> <span class="o">=</span> <span class="n">arguments</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">'name'</span><span class="p">)</span>
+        <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="o">*</span><span class="n">name</span><span class="p">,</span> <span class="o">**</span><span class="n">arguments</span><span class="p">)</span>
     <span class="k">return</span> <span class="bp">self</span>
 </code></pre>
 </div>
@@ -605,17 +607,7 @@ add_commands<span class="p">(</span><span class="bp">self</span><span class="p">
 <tr>
 <td class="linenos">
 <div class="linenodiv">
-<pre><span></span>108
-109
-110
-111
-112
-113
-114
-115
-116
-117
-118
+<pre><span></span>118
 119
 120
 121
@@ -660,7 +652,18 @@ add_commands<span class="p">(</span><span class="bp">self</span><span class="p">
 160
 161
 162
-163</pre>
+163
+164
+165
+166
+167
+168
+169
+170
+171
+172
+173
+174</pre>
 </div>
 </td>
 <td class="code">
@@ -718,8 +721,9 @@ add_commands<span class="p">(</span><span class="bp">self</span><span class="p">
                 <span class="p">)</span>
                 <span class="c1"># print(name, parameters, description)</span>
                 <span class="n">argument</span> <span class="o">=</span> <span class="n">Argument</span><span class="p">(</span><span class="n">parameters</span><span class="p">,</span> <span class="n">description</span><span class="p">)</span>
-                <span class="n">name</span> <span class="o">=</span> <span class="n">argument</span><span class="o">.</span><span class="n">attributes</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">'name'</span><span class="p">)</span>
-                <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="o">*</span><span class="n">name</span><span class="p">,</span> <span class="o">**</span><span class="n">argument</span><span class="o">.</span><span class="n">attributes</span><span class="p">)</span>
+                <span class="n">arguments</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__get_args</span><span class="p">(</span><span class="n">argument</span><span class="p">)</span>
+                <span class="n">name</span> <span class="o">=</span> <span class="n">arguments</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">'name'</span><span class="p">)</span>
+                <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="o">*</span><span class="n">name</span><span class="p">,</span> <span class="o">**</span><span class="n">arguments</span><span class="p">)</span>
     <span class="k">return</span> <span class="bp">self</span>
 </code></pre>
 </div>
@@ -742,18 +746,7 @@ add_subcommands<span class="p">(</span><span class="bp">self</span><span class="
 <tr>
 <td class="linenos">
 <div class="linenodiv">
-<pre><span></span>165
-166
-167
-168
-169
-170
-171
-172
-173
-174
-175
-176
+<pre><span></span>176
 177
 178
 179
@@ -766,7 +759,18 @@ add_subcommands<span class="p">(</span><span class="bp">self</span><span class="
 186
 187
 188
-189</pre>
+189
+190
+191
+192
+193
+194
+195
+196
+197
+198
+199
+200</pre>
 </div>
 </td>
 <td class="code">
@@ -817,17 +821,17 @@ dispatch<span class="p">(</span><span class="bp">self</span><span class="p">,</s
 <tr>
 <td class="linenos">
 <div class="linenodiv">
-<pre><span></span>227
-228
-229
-230
-231
-232
-233
-234
-235
-236
-237</pre>
+<pre><span></span>238
+239
+240
+241
+242
+243
+244
+245
+246
+247
+248</pre>
 </div>
 </td>
 <td class="code">
@@ -864,20 +868,20 @@ retrieve<span class="p">(</span><span class="bp">self</span><span class="p">,</s
 <tr>
 <td class="linenos">
 <div class="linenodiv">
-<pre><span></span>212
-213
-214
-215
-216
-217
-218
-219
-220
-221
-222
-223
+<pre><span></span>223
 224
-225</pre>
+225
+226
+227
+228
+229
+230
+231
+232
+233
+234
+235
+236</pre>
 </div>
 </td>
 <td class="code">

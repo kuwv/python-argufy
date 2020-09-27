@@ -518,10 +518,7 @@ __init__<span class="p">(</span><span class="bp">self</span><span class="p">,</s
 49
 50
 51
-52
-53
-54
-55</pre>
+52</pre>
 </div>
 </td>
 <td class="code">
@@ -546,10 +543,10 @@ __init__<span class="p">(</span><span class="bp">self</span><span class="p">,</s
         <span class="k">if</span> <span class="s1">','</span> <span class="ow">in</span> <span class="n">docstring</span><span class="o">.</span><span class="n">type_name</span><span class="p">:</span>
             <span class="n">args</span> <span class="o">=</span> <span class="n">docstring</span><span class="o">.</span><span class="n">type_name</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">','</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="n">annotation</span><span class="p">:</span>
-                <span class="n">a</span> <span class="o">=</span> <span class="n">args</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
-                <span class="k">if</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">types</span><span class="p">:</span>
+                <span class="n">arg</span> <span class="o">=</span> <span class="n">args</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">arg</span> <span class="ow">in</span> <span class="n">types</span><span class="p">:</span>
                     <span class="c1"># NOTE: Limit input that eval will parse</span>
-                    <span class="n">annotation</span> <span class="o">=</span> <span class="nb">eval</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>  <span class="c1"># nosec</span>
+                    <span class="n">annotation</span> <span class="o">=</span> <span class="nb">eval</span><span class="p">(</span><span class="n">arg</span><span class="p">)</span>  <span class="c1"># nosec</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">type</span> <span class="o">=</span> <span class="n">annotation</span>
             <span class="c1"># TODO: Parse choices</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">annotation</span><span class="p">:</span>
@@ -557,11 +554,8 @@ __init__<span class="p">(</span><span class="bp">self</span><span class="p">,</s
             <span class="k">if</span> <span class="n">docstring</span><span class="o">.</span><span class="n">type_name</span> <span class="ow">in</span> <span class="n">types</span><span class="p">:</span>
                 <span class="n">annotation</span> <span class="o">=</span> <span class="nb">eval</span><span class="p">(</span><span class="n">docstring</span><span class="o">.</span><span class="n">type_name</span><span class="p">)</span>  <span class="c1"># nosec</span>
 
-    <span class="c1"># if docstring:</span>
-    <span class="c1">#     print('docstring:', docstring.__dict__)</span>
-
-    <span class="k">if</span> <span class="n">annotation</span> <span class="ow">and</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">default</span><span class="p">:</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">metavar</span> <span class="o">=</span> <span class="p">(</span><span class="n">annotation</span><span class="o">.</span><span class="vm">__name__</span><span class="p">)</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span>
+    <span class="c1"># if annotation and not self.default:</span>
+    <span class="c1">#     self.metavar = (annotation.__name__).upper()</span>
 
     <span class="k">if</span> <span class="n">docstring</span><span class="p">:</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">help</span> <span class="o">=</span> <span class="n">docstring</span><span class="o">.</span><span class="n">description</span>
