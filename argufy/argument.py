@@ -47,7 +47,7 @@ class Argument:
         # if docstring:
         #     print('docstring:', docstring.__dict__)
 
-        if annotation:
+        if annotation and not self.default:
             print('metavar annotation:', annotation)
             self.metavar = (annotation.__name__).upper()
 

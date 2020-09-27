@@ -97,7 +97,6 @@ def test_argument_choice():
             Argument(parameters=sig.parameters[arg], docstring=docstring)
         )
     # print(arguments[0].__dict__)
-    # assert arguments[0].metavar == 'CHOICE_CHECK'
     assert arguments[0].help == 'argument choice'
     assert arguments[0].default == 'A'
 
