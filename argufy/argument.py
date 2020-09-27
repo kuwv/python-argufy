@@ -79,7 +79,7 @@ class Argument:
     @metavar.setter
     def metavar(self, metavar: str) -> None:
         '''Set argparse argument metavar.'''
-        # if [n for n in self.name if not n.startswith('-')] != []:
+        # NOTE: Only positional arguments use metavars
         if not hasattr(self, 'default'):
             self.__metavar = metavar
 
