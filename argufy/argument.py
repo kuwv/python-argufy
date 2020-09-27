@@ -8,11 +8,11 @@ from typing import Any, Dict, List, Type
 
 from docstring_parser.common import DocstringParam
 
+types = ('float', 'int', 'str', 'list', 'dict', 'tuple', 'set')
+
 
 class Argument:
     '''Represent argparse arguments.'''
-
-    types = ('float', 'int', 'str', 'list', 'dict', 'tuple', 'set')
 
     def __init__(
         self,
@@ -37,12 +37,14 @@ class Argument:
                     print(x)
                 if not annotation:
                     a = args.pop(0)
-                    if a in self.types:
-                        annotation = eval(a)
+                    if a in types:
+                        # NOTE: Limit input that eval will parse
+                        annotation = eval(a)  # nosec
                         self.type = annotation
             if not annotation:
-                # TODO: There has to be a cleaner way
-                annotation = eval(docstring.type_name)  # nosec
+                # NOTE: Limit input that eval will parse
+                if docstring.type_name in types:
+                    annotation = eval(docstring.type_name)  # nosec
 
         # if docstring:
         #     print('docstring:', docstring.__dict__)
