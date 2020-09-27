@@ -483,9 +483,7 @@ __init__<span class="p">(</span><span class="bp">self</span><span class="p">,</s
 <tr>
 <td class="linenos">
 <div class="linenodiv">
-<pre><span></span>17
-18
-19
+<pre><span></span>19
 20
 21
 22
@@ -518,7 +516,9 @@ __init__<span class="p">(</span><span class="bp">self</span><span class="p">,</s
 49
 50
 51
-52</pre>
+52
+53
+54</pre>
 </div>
 </td>
 <td class="code">
@@ -554,8 +554,8 @@ __init__<span class="p">(</span><span class="bp">self</span><span class="p">,</s
             <span class="k">if</span> <span class="n">docstring</span><span class="o">.</span><span class="n">type_name</span> <span class="ow">in</span> <span class="n">types</span><span class="p">:</span>
                 <span class="n">annotation</span> <span class="o">=</span> <span class="nb">eval</span><span class="p">(</span><span class="n">docstring</span><span class="o">.</span><span class="n">type_name</span><span class="p">)</span>  <span class="c1"># nosec</span>
 
-    <span class="c1"># if annotation and not self.default:</span>
-    <span class="c1">#     self.metavar = (annotation.__name__).upper()</span>
+    <span class="k">if</span> <span class="n">annotation</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">metavar</span> <span class="o">=</span> <span class="p">(</span><span class="n">annotation</span><span class="o">.</span><span class="vm">__name__</span><span class="p">)</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span>
 
     <span class="k">if</span> <span class="n">docstring</span><span class="p">:</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">help</span> <span class="o">=</span> <span class="n">docstring</span><span class="o">.</span><span class="n">description</span>
