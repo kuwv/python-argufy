@@ -38,13 +38,13 @@ def test_argument_simple():
     assert arguments[0].attributes.get('default', None) is None
 
 
-def argument_bool(bool_check: bool = False):
+def argument_bool(check_false: bool = False, check_true: bool = True):
     '''Example bool.
 
     Parameters
     ----------
     bool_check: bool, optional
-        list packages and version
+        list packages and v1ersion
 
     '''
     pass
@@ -67,6 +67,7 @@ def test_argument_bool():
         )
     # print(arguments[0].__dict__)
     assert arguments[0].default is False
+    assert arguments[1].default is True
 
 
 def argument_choice(choice_check: str = 'A'):
@@ -149,7 +150,7 @@ def test_argument_full():
         arguments.append(
             Argument(parameters=sig.parameters[arg], docstring=docstring)
         )
-    print(arguments[0].__dict__)
+    # print(arguments[0].__dict__)
     assert arguments[0].help == 'argument string'
     assert arguments[0].default == 'A'
 

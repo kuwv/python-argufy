@@ -39,6 +39,7 @@ class Argument:
                         # NOTE: Limit input that eval will parse
                         annotation = eval(a)  # nosec
                         self.type = annotation
+                # TODO: Parse choices
             if not annotation:
                 # NOTE: Limit input that eval will parse
                 if docstring.type_name in types:
@@ -48,7 +49,6 @@ class Argument:
         #     print('docstring:', docstring.__dict__)
 
         if annotation and not self.default:
-            print('metavar annotation:', annotation)
             self.metavar = (annotation.__name__).upper()
 
         if docstring:
@@ -85,11 +85,9 @@ class Argument:
     def metavar(self, metavar: str) -> None:
         '''Set argparse argument metavar.'''
         # if self.attributes.get('type', None) != bool:
-        print(self.__positional_argument)
         if self.__positional_argument:
             self.attributes['metavar'] = metavar
             self.__metavar = metavar
-            print('metavar:', self.__metavar)
 
     @property
     def type(self) -> Any:
@@ -125,38 +123,38 @@ class Argument:
             self.attributes['type'] = annotation
             self.__type = annotation
 
-    @property
-    def const(self) -> str:
-        '''Get argparse argument const.'''
-        return self.__const
+    # @property
+    # def const(self) -> str:
+    #     '''Get argparse argument const.'''
+    #     return self.__const
 
-    @const.setter
-    def const(self, const: str) -> None:
-        '''Set argparse argument const.'''
-        self.attributes['const'] = const
-        self.__const = const
+    # @const.setter
+    # def const(self, const: str) -> None:
+    #     '''Set argparse argument const.'''
+    #     self.attributes['const'] = const
+    #     self.__const = const
 
-    @property
-    def dest(self) -> str:
-        '''Get argparse command/argument dest.'''
-        return self.__dest
+    # @property
+    # def dest(self) -> str:
+    #     '''Get argparse command/argument dest.'''
+    #     return self.__dest
 
-    @dest.setter
-    def dest(self, dest: str) -> None:
-        '''Set argparse command/argument dest.'''
-        self.attributes['dest'] = dest
-        self.__dest = dest
+    # @dest.setter
+    # def dest(self, dest: str) -> None:
+    #     '''Set argparse command/argument dest.'''
+    #     self.attributes['dest'] = dest
+    #     self.__dest = dest
 
-    @property
-    def required(self) -> bool:
-        '''Get argparse required argument.'''
-        return self.__required
+    # @property
+    # def required(self) -> bool:
+    #     '''Get argparse required argument.'''
+    #     return self.__required
 
-    @required.setter
-    def required(self, required: bool) -> None:
-        '''Set argparse required argument.'''
-        self.attributes['required'] = required
-        self.__required = required
+    # @required.setter
+    # def required(self, required: bool) -> None:
+    #     '''Set argparse required argument.'''
+    #     self.attributes['required'] = required
+    #     self.__required = required
 
     @property
     def action(self) -> str:
@@ -169,16 +167,16 @@ class Argument:
         self.attributes['action'] = action
         self.__action = action
 
-    @property
-    def choices(self) -> str:
-        '''Get argparse argument choices.'''
-        return self.__choices
+    # @property
+    # def choices(self) -> str:
+    #     '''Get argparse argument choices.'''
+    #     return self.__choices
 
-    @choices.setter
-    def choices(self, choices: str) -> None:
-        '''Set argparse argument choices.'''
-        self.attributes['choices'] = choices
-        self.__choices = choices
+    # @choices.setter
+    # def choices(self, choices: str) -> None:
+    #     '''Set argparse argument choices.'''
+    #     self.attributes['choices'] = choices
+    #     self.__choices = choices
 
     @property
     def nargs(self) -> str:
