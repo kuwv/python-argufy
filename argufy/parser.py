@@ -87,6 +87,7 @@ class Parser(ArgumentParser):
 
     @staticmethod
     def __get_args(argument) -> Dict[Any, Any]:
+        '''Retrieve arguments from argument.'''
         return {
             k[len('_Argument__') :]: v  # noqa
             for k, v in vars(argument).items()

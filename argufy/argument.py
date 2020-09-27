@@ -34,10 +34,10 @@ class Argument:
             if ',' in docstring.type_name:
                 args = docstring.type_name.split(',', 1)
                 if not annotation:
-                    a = args.pop(0)
-                    if a in types:
+                    arg = args.pop(0)
+                    if arg in types:
                         # NOTE: Limit input that eval will parse
-                        annotation = eval(a)  # nosec
+                        annotation = eval(arg)  # nosec
                         self.type = annotation
                 # TODO: Parse choices
             if not annotation:
