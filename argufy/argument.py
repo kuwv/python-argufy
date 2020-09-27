@@ -27,28 +27,24 @@ class Argument:
         self.default = parameters.default
         self.name = parameters.name.replace('_', '-')  # type: ignore
 
-        annotation = None
         if parameters.annotation != inspect._empty:  # type: ignore
-            annotation = parameters.annotation
-            self.type = annotation
+            self.type = parameters.annotation
         if docstring and docstring.type_name:
-            # print(docstring.type_name)
             if ',' in docstring.type_name:
                 args = docstring.type_name.split(',', 1)
-                if not annotation:
+                if not hasattr(self, 'type'):
                     arg = args.pop(0)
                     if arg in types:
                         # NOTE: Limit input that eval will parse
-                        annotation = eval(arg)  # nosec
-                        self.type = annotation
+                        self.type = eval(arg)  # nosec
                 # TODO: Parse choices
-            if not annotation:
+            if not hasattr(self, 'type'):
                 # NOTE: Limit input that eval will parse
                 if docstring.type_name in types:
-                    annotation = eval(docstring.type_name)  # nosec
+                    self.type = eval(docstring.type_name)  # nosec
 
-        if annotation:
-            self.metavar = (annotation.__name__).upper()
+        if hasattr(self, 'type'):
+            self.metavar = (self.type.__name__).upper()
 
         if docstring:
             self.help = docstring.description
