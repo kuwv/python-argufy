@@ -34,8 +34,8 @@ def test_argument_simple():
             Argument(parameters=sig.parameters[arg], docstring=document)
         )
     # print('Arguments: ', arguments[0].__dict__)
-    # assert arguments[0].metavar == 'INT'
-    assert arguments[0].default is None
+    assert not hasattr(arguments[0], 'default')
+    assert arguments[0].metavar == 'INT'
 
 
 def argument_bool(check_false: bool = False, check_true: bool = True):

@@ -14,6 +14,8 @@ types = ('float', 'int', 'str', 'list', 'dict', 'tuple', 'set')
 class Argument:
     '''Represent argparse arguments.'''
 
+    __short_flags = []
+
     def __init__(
         self,
         parameters: Type[inspect.Parameter],
@@ -45,8 +47,8 @@ class Argument:
                 if docstring.type_name in types:
                     annotation = eval(docstring.type_name)  # nosec
 
-        # if annotation and not self.default:
-        #     self.metavar = (annotation.__name__).upper()
+        if annotation:
+            self.metavar = (annotation.__name__).upper()
 
         if docstring:
             self.help = docstring.description
@@ -77,7 +79,8 @@ class Argument:
     @metavar.setter
     def metavar(self, metavar: str) -> None:
         '''Set argparse argument metavar.'''
-        if [n for n in self.name if not n.startswith('-')] != []:
+        # if [n for n in self.name if not n.startswith('-')] != []:
+        if not hasattr(self, 'default'):
             self.__metavar = metavar
 
     @property
@@ -179,8 +182,6 @@ class Argument:
         '''Set argparse argument default.'''
         if default != inspect._empty:  # type: ignore
             self.__default = default
-        else:
-            self.__default = None
 
     @property
     def help(self) -> str:
