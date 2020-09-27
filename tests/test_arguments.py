@@ -70,12 +70,12 @@ def test_argument_bool():
     assert arguments[1].default is True
 
 
-def argument_choice(choice_check: str = 'A'):
+def argument_choice(choice: str = 'A'):
     '''Example choice.
 
     Parameters
     ----------
-    choice_check: str, {'A', 'B', 'C'}
+    choice: str, {'A','B','C'}
         argument choice
 
     '''
@@ -116,7 +116,7 @@ def argument_full(
 
     Parameters
     ----------
-    string_check: str, {'A', 'B', 'C'}
+    string_check: str, {'A','B','C'}
         argument string
     bool_check:
         argument bool
@@ -152,28 +152,36 @@ def test_argument_full():
         )
     # print(arguments[0].__dict__)
     assert arguments[0].help == 'argument string'
+    assert arguments[0].type == str
     assert arguments[0].default == 'A'
 
     # print(arguments[1].__dict__)
     assert arguments[1].help == 'argument bool'
+    # NOTE: Argparse does not store bool type
+    assert not hasattr(arguments[1], 'type')
     assert arguments[1].default is False
 
     # print(arguments[2].__dict__)
     assert arguments[2].help == 'argument int'
+    assert arguments[2].type == int
     assert arguments[2].default == 1
 
     # print(arguments[3].__dict__)
     assert arguments[3].help == 'argument float'
+    assert arguments[3].type == float
     assert arguments[3].default == 1.5
 
     # print(arguments[4].__dict__)
     assert arguments[4].help == 'argument list'
+    assert arguments[4].type == list
     assert arguments[4].default == ['A']
 
     # print(arguments[5].__dict__)
     assert arguments[5].help == 'argument set'
+    assert arguments[5].type == set
     assert arguments[5].default == {'a'}
 
     # print(arguments[6].__dict__)
     assert arguments[6].help == 'argument tuple'
+    assert arguments[6].type == tuple
     assert arguments[6].default == ('A',)

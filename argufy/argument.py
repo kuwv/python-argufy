@@ -8,7 +8,7 @@ from typing import Any, Dict, List, Type
 
 from docstring_parser.common import DocstringParam
 
-types = ('float', 'int', 'str', 'list', 'dict', 'tuple', 'set')
+types = ('bool', 'dict', 'float', 'int', 'list', 'str', 'set', 'tuple')
 
 
 class Argument:
@@ -64,12 +64,18 @@ class Argument:
         if not hasattr(self, 'default'):
             self.__name = [name]
         else:
-            names = ['--' + name]
-            # TODO: Need to check other conflicting variables
-            # if '-' not in name:
-            #     # TODO: check against default names
-            #     names.append('-' + name[:1])
-            self.__name = names
+            flags = ['--' + name]
+            # NOTE: check for conflicting flags
+            if '-' not in name:
+                # TODO: check if common short flag (ex: version)
+                n = name[:1]
+                if n not in Argument.__short_flags:
+                    Argument.__short_flags.append(n)
+                    flags.append('-' + n)
+                elif n.upper() not in Argument.__short_flags:
+                    Argument.__short_flags.append(n.upper())
+                    flags.append('-' + n.upper())
+            self.__name = flags
 
     @property
     def metavar(self) -> str:
