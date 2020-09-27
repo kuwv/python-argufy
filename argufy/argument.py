@@ -45,11 +45,8 @@ class Argument:
                 if docstring.type_name in types:
                     annotation = eval(docstring.type_name)  # nosec
 
-        # if docstring:
-        #     print('docstring:', docstring.__dict__)
-
-        if annotation and not self.default:
-            self.metavar = (annotation.__name__).upper()
+        # if annotation and not self.default:
+        #     self.metavar = (annotation.__name__).upper()
 
         if docstring:
             self.help = docstring.description
@@ -62,19 +59,15 @@ class Argument:
     @name.setter
     def name(self, name: str) -> None:
         '''Set argparse command/argument name.'''
-        if 'default' not in self.attributes:
-            self.attributes['name'] = [name]
+        if not hasattr(self, 'default'):
             self.__name = [name]
-            self.__positional_argument = True
         else:
             names = ['--' + name]
             # TODO: Need to check other conflicting variables
             # if '-' not in name:
             #     # TODO: check against default names
             #     names.append('-' + name[:1])
-            self.attributes['name'] = names
             self.__name = names
-            self.__positional_argument = False
 
     @property
     def metavar(self) -> str:
@@ -84,9 +77,7 @@ class Argument:
     @metavar.setter
     def metavar(self, metavar: str) -> None:
         '''Set argparse argument metavar.'''
-        # if self.attributes.get('type', None) != bool:
-        if self.__positional_argument:
-            self.attributes['metavar'] = metavar
+        if [n for n in self.name if not n.startswith('-')] != []:
             self.__metavar = metavar
 
     @property
@@ -100,27 +91,22 @@ class Argument:
         # print('prematched annotation:', annotation)
         if annotation == bool:
             # NOTE: these store bool type internally
-            if self.attributes.get('default'):
+            if self.default or not hasattr(self, 'default'):
                 self.action = 'store_false'
             else:
                 self.action = 'store_true'
         elif annotation == int:
-            self.attributes['type'] = annotation
             self.__type = annotation
             self.action = 'append'
         elif annotation == list:
-            self.attributes['type'] = annotation
             self.__type = annotation
             self.nargs = '+'
         elif annotation == tuple:
-            self.attributes['type'] = annotation
             self.__type = annotation
         elif annotation == set:
-            self.attributes['type'] = annotation
             self.__type = annotation
         else:
             # print('unmatched annotation:', annotation)
-            self.attributes['type'] = annotation
             self.__type = annotation
 
     # @property
@@ -131,7 +117,6 @@ class Argument:
     # @const.setter
     # def const(self, const: str) -> None:
     #     '''Set argparse argument const.'''
-    #     self.attributes['const'] = const
     #     self.__const = const
 
     # @property
@@ -142,7 +127,6 @@ class Argument:
     # @dest.setter
     # def dest(self, dest: str) -> None:
     #     '''Set argparse command/argument dest.'''
-    #     self.attributes['dest'] = dest
     #     self.__dest = dest
 
     # @property
@@ -153,7 +137,6 @@ class Argument:
     # @required.setter
     # def required(self, required: bool) -> None:
     #     '''Set argparse required argument.'''
-    #     self.attributes['required'] = required
     #     self.__required = required
 
     @property
@@ -164,7 +147,6 @@ class Argument:
     @action.setter
     def action(self, action: str) -> None:
         '''Set argparse argument action.'''
-        self.attributes['action'] = action
         self.__action = action
 
     # @property
@@ -175,7 +157,6 @@ class Argument:
     # @choices.setter
     # def choices(self, choices: str) -> None:
     #     '''Set argparse argument choices.'''
-    #     self.attributes['choices'] = choices
     #     self.__choices = choices
 
     @property
@@ -186,7 +167,6 @@ class Argument:
     @nargs.setter
     def nargs(self, nargs: str) -> None:
         '''Set argparse argument nargs.'''
-        self.attributes['nargs'] = nargs
         self.__nargs = nargs
 
     @property
@@ -198,7 +178,6 @@ class Argument:
     def default(self, default: Any) -> None:
         '''Set argparse argument default.'''
         if default != inspect._empty:  # type: ignore
-            self.attributes['default'] = default
             self.__default = default
         else:
             self.__default = None
@@ -211,5 +190,4 @@ class Argument:
     @help.setter
     def help(self, description: str) -> None:
         '''Set argparse command/argument help message.'''
-        self.attributes['help'] = description
         self.__help = description

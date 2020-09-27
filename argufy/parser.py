@@ -7,7 +7,7 @@ import inspect
 import sys
 from argparse import ArgumentParser, Namespace, _SubParsersAction
 from types import ModuleType
-from typing import Any, Callable, Optional, Sequence, Type, TypeVar
+from typing import Any, Callable, Dict, Optional, Sequence, Type, TypeVar
 
 # from argparse_color_formatter import ColorHelpFormatter, ColorTextWrapper
 from docstring_parser import parse
@@ -85,6 +85,14 @@ class Parser(ArgumentParser):
         module = inspect.getmodule(stack_frame[0])
         return module
 
+    @staticmethod
+    def __get_args(argument) -> Dict[Any, Any]:
+        return {
+            k[len('_Argument__') :]: v  # noqa
+            for k, v in vars(argument).items()
+            if k.startswith('_Argument__')
+        }
+
     def add_arguments(
         self, obj: Any, parser: Optional[Type[ArgumentParser]] = None
     ) -> Type[ArgumentParser]:
@@ -101,8 +109,9 @@ class Parser(ArgumentParser):
                 signature.parameters[arg], description  # type: ignore
             )
             # print('sig:', signature.parameters[arg])
-            name = argument.attributes.pop('name')
-            parser.add_argument(*name, **argument.attributes)
+            arguments = self.__get_args(argument)
+            name = arguments.pop('name')
+            parser.add_argument(*name, **arguments)
         return self
 
     def add_commands(
@@ -158,8 +167,9 @@ class Parser(ArgumentParser):
                     )
                     # print(name, parameters, description)
                     argument = Argument(parameters, description)
-                    name = argument.attributes.pop('name')
-                    parser.add_argument(*name, **argument.attributes)
+                    arguments = self.__get_args(argument)
+                    name = arguments.pop('name')
+                    parser.add_argument(*name, **arguments)
         return self
 
     def add_subcommands(
