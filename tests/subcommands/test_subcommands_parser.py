@@ -24,7 +24,7 @@ def test_help():
     parser = Parser()
     parser.add_commands(subcommands_parser, ['test_'])
     with pytest.raises(SystemExit):
-        parser.dispatch(['subcommands-parser'])
+        parser.dispatch(['subcommands-parser', 'example-bool'])
 
 
 def test_bool():
