@@ -41,8 +41,7 @@ def test_argument_type_hints_simple():
 
 
 def argument_type_hints_bool(
-    check_false: bool = False,
-    check_true: bool = True
+    check_false: bool = False, check_true: bool = True
 ):
     '''Example bool.'''
     pass

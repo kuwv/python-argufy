@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # :copyright: (c) 2020 by Jesse Johnson.
 # :license: Apache 2.0, see LICENSE for more details.
-'''Test arguments.'''
+'''Test google docstring arguments.'''
 
 import sys
 from inspect import getmembers, isfunction, signature
@@ -14,17 +14,17 @@ module = sys.modules[__name__]
 
 
 def argument_google_bool(check_false: bool = False, check_true: bool = True):
-    '''Example bool.
+    '''Mock google example bool.
 
     Args:
-        bool_check: bool, optional; list packages and v1ersion
+        bool_check (bool): optional; list packages and v1ersion
 
     '''
     pass
 
 
 def test_argument_google_bool():
-    '''Test simple boolean.'''
+    '''Test google simple boolean.'''
     name, fn = [
         x
         for x in getmembers(module, isfunction)
@@ -46,17 +46,19 @@ def test_argument_google_bool():
 
 
 def argument_google_choice(choice: str = 'A'):
-    '''Example choice.
+    '''Mock google example choice.
+
+    {'A','B','C'}
 
     Args:
-        choice: str, {'A','B','C'}; argument choice
+        choice (str): argument choice
 
     '''
     pass
 
 
 def test_argument_google_choice():
-    '''Test simple character.'''
+    '''Test google simple character.'''
     name, fn = [
         x
         for x in getmembers(module, isfunction)
@@ -77,7 +79,7 @@ def test_argument_google_choice():
     assert arguments[0].default == 'A'
 
 
-def argument_google_full(
+def argument_google_all(
     string_check='A',
     bool_check: bool = False,
     integer_check: int = 1,
@@ -87,28 +89,28 @@ def argument_google_full(
     tuple_check: tuple = ('A',),
     # file_check: open = 'test.toml',
 ):
-    '''Example full.
+    '''Mock google example full.
 
     Args:
-      string_check: str
+      string_check (str):
         argument string
-      bool_check: argument bool
-      integer_check: argument int
-      float_check: argument float
-      list_check: argument list
-      set_check: argument set
-      tuple_check: argument tuple
+      bool_check (bool): argument bool
+      integer_check (int): argument int
+      float_check (float): argument float
+      list_check (list): argument list
+      set_check (set): argument set
+      tuple_check (tuple): argument tuple
 
     '''
     pass
 
 
-def test_argument_google_full():
-    '''Test full type set.'''
+def test_argument_google_all():
+    '''Test google full type set.'''
     name, fn = [
         x
         for x in getmembers(module, isfunction)
-        if x[0] == 'argument_google_full'
+        if x[0] == 'argument_google_all'
     ][0]
     sig = signature(fn)
     document = parse(fn.__doc__)

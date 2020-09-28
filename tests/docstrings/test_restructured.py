@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # :copyright: (c) 2020 by Jesse Johnson.
 # :license: Apache 2.0, see LICENSE for more details.
-'''Test arguments.'''
+'''Test restructured arguments.'''
 
 import sys
 from inspect import getmembers, isfunction, signature
@@ -13,47 +13,22 @@ from argufy import Argument
 module = sys.modules[__name__]
 
 
-def argument_simple(check: int):
-    '''Example demonstrating minimal CLI.'''
-    pass
+def argument_restructured_bool(check_false=False, check_true=True):
+    '''Mock restructured example bool.
 
-
-def test_argument_simple():
-    '''Test simple argument.'''
-    name, fn = [
-        x for x in getmembers(module, isfunction) if x[0] == 'argument_simple'
-    ][0]
-    sig = signature(fn)
-    docstring = parse(fn.__doc__)
-    arguments = []
-    for arg in sig.parameters:
-        document = next(
-            (d for d in docstring.params if d.arg_name == arg), None
-        )
-        arguments.append(
-            Argument(parameters=sig.parameters[arg], docstring=document)
-        )
-    # print('Arguments: ', arguments[0].__dict__)
-    assert not hasattr(arguments[0], 'default')
-    assert arguments[0].metavar == 'INT'
-
-
-def argument_bool(check_false: bool = False, check_true: bool = True):
-    '''Example bool.
-
-    Parameters
-    ----------
-    bool_check: bool, optional
-        list packages and v1ersion
+    :param bool_check: list packages and v1ersion
+    :type bool_check: bool
 
     '''
     pass
 
 
-def test_argument_bool():
-    '''Test simple boolean.'''
+def test_argument_restructured_bool():
+    '''Test restructured example boolean.'''
     name, fn = [
-        x for x in getmembers(module, isfunction) if x[0] == 'argument_bool'
+        x
+        for x in getmembers(module, isfunction)
+        if x[0] == 'argument_restructured_bool'
     ][0]
     sig = signature(fn)
     docstring = parse(fn.__doc__)
@@ -70,22 +45,24 @@ def test_argument_bool():
     assert arguments[1].default is True
 
 
-def argument_choice(choice: str = 'A'):
-    '''Example choice.
+def argument_restructured_choice(choice='A'):
+    '''Mock restructured example choice.
 
-    Parameters
-    ----------
-    choice: str, {'A','B','C'}
-        argument choice
+    {'A','B','C'}
+
+    :param choice: argument choice
+    :type str: choice
 
     '''
     pass
 
 
-def test_argument_choice():
-    '''Test simple character.'''
+def test_argument_restructured_choice():
+    '''Test restructured choices.'''
     name, fn = [
-        x for x in getmembers(module, isfunction) if x[0] == 'argument_choice'
+        x
+        for x in getmembers(module, isfunction)
+        if x[0] == 'argument_restructured_choice'
     ][0]
     sig = signature(fn)
     document = parse(fn.__doc__)
@@ -102,43 +79,43 @@ def test_argument_choice():
     assert arguments[0].default == 'A'
 
 
-def argument_full(
+def argument_restructured_all(
     string_check='A',
-    bool_check: bool = False,
-    integer_check: int = 1,
-    float_check: float = 1.5,
-    list_check: list = ['A'],
-    set_check: set = {'a'},
-    tuple_check: tuple = ('A',),
-    # file_check: open = 'test.toml',
+    bool_check=False,
+    integer_check=1,
+    float_check=1.5,
+    list_check=['A'],
+    set_check={'a'},
+    tuple_check=('A',),
+    # file_check='test.toml',
 ):
-    '''Example full.
+    '''Mock restructured full type set.
 
-    Parameters
-    ----------
-    string_check: str, {'A','B','C'}
-        argument string
-    bool_check:
-        argument bool
-    integer_check:
-        argument int
-    float_check:
-        argument float
-    list_check:
-        argument list
-    set_check:
-        argument set
-    tuple_check:
-        argument tuple
+    :param string_check: argument string
+    :type string_check: str
+    :param bool_check: argument bool
+    :type bool_check: bool
+    :param integer_check: argument int
+    :type integer_check: int
+    :param float_check: argument float
+    :type float_check: float
+    :param list_check: argument list
+    :type list_check: list
+    :param set_check: argument set
+    :type set_check: set
+    :param tuple_check: argument tuple
+    :type tuple_check: tuple
 
     '''
     pass
 
 
-def test_argument_full():
-    '''Test full type set.'''
+def test_argument_restructured_all():
+    '''Test restructured full type set.'''
     name, fn = [
-        x for x in getmembers(module, isfunction) if x[0] == 'argument_full'
+        x
+        for x in getmembers(module, isfunction)
+        if x[0] == 'argument_restructured_all'
     ][0]
     sig = signature(fn)
     document = parse(fn.__doc__)
@@ -152,36 +129,36 @@ def test_argument_full():
         )
     # print(arguments[0].__dict__)
     assert arguments[0].help == 'argument string'
-    assert arguments[0].type == str
+    # assert arguments[0].type == str
     assert arguments[0].default == 'A'
 
     # print(arguments[1].__dict__)
     assert arguments[1].help == 'argument bool'
     # NOTE: Argparse does not store bool type
-    assert not hasattr(arguments[1], 'type')
+    # assert not hasattr(arguments[1], 'type')
     assert arguments[1].default is False
 
     # print(arguments[2].__dict__)
     assert arguments[2].help == 'argument int'
-    assert arguments[2].type == int
+    # assert arguments[2].type == int
     assert arguments[2].default == 1
 
     # print(arguments[3].__dict__)
     assert arguments[3].help == 'argument float'
-    assert arguments[3].type == float
+    # assert arguments[3].type == float
     assert arguments[3].default == 1.5
 
     # print(arguments[4].__dict__)
     assert arguments[4].help == 'argument list'
-    assert arguments[4].type == list
+    # assert arguments[4].type == list
     assert arguments[4].default == ['A']
 
     # print(arguments[5].__dict__)
     assert arguments[5].help == 'argument set'
-    assert arguments[5].type == set
+    # assert arguments[5].type == set
     assert arguments[5].default == {'a'}
 
     # print(arguments[6].__dict__)
     assert arguments[6].help == 'argument tuple'
-    assert arguments[6].type == tuple
+    # assert arguments[6].type == tuple
     assert arguments[6].default == ('A',)
