@@ -10,6 +10,7 @@ check_attribute: bool
 
 '''
 
+import pytest
 import sys
 
 from argufy import Parser
@@ -42,11 +43,12 @@ def example_choice(choice_check: str = 'A'):
     assert choice_check == 'B'
 
 
-# def test_help():
-#     '''Do help function for CLI.'''
-#     parser = Parser()
-#     parser.add_commands(module, None, ['test_'])
-#     parser.dispatch()
+def test_help():
+    '''Do help function for CLI.'''
+    parser = Parser()
+    parser.add_commands(module, ['test_'])
+    with pytest.raises(SystemExit):
+        parser.dispatch()
 
 
 def test_bool():

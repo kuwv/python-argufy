@@ -11,6 +11,7 @@ check_attribute: bool
 '''
 
 import sys
+import pytest
 
 from argufy import Parser
 
@@ -18,11 +19,12 @@ sys.path.append('.')
 import subcommands_parser  # noqa: E402
 
 
-# def test_help():
-#     '''Do help function for CLI.'''
-#     parser = Parser()
-#     parser.add_commands(module, None, ['test_'])
-#     parser.dispatch()
+def test_help():
+    '''Do help function for CLI.'''
+    parser = Parser()
+    parser.add_commands(subcommands_parser, ['test_'])
+    with pytest.raises(SystemExit):
+        parser.dispatch(['subcommands-parser'])
 
 
 def test_bool():
