@@ -15,7 +15,7 @@ import sys
 from argufy import Parser
 
 sys.path.append('.')
-import subcommands_parser
+import subcommands_parser  # noqa: E402
 
 
 # def test_help():
