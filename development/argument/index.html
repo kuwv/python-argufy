@@ -514,11 +514,7 @@ __init__<span class="p">(</span><span class="bp">self</span><span class="p">,</s
 47
 48
 49
-50
-51
-52
-53
-54</pre>
+50</pre>
 </div>
 </td>
 <td class="code">
@@ -534,28 +530,24 @@ __init__<span class="p">(</span><span class="bp">self</span><span class="p">,</s
     <span class="bp">self</span><span class="o">.</span><span class="n">default</span> <span class="o">=</span> <span class="n">parameters</span><span class="o">.</span><span class="n">default</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">parameters</span><span class="o">.</span><span class="n">name</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">'_'</span><span class="p">,</span> <span class="s1">'-'</span><span class="p">)</span>  <span class="c1"># type: ignore</span>
 
-    <span class="n">annotation</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="k">if</span> <span class="n">parameters</span><span class="o">.</span><span class="n">annotation</span> <span class="o">!=</span> <span class="n">inspect</span><span class="o">.</span><span class="n">_empty</span><span class="p">:</span>  <span class="c1"># type: ignore</span>
-        <span class="n">annotation</span> <span class="o">=</span> <span class="n">parameters</span><span class="o">.</span><span class="n">annotation</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">type</span> <span class="o">=</span> <span class="n">annotation</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">type</span> <span class="o">=</span> <span class="n">parameters</span><span class="o">.</span><span class="n">annotation</span>
     <span class="k">if</span> <span class="n">docstring</span> <span class="ow">and</span> <span class="n">docstring</span><span class="o">.</span><span class="n">type_name</span><span class="p">:</span>
-        <span class="c1"># print(docstring.type_name)</span>
         <span class="k">if</span> <span class="s1">','</span> <span class="ow">in</span> <span class="n">docstring</span><span class="o">.</span><span class="n">type_name</span><span class="p">:</span>
             <span class="n">args</span> <span class="o">=</span> <span class="n">docstring</span><span class="o">.</span><span class="n">type_name</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">','</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
-            <span class="k">if</span> <span class="ow">not</span> <span class="n">annotation</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">'type'</span><span class="p">):</span>
                 <span class="n">arg</span> <span class="o">=</span> <span class="n">args</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
                 <span class="k">if</span> <span class="n">arg</span> <span class="ow">in</span> <span class="n">types</span><span class="p">:</span>
                     <span class="c1"># NOTE: Limit input that eval will parse</span>
-                    <span class="n">annotation</span> <span class="o">=</span> <span class="nb">eval</span><span class="p">(</span><span class="n">arg</span><span class="p">)</span>  <span class="c1"># nosec</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">type</span> <span class="o">=</span> <span class="n">annotation</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">type</span> <span class="o">=</span> <span class="nb">eval</span><span class="p">(</span><span class="n">arg</span><span class="p">)</span>  <span class="c1"># nosec</span>
             <span class="c1"># TODO: Parse choices</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="n">annotation</span><span class="p">:</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">'type'</span><span class="p">):</span>
             <span class="c1"># NOTE: Limit input that eval will parse</span>
             <span class="k">if</span> <span class="n">docstring</span><span class="o">.</span><span class="n">type_name</span> <span class="ow">in</span> <span class="n">types</span><span class="p">:</span>
-                <span class="n">annotation</span> <span class="o">=</span> <span class="nb">eval</span><span class="p">(</span><span class="n">docstring</span><span class="o">.</span><span class="n">type_name</span><span class="p">)</span>  <span class="c1"># nosec</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">type</span> <span class="o">=</span> <span class="nb">eval</span><span class="p">(</span><span class="n">docstring</span><span class="o">.</span><span class="n">type_name</span><span class="p">)</span>  <span class="c1"># nosec</span>
 
-    <span class="k">if</span> <span class="n">annotation</span><span class="p">:</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">metavar</span> <span class="o">=</span> <span class="p">(</span><span class="n">annotation</span><span class="o">.</span><span class="vm">__name__</span><span class="p">)</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span>
+    <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">'type'</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">metavar</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">type</span><span class="o">.</span><span class="vm">__name__</span><span class="p">)</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span>
 
     <span class="k">if</span> <span class="n">docstring</span><span class="p">:</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">help</span> <span class="o">=</span> <span class="n">docstring</span><span class="o">.</span><span class="n">description</span>
