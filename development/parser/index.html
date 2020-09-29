@@ -811,7 +811,7 @@ add_subcommands<span class="p">(</span><span class="bp">self</span><span class="
 <div class="doc doc-object doc-method">
 <h3 class="doc doc-heading" id="argufy.parser.Parser.dispatch">
 <code class="highlight language-python">
-dispatch<span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">ns</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> </code>
+dispatch<span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="p">[</span><span class="s1">'--line-by-line'</span><span class="p">],</span> <span class="n">ns</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> </code>
 </h3>
 <div class="doc doc-contents">
 <p>Call command with arguments.</p>
@@ -821,8 +821,7 @@ dispatch<span class="p">(</span><span class="bp">self</span><span class="p">,</s
 <tr>
 <td class="linenos">
 <div class="linenodiv">
-<pre><span></span>238
-239
+<pre><span></span>239
 240
 241
 242
@@ -831,16 +830,17 @@ dispatch<span class="p">(</span><span class="bp">self</span><span class="p">,</s
 245
 246
 247
-248</pre>
+248
+249</pre>
 </div>
 </td>
 <td class="code">
 <div class="highlight">
 <pre><span></span><code><span class="k">def</span> <span class="nf">dispatch</span><span class="p">(</span>
-    <span class="bp">self</span><span class="p">,</span> <span class="n">args</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">ns</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="bp">self</span><span class="p">,</span> <span class="n">args</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">:],</span> <span class="n">ns</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">F</span><span class="p">],</span> <span class="n">F</span><span class="p">]:</span>
     <span class="sd">'''Call command with arguments.'''</span>
-    <span class="k">if</span> <span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span> <span class="o">==</span> <span class="p">[]</span> <span class="ow">and</span> <span class="n">args</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">args</span> <span class="o">==</span> <span class="p">[]:</span>
         <span class="n">args</span> <span class="o">=</span> <span class="p">[</span><span class="s1">'--help'</span><span class="p">]</span>
     <span class="n">arguments</span><span class="p">,</span> <span class="n">namespace</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">retrieve</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="n">ns</span><span class="p">)</span>
     <span class="k">if</span> <span class="s1">'fn'</span> <span class="ow">in</span> <span class="n">namespace</span><span class="p">:</span>
@@ -881,7 +881,8 @@ retrieve<span class="p">(</span><span class="bp">self</span><span class="p">,</s
 233
 234
 235
-236</pre>
+236
+237</pre>
 </div>
 </td>
 <td class="code">
@@ -894,11 +895,12 @@ retrieve<span class="p">(</span><span class="bp">self</span><span class="p">,</s
     <span class="k">if</span> <span class="n">main_args</span> <span class="o">==</span> <span class="p">[]</span> <span class="ow">and</span> <span class="s1">'fn'</span> <span class="ow">in</span> <span class="nb">vars</span><span class="p">(</span><span class="n">main_ns</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">main_args</span><span class="p">,</span> <span class="n">main_ns</span>
     <span class="k">else</span><span class="p">:</span>
+        <span class="c1"># NOTE: default to help message for subcommand</span>
         <span class="k">if</span> <span class="s1">'mod'</span> <span class="ow">in</span> <span class="nb">vars</span><span class="p">(</span><span class="n">main_ns</span><span class="p">):</span>
             <span class="n">a</span> <span class="o">=</span> <span class="p">[]</span>
             <span class="n">a</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">vars</span><span class="p">(</span><span class="n">main_ns</span><span class="p">)[</span><span class="s1">'mod'</span><span class="p">]</span><span class="o">.</span><span class="vm">__name__</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">'.'</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
             <span class="n">a</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">'--help'</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">parse_args</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">parse_args</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
         <span class="k">return</span> <span class="kc">None</span>
 </code></pre>
 </div>
