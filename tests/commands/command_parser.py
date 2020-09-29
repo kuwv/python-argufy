@@ -14,7 +14,7 @@ check_attribute: bool
 
 
 def example_bool(bool_check: bool = False):
-    '''Example bool.
+    '''Mock example bool.
 
     Parameters
     ----------
@@ -26,7 +26,7 @@ def example_bool(bool_check: bool = False):
 
 
 def example_choice(choice_check: str = 'A'):
-    '''Example choice.
+    '''Mock example choice.
 
     Parameters
     ----------
