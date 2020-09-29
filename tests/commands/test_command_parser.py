@@ -10,7 +10,6 @@ check_attribute: bool
 
 '''
 
-import os
 import pytest
 import sys
 

@@ -237,7 +237,7 @@ class Parser(ArgumentParser):
             return None
 
     def dispatch(
-        self, args: Sequence[str] = sys.argv[1:], ns: Optional[str] = None,
+        self, args: Sequence[str] = sys.argv[1:], ns: Optional[str] = None
     ) -> Callable[[F], F]:
         '''Call command with arguments.'''
         if args == []:
