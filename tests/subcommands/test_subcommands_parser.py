@@ -23,8 +23,16 @@ def test_help():
     '''Do help function for CLI.'''
     parser = Parser()
     parser.add_commands(subcommands_parser, ['test_'])
-    with pytest.raises(SystemExit):
+
+    with pytest.raises(SystemExit) as err:
+        parser.dispatch(['subcommands-parser'])
+    assert err.type == SystemExit
+    assert err.value.code == 2
+
+    with pytest.raises(SystemExit) as err:
         parser.dispatch(['subcommands-parser', 'example-bool'])
+    assert err.type == SystemExit
+    assert err.value.code == 2
 
 
 def test_bool():

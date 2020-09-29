@@ -10,56 +10,36 @@ check_attribute: bool
 
 '''
 
+import os
 import pytest
 import sys
 
 from argufy import Parser
 
-module = sys.modules[__name__]
-# check_attribute = 'test-attr'
-
-
-def example_bool(bool_check: bool = False):
-    '''Example bool.
-
-    Parameters
-    ----------
-    bool_check: bool, optional
-        list packages and version
-
-    '''
-    assert bool_check is True
-
-
-def example_choice(choice_check: str = 'A'):
-    '''Example choice.
-
-    Parameters
-    ----------
-    choice_check: str, {'A', 'B', 'C'}
-        example choice
-
-    '''
-    assert choice_check == 'B'
+sys.path.append('.')
+import command_parser  # noqa: E402
+# module = sys.modules[__name__]
 
 
 def test_help():
     '''Do help function for CLI.'''
     parser = Parser()
-    parser.add_commands(module, ['test_'])
-    with pytest.raises(SystemExit):
+    parser.add_commands(command_parser, ['test_'])
+    with pytest.raises(SystemExit) as err:
         parser.dispatch()
+    assert err.type == SystemExit
+    assert err.value.code == 0
 
 
 def test_bool():
     '''Do main function for CLI.'''
     parser = Parser()
-    parser.add_commands(module, ['test_'])
+    parser.add_commands(command_parser, ['test_'])
     parser.dispatch(['example-bool', '--bool-check'])
 
 
 def test_choice():
     '''Do main function for CLI.'''
     parser = Parser()
-    parser.add_commands(module, ['test_'])
+    parser.add_commands(command_parser, ['test_'])
     parser.dispatch(['example-choice', '--choice-check', 'B'])

@@ -232,7 +232,7 @@ class Parser(ArgumentParser):
                 a = []
                 a.append(vars(main_ns)['mod'].__name__.split('.')[-1])
                 a.append('--help')
-            self.parse_args(a)
+                self.parse_args(a)
             return None
 
     def dispatch(
