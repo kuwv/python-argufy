@@ -228,6 +228,7 @@ class Parser(ArgumentParser):
         if main_args == [] and 'fn' in vars(main_ns):
             return main_args, main_ns
         else:
+            # NOTE: default to help message for subcommand
             if 'mod' in vars(main_ns):
                 a = []
                 a.append(vars(main_ns)['mod'].__name__.split('.')[-1])
@@ -236,10 +237,10 @@ class Parser(ArgumentParser):
             return None
 
     def dispatch(
-        self, args: Sequence[str] = None, ns: Optional[str] = None,
+        self, args: Sequence[str] = sys.argv[1:], ns: Optional[str] = None,
     ) -> Callable[[F], F]:
         '''Call command with arguments.'''
-        if sys.argv[1:] == [] and args is None:
+        if args == []:
             args = ['--help']
         arguments, namespace = self.retrieve(args, ns)
         if 'fn' in namespace:
