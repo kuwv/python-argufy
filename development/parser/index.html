@@ -693,7 +693,7 @@ add_commands<span class="p">(</span><span class="bp">self</span><span class="p">
         <span class="c1"># TODO: Possible singledispatch candidate</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">name</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__exclude_prefixes__</span><span class="p">):</span>
             <span class="k">if</span> <span class="n">inspect</span><span class="o">.</span><span class="n">isclass</span><span class="p">(</span><span class="n">value</span><span class="p">):</span>
-                <span class="k">continue</span>
+                <span class="k">continue</span>  <span class="c1"># pragma: no cover</span>
             <span class="k">elif</span> <span class="n">inspect</span><span class="o">.</span><span class="n">isfunction</span><span class="p">(</span><span class="n">value</span><span class="p">)</span> <span class="ow">or</span> <span class="n">inspect</span><span class="o">.</span><span class="n">ismethod</span><span class="p">(</span><span class="n">value</span><span class="p">):</span>
                 <span class="k">if</span> <span class="p">(</span>
                     <span class="n">module</span><span class="o">.</span><span class="vm">__name__</span> <span class="o">==</span> <span class="n">value</span><span class="o">.</span><span class="vm">__module__</span>
