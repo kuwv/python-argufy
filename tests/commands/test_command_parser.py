@@ -27,7 +27,7 @@ def test_help():
     with pytest.raises(SystemExit) as err:
         parser.dispatch()
     assert err.type == SystemExit
-    assert err.value.code == 0
+    assert err.value.code == 2
 
 
 def test_bool():
