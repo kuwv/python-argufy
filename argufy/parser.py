@@ -241,7 +241,7 @@ class Parser(ArgumentParser):
     ) -> Callable[[F], F]:
         '''Call command with arguments.'''
         if args == []:
-            args = ['--help']
+            args = ['--help']  # pragma: no cover
         arguments, namespace = self.retrieve(args, ns)
         if 'fn' in namespace:
             fn = vars(namespace).pop('fn')
