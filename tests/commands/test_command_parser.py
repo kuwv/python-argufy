@@ -14,6 +14,7 @@ import pytest
 import sys
 
 from argufy import Parser
+from argufy.__version__ import __version__
 
 sys.path.append('.')
 import command_parser  # noqa: E402
@@ -22,7 +23,7 @@ import command_parser  # noqa: E402
 
 def test_help():
     '''Do help function for CLI.'''
-    parser = Parser()
+    parser = Parser(version=__version__)
     parser.add_commands(command_parser, ['test_'])
     with pytest.raises(SystemExit) as err:
         parser.dispatch()

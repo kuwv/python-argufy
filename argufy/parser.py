@@ -140,7 +140,7 @@ class Parser(ArgumentParser):
             # TODO: Possible singledispatch candidate
             if not name.startswith(self.__exclude_prefixes__):
                 if inspect.isclass(value):
-                    continue
+                    continue  # pragma: no cover
                 elif inspect.isfunction(value) or inspect.ismethod(value):
                     if (
                         module.__name__ == value.__module__
