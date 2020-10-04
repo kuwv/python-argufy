@@ -20,6 +20,10 @@ does this by building CLI's from the functions directly. It then parses docstrin
 
 In short, the more code-complete your application is the more complete the CLI.
 
+## Design Principles
+
+## Design Choices
+
 ## Alternatives
 
 There are multiple alternatives such as Click and Docpopt. These are

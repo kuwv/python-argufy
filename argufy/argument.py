@@ -8,7 +8,7 @@ from typing import Any, Dict, List, Type
 
 from docstring_parser.common import DocstringParam
 
-types = ('bool', 'dict', 'float', 'int', 'list', 'str', 'set', 'tuple')
+types = {'bool', 'dict', 'float', 'int', 'list', 'str', 'set', 'tuple'}
 
 
 class Argument:
@@ -34,8 +34,8 @@ class Argument:
                 args = docstring.type_name.split(',', 1)
                 if not hasattr(self, 'type'):
                     arg = args.pop(0)
+                    # NOTE: Limit input that eval will parse
                     if arg in types:
-                        # NOTE: Limit input that eval will parse
                         self.type = eval(arg)  # nosec
                 # TODO: Parse choices
             if not hasattr(self, 'type'):
