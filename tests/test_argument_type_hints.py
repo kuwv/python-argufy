@@ -13,12 +13,12 @@ from argufy import Argument
 module = sys.modules[__name__]
 
 
-def argument_type_hints_simple(check: int):
+def argument_type_hints_simple(check: int) -> None:
     '''Example demonstrating minimal CLI.'''
     pass
 
 
-def test_argument_type_hints_simple():
+def test_argument_type_hints_simple() -> None:
     '''Test simple argument.'''
     name, fn = [
         x
@@ -42,12 +42,12 @@ def test_argument_type_hints_simple():
 
 def argument_type_hints_bool(
     check_false: bool = False, check_true: bool = True
-):
+) -> None:
     '''Example bool.'''
     pass
 
 
-def test_argument_type_hints_bool():
+def test_argument_type_hints_bool() -> None:
     '''Test simple boolean.'''
     name, fn = [
         x
@@ -78,12 +78,12 @@ def argument_type_hints_all(
     set_check: set = {'a'},
     tuple_check: tuple = ('A',),
     # file_check: open = 'test.toml',
-):
+) -> None:
     '''Example full.'''
     pass
 
 
-def test_argument_type_hints_all():
+def test_argument_type_hints_all() -> None:
     '''Test full type set.'''
     name, fn = [
         x

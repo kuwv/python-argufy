@@ -4,7 +4,7 @@
 '''Arguments for inspection based CLI parser.'''
 
 import inspect
-from typing import Any, Dict, List, Type
+from typing import Any, Dict, List
 
 from docstring_parser.common import DocstringParam
 
@@ -14,12 +14,10 @@ types = {'bool', 'dict', 'float', 'int', 'list', 'str', 'set', 'tuple'}
 class Argument:
     '''Represent argparse arguments.'''
 
-    __short_flags = []
+    __short_flags: List[str] = []
 
     def __init__(
-        self,
-        parameters: Type[inspect.Parameter],
-        docstring: Type[DocstringParam],
+        self, parameters: inspect.Parameter, docstring: DocstringParam,
     ) -> None:
         '''Initialize argparse argument.'''
         self.attributes: Dict[Any, Any] = {}
@@ -88,7 +86,7 @@ class Argument:
     @property
     def type(self) -> Any:
         '''Get argparse argument type.'''
-        return self.__type
+        return self.__type  # type: ignore
 
     @type.setter
     def type(self, annotation: Any) -> None:
