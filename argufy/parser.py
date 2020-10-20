@@ -119,7 +119,6 @@ class Parser(ArgumentParser):
             argument = Argument(signature.parameters[arg], description)
             arguments = self.__get_args(argument)
             name = arguments.pop('name')
-            print(name, arguments)
             parser.add_argument(*name, **arguments)
         # if signature.parameters:
         #     print('not empty')

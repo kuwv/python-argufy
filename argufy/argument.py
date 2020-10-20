@@ -56,7 +56,6 @@ class Argument:
     def name(self, name: str) -> None:
         '''Set argparse command/argument name.'''
         if not hasattr(self, 'default'):
-            print(name)
             self.__name = [name]
         else:
             flags = ['--' + name]
