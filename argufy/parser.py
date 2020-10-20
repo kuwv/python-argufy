@@ -16,7 +16,7 @@ from typing import (
     Optional,
     Sequence,
     Tuple,
-    TypeVar,
+    TypeVar
 )
 
 # from argparse_color_formatter import ColorHelpFormatter, ColorTextWrapper
@@ -117,10 +117,14 @@ class Parser(ArgumentParser):
                 (d for d in docstring.params if d.arg_name == arg), None
             )
             argument = Argument(signature.parameters[arg], description)
-            # print('sig:', signature.parameters[arg])
             arguments = self.__get_args(argument)
             name = arguments.pop('name')
+            print(name, arguments)
             parser.add_argument(*name, **arguments)
+        # if signature.parameters:
+        #     print('not empty')
+        # else:
+        #     print('empty')
         return self
 
     def add_commands(
@@ -162,6 +166,7 @@ class Parser(ArgumentParser):
                                 help=parse(value.__doc__).short_description,
                             )
                             cmd.set_defaults(fn=value)
+                        # print('command', name, value, cmd)
                         self.add_arguments(value, cmd)
                 elif isinstance(value, (float, int, str, list, dict, tuple)):
                     # TODO: Reconcile inspect parameters with dict
@@ -175,7 +180,6 @@ class Parser(ArgumentParser):
                         (d for d in docstring.params if d.arg_name == name),
                         None,
                     )
-                    # print(name, parameters, description)
                     argument = Argument(parameters, description)
                     arguments = self.__get_args(argument)
                     name = arguments.pop('name')

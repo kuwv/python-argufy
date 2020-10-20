@@ -41,8 +41,8 @@ class Argument:
                 if docstring.type_name in types:
                     self.type = eval(docstring.type_name)  # nosec
 
-        if hasattr(self, 'type'):
-            self.metavar = (self.type.__name__).upper()
+        # if hasattr(self, 'type'):
+        #     self.metavar = (self.type.__name__)
 
         if docstring:
             self.help = docstring.description
@@ -56,6 +56,7 @@ class Argument:
     def name(self, name: str) -> None:
         '''Set argparse command/argument name.'''
         if not hasattr(self, 'default'):
+            print(name)
             self.__name = [name]
         else:
             flags = ['--' + name]
