@@ -16,7 +16,7 @@ from typing import (
     Optional,
     Sequence,
     Tuple,
-    TypeVar
+    TypeVar,
 )
 
 # from argparse_color_formatter import ColorHelpFormatter, ColorTextWrapper
