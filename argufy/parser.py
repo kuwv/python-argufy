@@ -5,7 +5,7 @@
 
 import inspect
 import sys
-from argparse import ArgumentParser, Namespace, _SubParsersAction
+from argparse import _SubParsersAction, ArgumentParser, Namespace
 from inspect import _ParameterKind
 from types import ModuleType
 from typing import (
@@ -138,6 +138,7 @@ class Parser(ArgumentParser):
 
         if not parser:
             parser = self
+
         if not any(isinstance(x, _SubParsersAction) for x in parser._actions):
             parser.add_subparsers(dest=module_name)
         command = next(
@@ -197,6 +198,7 @@ class Parser(ArgumentParser):
 
         if not parser:
             parser = self
+
         if not any(isinstance(x, _SubParsersAction) for x in parser._actions):
             parser.add_subparsers(dest=module_name)
         command = next(

@@ -1,9 +1,49 @@
 '''Simple argparse.'''
+
 import sys
+
+from argparse import _ArgumentGroup, Action, HelpFormatter
+from typing import Iterable, Optional
+
+import colorama
+from colorama import Fore, Back, Style
 
 from argufy import Parser
 
 module = sys.modules[__name__]
+
+print(Fore.RED + 'some red text')
+print(Back.GREEN + 'and with a green background')
+print(Style.DIM + 'and in dim text')
+print(Style.RESET_ALL)
+print(Fore.CYAN + 'testing')
+print('back to normal now')
+
+colorama.init()
+
+
+class ArgufyHelpFormatter(HelpFormatter):
+    def add_usage(
+        self,
+        usage: str,
+        actions: Iterable[Action],
+        groups: Iterable[_ArgumentGroup],
+        prefix: Optional[str] = None
+    ) -> None:
+        '''Format usage message.'''
+        if prefix is None:
+            prefix = Fore.CYAN + 'USAGE: ' + Style.RESET_ALL
+        super(ArgufyHelpFormatter, self).add_usage(
+            usage, actions, groups, prefix
+        )
+
+    def add_argument(self, action: Action) -> None:
+        '''Format arguments.'''
+        if action is not None:
+            print('action: ', type(action.choices))
+            for choice in action.choices.items():
+                print(choice)
+            super(ArgufyHelpFormatter, self).add_argument(action)
 
 
 def empty():  # type: ignore
@@ -25,6 +65,6 @@ def example_choice(choice_check='A'):  # type: ignore
     print(choice_check)
 
 
-__parser = Parser()
-__parser.add_commands(module)
-__parser.dispatch()
+parser = Parser(formatter_class=ArgufyHelpFormatter)  # type: ignore
+parser.add_commands(module)
+parser.dispatch()
