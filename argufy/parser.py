@@ -5,7 +5,12 @@
 
 import inspect
 import sys
-from argparse import _SubParsersAction, ArgumentParser, Namespace
+from argparse import (
+    # _FormatterClass,
+    _SubParsersAction,
+    ArgumentParser,
+    Namespace,
+)
 from inspect import _ParameterKind
 from types import ModuleType
 from typing import (
@@ -22,6 +27,7 @@ from typing import (
 # from argparse_color_formatter import ColorHelpFormatter, ColorTextWrapper
 from docstring_parser import parse
 
+from .formatter import ArgufyHelpFormatter
 from .argument import Argument
 
 # Define function as parameters for MyPy
@@ -79,10 +85,12 @@ class Parser(ArgumentParser):
         if 'version' in kwargs:
             self.version = kwargs.pop('version')
 
+        if 'formatter_class' not in kwargs:
+            self.formatter_class = ArgufyHelpFormatter
+
         super().__init__(**kwargs)  # type: ignore
         # if not hasattr(self, '_commands'):
         #     self._commands = None
-
         # if module:
         #     self._load_module(module)
 
@@ -114,16 +122,13 @@ class Parser(ArgumentParser):
         signature = inspect.signature(obj)
         for arg in signature.parameters:
             description = next(
-                (d for d in docstring.params if d.arg_name == arg), None
+                (d for d in docstring.params if d.arg_name == arg),
+                None,
             )
             argument = Argument(signature.parameters[arg], description)
             arguments = self.__get_args(argument)
             name = arguments.pop('name')
             parser.add_argument(*name, **arguments)
-        # if signature.parameters:
-        #     print('not empty')
-        # else:
-        #     print('empty')
         return self
 
     def add_commands(
@@ -138,7 +143,6 @@ class Parser(ArgumentParser):
 
         if not parser:
             parser = self
-
         if not any(isinstance(x, _SubParsersAction) for x in parser._actions):
             parser.add_subparsers(dest=module_name)
         command = next(
@@ -166,6 +170,7 @@ class Parser(ArgumentParser):
                                 help=parse(value.__doc__).short_description,
                             )
                             cmd.set_defaults(fn=value)
+                            self.formatter_class = ArgufyHelpFormatter
                         # print('command', name, value, cmd)
                         self.add_arguments(value, cmd)
                 elif isinstance(value, (float, int, str, list, dict, tuple)):
@@ -198,7 +203,6 @@ class Parser(ArgumentParser):
 
         if not parser:
             parser = self
-
         if not any(isinstance(x, _SubParsersAction) for x in parser._actions):
             parser.add_subparsers(dest=module_name)
         command = next(
