@@ -2,24 +2,9 @@
 
 import sys
 
-from argparse import _ArgumentGroup, Action, HelpFormatter
-from typing import Iterable, Optional
-
-import colorama
-from colorama import Fore, Back, Style
-
 from argufy import Parser
 
 module = sys.modules[__name__]
-
-# print(Fore.RED + 'some red text')
-# print(Back.GREEN + 'and with a green background')
-# print(Style.DIM + 'and in dim text')
-# print(Style.RESET_ALL)
-# print(Fore.CYAN + 'testing')
-# print('back to normal now')
-
-colorama.init()
 
 
 def empty():  # type: ignore
@@ -42,6 +27,5 @@ def example_choice(choice_check='A'):  # type: ignore
 
 
 parser = Parser()
-# parser = Parser(formatter_class=ArgufyHelpFormatter)  # type: ignore
 parser.add_commands(module)
 parser.dispatch()

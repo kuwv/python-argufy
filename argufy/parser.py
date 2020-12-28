@@ -88,8 +88,12 @@ class Parser(ArgumentParser):
         #     self._commands = None
 
         # TODO: move to formatter
-        self._positionals.title = Style.BRIGHT + 'arguments' + Style.RESET_ALL
-        self._optionals.title = Style.BRIGHT + 'flags' + Style.RESET_ALL
+        self._positionals.title = (
+            Style.BRIGHT + self._positionals.title + Style.RESET_ALL
+        )
+        self._optionals.title = (
+            Style.BRIGHT + self._optionals.title + Style.RESET_ALL
+        )
 
     @staticmethod
     def __get_parent_module() -> Optional[ModuleType]:
