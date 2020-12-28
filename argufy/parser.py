@@ -1,16 +1,11 @@
 # -*- coding: utf-8 -*-
 # copyright: (c) 2020 by Jesse Johnson.
 # license: Apache 2.0, see LICENSE for more details.
-'''Argufier is an inspection based CLI parser.'''
+'''Argufy is an inspection based CLI parser.'''
 
 import inspect
 import sys
-from argparse import (
-    # _FormatterClass,
-    _SubParsersAction,
-    ArgumentParser,
-    Namespace,
-)
+from argparse import _SubParsersAction, ArgumentParser, Namespace
 from inspect import _ParameterKind
 from types import ModuleType
 from typing import (
@@ -24,7 +19,7 @@ from typing import (
     TypeVar,
 )
 
-# from argparse_color_formatter import ColorHelpFormatter, ColorTextWrapper
+from colorama import Style
 from docstring_parser import parse
 
 from .formatter import ArgufyHelpFormatter
@@ -91,17 +86,17 @@ class Parser(ArgumentParser):
         super().__init__(**kwargs)  # type: ignore
         # if not hasattr(self, '_commands'):
         #     self._commands = None
-        # if module:
-        #     self._load_module(module)
+
+        # TODO: move to formatter
+        self._positionals.title = Style.BRIGHT + 'arguments' + Style.RESET_ALL
+        self._optionals.title = Style.BRIGHT + 'flags' + Style.RESET_ALL
 
     @staticmethod
     def __get_parent_module() -> Optional[ModuleType]:
         '''Get parent name importing this module.'''
-        module = None
         stack = inspect.stack()
         stack_frame = stack[1]
-        module = inspect.getmodule(stack_frame[0])
-        return module
+        return inspect.getmodule(stack_frame[0]) or None
 
     @staticmethod
     def __get_args(argument: Argument) -> Dict[Any, Any]:
@@ -144,13 +139,12 @@ class Parser(ArgumentParser):
         if not parser:
             parser = self
         if not any(isinstance(x, _SubParsersAction) for x in parser._actions):
-            parser.add_subparsers(dest=module_name)
+            parser.add_subparsers(dest=module_name, parser_class=Parser)
         command = next(
             (x for x in parser._actions if isinstance(x, _SubParsersAction)),
             None,
         )
 
-        # self._load_module(module, command, exclude_prefix)
         for name, value in inspect.getmembers(module):
             # TODO: Possible singledispatch candidate
             if not name.startswith(self.__exclude_prefixes__):
@@ -165,12 +159,16 @@ class Parser(ArgumentParser):
                         )
                     ):
                         if command:
+                            msg = parse(value.__doc__).short_description
                             cmd = command.add_parser(
                                 name.replace('_', '-'),
-                                help=parse(value.__doc__).short_description,
+                                description=msg,
+                                formatter_class=ArgufyHelpFormatter,
+                                help=msg,
                             )
                             cmd.set_defaults(fn=value)
-                            self.formatter_class = ArgufyHelpFormatter
+                            parser.formatter_class = ArgufyHelpFormatter
+                            # print(cmd)
                         # print('command', name, value, cmd)
                         self.add_arguments(value, cmd)
                 elif isinstance(value, (float, int, str, list, dict, tuple)):
@@ -204,17 +202,21 @@ class Parser(ArgumentParser):
         if not parser:
             parser = self
         if not any(isinstance(x, _SubParsersAction) for x in parser._actions):
-            parser.add_subparsers(dest=module_name)
+            parser.add_subparsers(dest=module_name, parser_class=Parser)
         command = next(
             (x for x in parser._actions if isinstance(x, _SubParsersAction)),
             None,
         )
         if command:
+            msg = docstring.short_description
             subcommand = command.add_parser(
                 module_name.replace('_', '-'),
-                help=docstring.short_description,
+                description=msg,
+                formatter_class=ArgufyHelpFormatter,
+                help=msg,
             )
             subcommand.set_defaults(mod=module)
+            parser.formatter_class = ArgufyHelpFormatter
         self.add_commands(module, exclude_prefix, subcommand)
         return self
 

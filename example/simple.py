@@ -22,30 +22,6 @@ module = sys.modules[__name__]
 colorama.init()
 
 
-class ArgufyHelpFormatter(HelpFormatter):
-    def add_usage(
-        self,
-        usage: str,
-        actions: Iterable[Action],
-        groups: Iterable[_ArgumentGroup],
-        prefix: Optional[str] = 'USAGE: '
-    ) -> None:
-        '''Format usage message.'''
-        if prefix is None:
-            prefix = Fore.CYAN + prefix + Style.RESET_ALL
-        super(ArgufyHelpFormatter, self).add_usage(
-            usage, actions, groups, prefix
-        )
-
-    def add_argument(self, action: Action) -> None:
-        '''Format arguments.'''
-        if action is not None and action.choices is not None:
-            print('action: ', type(action.choices))
-            for choice in action.choices.items():  # type: ignore
-                print(type(choice))
-            super(ArgufyHelpFormatter, self).add_argument(action)
-
-
 def empty():  # type: ignore
     '''Empty function to check switch.'''
     print('test empty switch')
