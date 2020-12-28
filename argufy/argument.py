@@ -170,6 +170,12 @@ class Argument:
     @nargs.setter
     def nargs(self, nargs: str) -> None:
         '''Set argparse argument nargs.'''
+        # TODO: map nargs to argparse with typing
+        # 3: set number of values
+        # ?: a single optional value
+        # *: a flexible list of values
+        # +: like * requiring at least one value
+        # REMAINDER: unused args
         self.__nargs = nargs
 
     @property

@@ -24,19 +24,28 @@ class ArgufyHelpFormatter(HelpFormatter):
     ) -> None:
         '''Format usage message.'''
         if prefix is not None:
-            prefix = Style.BRIGHT + prefix + Style.RESET_ALL
+            prefix = self.font(prefix)
         super(ArgufyHelpFormatter, self).add_usage(
             usage, actions, groups, prefix
         )
 
+    @staticmethod
+    def font(text: str, width: str = 'BRIGHT') -> str:
+        '''Set the string thickness.'''
+        return getattr(Style, width) + text + Style.RESET_ALL
+
+    @staticmethod
+    def shade(text: str, color: str = 'CYAN') -> str:
+        '''Set the string color.'''
+        return getattr(Fore, color.upper()) + text + Style.RESET_ALL
+
     def _format_action_invocation(self, action: Action) -> str:
         '''Format arguments summary.'''
-        # print('action:', pprint(action))  # type: ignore
         if isinstance(action, argparse._SubParsersAction):
             if action.choices is not None:
                 for choice in list(action.choices):
                     parser = action.choices.pop(choice)
-                    choice = Fore.CYAN + choice + Fore.RESET
+                    choice = self.shade(choice)
                     action.choices[choice] = parser
         return super(
             ArgufyHelpFormatter, self
@@ -46,10 +55,10 @@ class ArgufyHelpFormatter(HelpFormatter):
         '''Format help message.'''
         if action.help:
             return (
-                Style.NORMAL +
-                Fore.YELLOW +
-                super(ArgufyHelpFormatter, self)._expand_help(action) +
-                Style.RESET_ALL
+                self.shade(
+                    super(ArgufyHelpFormatter, self)._expand_help(action),
+                    'YELLOW',
+                ).lower()
             )
         else:
             return ''
@@ -60,16 +69,17 @@ class ArgufyHelpFormatter(HelpFormatter):
             action, argparse._SubParsersAction._ChoicesPseudoAction
         ):
             subcommand = (
-                Style.BRIGHT +
-                Fore.CYAN +
-                self._format_action_invocation(action) +
-                Style.RESET_ALL
+                self.shade(
+                    self.font(
+                        self._format_action_invocation(action)
+                    )
+                )
             )
             help_text = self._expand_help(action)
             return f"    {subcommand.ljust(33)}{help_text}\n"
         else:
             # action.option_strings = [
-            #     Fore.MAGENTA + x + Fore.RESET
-            #     for x in action.option_strings
+            #     self.font(self.shade(option))
+            #     for option in action.option_strings
             # ]
             return super(ArgufyHelpFormatter, self)._format_action(action)

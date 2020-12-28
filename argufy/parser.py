@@ -19,7 +19,6 @@ from typing import (
     TypeVar,
 )
 
-from colorama import Style
 from docstring_parser import parse
 
 from .formatter import ArgufyHelpFormatter
@@ -89,18 +88,21 @@ class Parser(ArgumentParser):
 
         # TODO: move to formatter
         self._positionals.title = (
-            Style.BRIGHT + self._positionals.title + Style.RESET_ALL
+            ArgufyHelpFormatter.font(self._positionals.title or 'arguments')
         )
         self._optionals.title = (
-            Style.BRIGHT + self._optionals.title + Style.RESET_ALL
+            ArgufyHelpFormatter.font(self._optionals.title or 'flags')
         )
 
     @staticmethod
     def __get_parent_module() -> Optional[ModuleType]:
         '''Get parent name importing this module.'''
         stack = inspect.stack()
-        stack_frame = stack[1]
-        return inspect.getmodule(stack_frame[0]) or None
+        # print(stack)
+        stack_frame = stack[-3]
+        result = inspect.getmodule(stack_frame[0]) or None
+        # print(result)
+        return result
 
     @staticmethod
     def __get_args(argument: Argument) -> Dict[Any, Any]:
@@ -126,6 +128,7 @@ class Parser(ArgumentParser):
             )
             argument = Argument(signature.parameters[arg], description)
             arguments = self.__get_args(argument)
+            print(arguments)
             name = arguments.pop('name')
             parser.add_argument(*name, **arguments)
         return self
@@ -172,7 +175,6 @@ class Parser(ArgumentParser):
                             )
                             cmd.set_defaults(fn=value)
                             parser.formatter_class = ArgufyHelpFormatter
-                            # print(cmd)
                         # print('command', name, value, cmd)
                         self.add_arguments(value, cmd)
                 elif isinstance(value, (float, int, str, list, dict, tuple)):

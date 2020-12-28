@@ -2,12 +2,12 @@
 
 ## Overview
 
-The commands module takes a module as an argument and inspects it for   
-functions. These functions are then used to populate CLI commands. It is   
-different from the subcommands module in that the module isn't used to as a  
+The commands module takes a module as an argument and inspects it for
+functions. The results are then used to populate CLI commands. It is
+different from the subcommands module in that the module name isn't used as a
 command itself.
 
-This command is usefull either for all-in-modules or a module that is holding  
+This command is usefull either for all-in-modules or a module that is holding
 functions that combine an applications parts into a CLI.
 
 ## Convert Module to CLI
@@ -25,7 +25,7 @@ def example_choice(choice_check = 'A'):
 
 ## Creating a parser
 
-Next create a parser to 
+Next create a parser to
 
 ```
 from argufy import Parser

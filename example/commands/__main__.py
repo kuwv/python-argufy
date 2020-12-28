@@ -5,15 +5,17 @@
 
 from argufy import Parser
 
-from . import command
+from . import cmd1
+from . import cmd2
 
 example_variable = 'ex_var'
 
 
-def main():
+def main() -> None:
     '''Demonstrate main with CLI.'''
     parser = Parser()
-    parser.add_commands(command)
+    parser.add_commands(cmd1)
+    parser.add_commands(cmd2)
     parser.dispatch()
 
 
