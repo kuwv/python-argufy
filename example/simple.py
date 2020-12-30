@@ -13,6 +13,7 @@ def switch():  # type: ignore
 
 
 def positional(test: str):  # type: ignore
+    '''Run example positional.'''
     print(test)
 
 

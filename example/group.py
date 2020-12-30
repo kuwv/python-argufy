@@ -1,3 +1,4 @@
+'''Example argument group.'''
 from argufy import Parser
 
 # parser = argparse.ArgumentParser()
