@@ -13,6 +13,7 @@ colorama.init()
 
 class ArgufyHelpFormatter(HelpFormatter):
     '''Provide formatting for Argufy.'''
+
     # argparse.HelpFormatter(prog, max_help_position=80, width=130)
 
     def add_usage(
@@ -20,7 +21,7 @@ class ArgufyHelpFormatter(HelpFormatter):
         usage: str,
         actions: Iterable[Action],
         groups: Iterable[argparse._ArgumentGroup],
-        prefix: Optional[str] = 'usage: '
+        prefix: Optional[str] = 'usage: ',
     ) -> None:
         '''Format usage message.'''
         if prefix is not None:
@@ -55,29 +56,21 @@ class ArgufyHelpFormatter(HelpFormatter):
     def _expand_help(self, action: Action) -> str:
         '''Format help message.'''
         if action.help:
-            return (
-                self.shade(
-                    super(ArgufyHelpFormatter, self)
-                    ._expand_help(action)
-                    .rstrip('.')
-                    .lower(),
-                    'YELLOW',
-                )
+            return self.shade(
+                super(ArgufyHelpFormatter, self)
+                ._expand_help(action)
+                .rstrip('.')
+                .lower(),
+                'YELLOW',
             )
         else:
             return ''
 
     def _format_action(self, action: Action) -> str:
         '''Format arguments.'''
-        if isinstance(
-            action, argparse._SubParsersAction._ChoicesPseudoAction
-        ):
-            subcommand = (
-                self.shade(
-                    self.font(
-                        self._format_action_invocation(action)
-                    )
-                )
+        if isinstance(action, argparse._SubParsersAction._ChoicesPseudoAction):
+            subcommand = self.shade(
+                self.font(self._format_action_invocation(action))
             )
             help_text = self._expand_help(action)
             # TODO: calculate correct spacing

@@ -5,7 +5,7 @@
 
 import inspect
 import sys
-from argparse import _SubParsersAction, ArgumentParser, Namespace
+from argparse import ArgumentParser, Namespace, _SubParsersAction
 from inspect import _ParameterKind
 from types import ModuleType
 from typing import (
@@ -21,8 +21,8 @@ from typing import (
 
 from docstring_parser import parse
 
-from .formatter import ArgufyHelpFormatter
 from .argument import Argument
+from .formatter import ArgufyHelpFormatter
 
 # Define function as parameters for MyPy
 F = TypeVar('F', bound=Callable[..., Any])
@@ -87,11 +87,11 @@ class Parser(ArgumentParser):
         #     self._commands = None
 
         # TODO: move to formatter
-        self._positionals.title = (
-            ArgufyHelpFormatter.font(self._positionals.title or 'arguments')
+        self._positionals.title = ArgufyHelpFormatter.font(
+            self._positionals.title or 'arguments'
         )
-        self._optionals.title = (
-            ArgufyHelpFormatter.font(self._optionals.title or 'flags')
+        self._optionals.title = ArgufyHelpFormatter.font(
+            self._optionals.title or 'flags'
         )
 
     @staticmethod
@@ -122,8 +122,7 @@ class Parser(ArgumentParser):
         signature = inspect.signature(obj)
         for arg in signature.parameters:
             description = next(
-                (d for d in docstring.params if d.arg_name == arg),
-                None,
+                (d for d in docstring.params if d.arg_name == arg), None,
             )
             argument = Argument(signature.parameters[arg], description)
             arguments = self.__get_args(argument)
