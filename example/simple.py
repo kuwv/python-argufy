@@ -7,7 +7,7 @@ from argufy import Parser
 module = sys.modules[__name__]
 
 
-def empty():  # type: ignore
+def switch():  # type: ignore
     '''Empty function to check switch.'''
     print('test empty switch')
 

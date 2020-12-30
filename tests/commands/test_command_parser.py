@@ -2,6 +2,7 @@
 # :copyright: (c) 2020 by Jesse Johnson.
 # :license: Apache 2.0, see LICENSE for more details.
 # type: ignore
+
 '''Test parser.
 
 Attributes
@@ -10,6 +11,8 @@ check_attribute: bool
     Check document attributes
 
 '''
+
+from ast import literal_eval
 
 import pytest
 import sys
@@ -26,21 +29,28 @@ def test_help():
     '''Do help function for CLI.'''
     parser = Parser(version=__version__)
     parser.add_commands(command_parser, ['test_'])
-    with pytest.raises(SystemExit) as err:
-        parser.dispatch()
-    assert err.type == SystemExit
-    # assert err.value.code == 2
+    with pytest.raises(SystemExit) as blank_err:
+        parser.dispatch([])
+    assert blank_err.type == SystemExit
+    with pytest.raises(SystemExit) as help_err:
+        parser.dispatch(['--help'])
+    assert help_err.type == SystemExit
+    assert blank_err.value.code == help_err.value.code
 
 
-def test_bool():
+def test_bool(capsys):
     '''Do main function for CLI.'''
     parser = Parser()
     parser.add_commands(command_parser, ['test_'])
     parser.dispatch(['example-bool', '--bool-check'])
+    capture = capsys.readouterr()
+    assert literal_eval(capture.out) is True
 
 
-def test_choice():
+def test_choice(capsys):
     '''Do main function for CLI.'''
     parser = Parser()
     parser.add_commands(command_parser, ['test_'])
     parser.dispatch(['example-choice', '--choice-check', 'B'])
+    capture = capsys.readouterr()
+    assert literal_eval(capture.out) is True

@@ -11,7 +11,9 @@ check_attribute: bool
 
 '''
 
+from ast import literal_eval
 import sys
+
 import pytest
 
 from argufy import Parser
@@ -23,21 +25,29 @@ import subcommands_parser  # noqa: E402
 
 def test_help():
     '''Do help function for CLI.'''
+    # NOTE: getting varying results
+    # 0 displays help
+    # 2 dumps error (invalid choice)
+
     parser = Parser(version=__version__)
     parser.add_commands(subcommands_parser, ['test_'])
 
-    with pytest.raises(SystemExit) as err:
-        parser.dispatch(['subcommands-parser'])
-    assert err.type == SystemExit
-    # assert err.value.code == 2
+    with pytest.raises(SystemExit) as blank_err:
+        parser.dispatch([])
+    assert blank_err.type == SystemExit
+
+    with pytest.raises(SystemExit) as help_err:
+        parser.dispatch(['--help'])
+    assert help_err.type == SystemExit
+    assert help_err.type == blank_err.type
 
     with pytest.raises(SystemExit) as err:
-        parser.dispatch(['subcommands-parser', 'example-bool'])
+        parser.dispatch(['example-bool', '--help'])
     assert err.type == SystemExit
-    # assert err.value.code == 2
+    assert err.value.code == 0
 
 
-def test_bool():
+def test_bool(capsys):
     '''Do main function for CLI.'''
     parser = Parser()
     parser.add_subcommands(subcommands_parser, ['test_'])
@@ -46,9 +56,11 @@ def test_bool():
         'example-bool',
         '--bool-check'
     ])
+    capture = capsys.readouterr()
+    assert literal_eval(capture.out) is True
 
 
-def test_choice():
+def test_choice(capsys):
     '''Do main function for CLI.'''
     parser = Parser()
     parser.add_subcommands(subcommands_parser, ['test_'])
@@ -58,3 +70,5 @@ def test_choice():
         '--choice-check',
         'B'
     ])
+    capture = capsys.readouterr()
+    assert literal_eval(capture.out) is True

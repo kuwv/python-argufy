@@ -22,7 +22,7 @@ def example_bool(bool_check: bool = False):
         list packages and version
 
     '''
-    assert bool_check is True
+    print(bool_check is True)
 
 
 def example_choice(choice_check: str = 'A'):
@@ -34,4 +34,4 @@ def example_choice(choice_check: str = 'A'):
         example choice
 
     '''
-    assert choice_check == 'B'
+    print(choice_check == 'B')

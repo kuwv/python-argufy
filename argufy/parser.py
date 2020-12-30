@@ -98,10 +98,9 @@ class Parser(ArgumentParser):
     def __get_parent_module() -> Optional[ModuleType]:
         '''Get parent name importing this module.'''
         stack = inspect.stack()
-        # print(stack)
+        # TODO: need way to better identify calling module
         stack_frame = stack[-3]
         result = inspect.getmodule(stack_frame[0]) or None
-        # print(result)
         return result
 
     @staticmethod
@@ -128,7 +127,6 @@ class Parser(ArgumentParser):
             )
             argument = Argument(signature.parameters[arg], description)
             arguments = self.__get_args(argument)
-            print(arguments)
             name = arguments.pop('name')
             parser.add_argument(*name, **arguments)
         return self
@@ -251,6 +249,9 @@ class Parser(ArgumentParser):
         self, args: Sequence[str] = None, ns: Optional[Namespace] = None,
     ) -> Tuple[List[str], Namespace]:
         '''Retrieve values from CLI.'''
+        # TODO: handle invalid argument
+        if args == []:
+            args = ['--help']  # pragma: no cover
         main_ns, main_args = self.parse_known_args(args, ns)
         if main_args == [] and 'fn' in vars(main_ns):
             return main_args, main_ns
@@ -269,8 +270,6 @@ class Parser(ArgumentParser):
         ns: Optional[Namespace] = None,
     ) -> Optional[Callable[[F], F]]:
         '''Call command with arguments.'''
-        if args == []:
-            args = ['--help']  # pragma: no cover
         arguments, namespace = self.retrieve(args, ns)
         if 'fn' in namespace:
             fn = vars(namespace).pop('fn')
