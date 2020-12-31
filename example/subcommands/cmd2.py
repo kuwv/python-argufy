@@ -9,7 +9,6 @@ example_variable: str
     Example variable for testing
 
 '''
-example_variable1 = 'test1'
 example_variable2 = 'test2'
 
 

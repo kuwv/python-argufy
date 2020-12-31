@@ -28,7 +28,7 @@ import command_parser  # noqa: E402
 def test_help():
     '''Do help function for CLI.'''
     parser = Parser(version=__version__)
-    parser.add_commands(command_parser, ['test_'])
+    parser.add_commands(command_parser, exclude_prefixes=['test_'])
     with pytest.raises(SystemExit) as blank_err:
         parser.dispatch([])
     assert blank_err.type == SystemExit
@@ -41,7 +41,7 @@ def test_help():
 def test_bool(capsys):
     '''Do main function for CLI.'''
     parser = Parser()
-    parser.add_commands(command_parser, ['test_'])
+    parser.add_commands(command_parser, exclude_prefixes=['test_'])
     parser.dispatch(['example-bool', '--bool-check'])
     capture = capsys.readouterr()
     assert literal_eval(capture.out) is True
@@ -50,7 +50,7 @@ def test_bool(capsys):
 def test_choice(capsys):
     '''Do main function for CLI.'''
     parser = Parser()
-    parser.add_commands(command_parser, ['test_'])
+    parser.add_commands(command_parser, exclude_prefixes=['test_'])
     parser.dispatch(['example-choice', '--choice-check', 'B'])
     capture = capsys.readouterr()
     assert literal_eval(capture.out) is True

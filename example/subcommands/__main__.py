@@ -8,11 +8,11 @@ from argufy import Parser
 from . import cmd1, cmd2
 
 
-def main():
+def main() -> None:
     '''Demonstrate main with CLI.'''
     parser = Parser()
-    parser.add_subcommands(cmd1)
-    parser.add_subcommands(cmd2)
+    parser.add_commands(cmd1)
+    parser.add_commands(cmd2)
     parser.dispatch()
 
 

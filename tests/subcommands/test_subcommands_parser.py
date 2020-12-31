@@ -30,7 +30,7 @@ def test_help():
     # 2 dumps error (invalid choice)
 
     parser = Parser(version=__version__)
-    parser.add_commands(subcommands_parser, ['test_'])
+    parser.add_subcommands(subcommands_parser, exclude_prefixes=['test_'])
 
     with pytest.raises(SystemExit) as blank_err:
         parser.dispatch([])
@@ -42,7 +42,7 @@ def test_help():
     assert help_err.type == blank_err.type
 
     with pytest.raises(SystemExit) as err:
-        parser.dispatch(['example-bool', '--help'])
+        parser.dispatch(['subcommands-parser', 'example-bool', '--help'])
     assert err.type == SystemExit
     assert err.value.code == 0
 
@@ -50,7 +50,7 @@ def test_help():
 def test_bool(capsys):
     '''Do main function for CLI.'''
     parser = Parser()
-    parser.add_subcommands(subcommands_parser, ['test_'])
+    parser.add_subcommands(subcommands_parser, exclude_prefixes=['test_'])
     parser.dispatch([
         'subcommands-parser',
         'example-bool',
@@ -63,7 +63,7 @@ def test_bool(capsys):
 def test_choice(capsys):
     '''Do main function for CLI.'''
     parser = Parser()
-    parser.add_subcommands(subcommands_parser, ['test_'])
+    parser.add_subcommands(subcommands_parser, exclude_prefixes=['test_'])
     parser.dispatch([
         'subcommands-parser',
         'example-choice',

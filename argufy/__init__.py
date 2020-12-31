@@ -7,8 +7,9 @@ import logging
 from typing import List
 
 from .argument import Argument  # noqa
+from .formatter import ArgufyHelpFormatter  # noqa
 from .parser import Parser  # noqa
 
-__all__: List[str] = ['Parser']
+__all__: List[str] = ['Parser', 'ArgufyHelpFormatter']
 
 logging.getLogger(__name__).addHandler(logging.NullHandler())

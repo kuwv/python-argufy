@@ -31,7 +31,7 @@ F = TypeVar('F', bound=Callable[..., Any])
 class Parser(ArgumentParser):
     '''Provide CLI parser for function.'''
 
-    __exclude_prefixes__ = ('@', '_')
+    exclude_prefixes = ('@', '_')
 
     def __init__(self, *args: str, **kwargs: str) -> None:
         '''Initialize parser.
@@ -82,6 +82,8 @@ class Parser(ArgumentParser):
         if 'formatter_class' not in kwargs:
             self.formatter_class = ArgufyHelpFormatter
 
+        self.command_type = kwargs.pop('command_type', None)
+
         super().__init__(**kwargs)  # type: ignore
         # if not hasattr(self, '_commands'):
         #     self._commands = None
@@ -99,7 +101,7 @@ class Parser(ArgumentParser):
         '''Get parent name importing this module.'''
         stack = inspect.stack()
         # TODO: need way to better identify calling module
-        stack_frame = stack[-3]
+        stack_frame = stack[2]
         result = inspect.getmodule(stack_frame[0]) or None
         return result
 
@@ -111,6 +113,17 @@ class Parser(ArgumentParser):
             for k, v in vars(argument).items()
             if k.startswith('_Argument__')
         }
+
+    def __get_excludes(
+        self, exclude_prefixes: tuple = tuple()
+    ) -> tuple:
+        if exclude_prefixes != []:
+            return (
+                tuple(exclude_prefixes) +
+                Parser.exclude_prefixes
+            )
+        else:
+            return Parser.exclude_prefixes
 
     def add_arguments(
         self, obj: Any, parser: Optional[ArgumentParser] = None
@@ -133,13 +146,13 @@ class Parser(ArgumentParser):
     def add_commands(
         self,
         module: ModuleType,
-        exclude_prefix: list = ['@', '_'],
         parser: Optional[ArgumentParser] = None,
+        exclude_prefixes: tuple = tuple(),
+        command_type: Optional[str] = None,
     ) -> 'Parser':
         '''Add commands.'''
         module_name = module.__name__.split('.')[-1]
         docstring = parse(module.__doc__)
-
         if not parser:
             parser = self
         if not any(isinstance(x, _SubParsersAction) for x in parser._actions):
@@ -149,9 +162,13 @@ class Parser(ArgumentParser):
             None,
         )
 
+        excludes = self.__get_excludes(exclude_prefixes)
+        if command_type is None:
+            command_type = self.command_type
+
         for name, value in inspect.getmembers(module):
             # TODO: Possible singledispatch candidate
-            if not name.startswith(self.__exclude_prefixes__):
+            if not name.startswith(excludes):
                 if inspect.isclass(value):
                     continue  # pragma: no cover
                 elif inspect.isfunction(value):  # or inspect.ismethod(value):
@@ -159,13 +176,17 @@ class Parser(ArgumentParser):
                     if (
                         module.__name__ == value.__module__
                         and not name.startswith(
-                            (', '.join(self.__exclude_prefixes__))
+                            (', '.join(excludes))
                         )
                     ):
                         if command:
+                            if command_type == 'chain':
+                                cmd_name = module_name + '.' + name
+                            else:
+                                cmd_name = name
                             msg = parse(value.__doc__).short_description
                             cmd = command.add_parser(
-                                name.replace('_', '-'),
+                                cmd_name.replace('_', '-'),
                                 description=msg,
                                 formatter_class=ArgufyHelpFormatter,
                                 help=msg,
@@ -195,8 +216,8 @@ class Parser(ArgumentParser):
     def add_subcommands(
         self,
         module: ModuleType,
-        exclude_prefix: list = ['@', '_'],
         parser: Optional[ArgumentParser] = None,
+        exclude_prefixes: tuple = tuple(),
     ) -> 'Parser':
         '''Add subcommands.'''
         module_name = module.__name__.split('.')[-1]
@@ -210,6 +231,9 @@ class Parser(ArgumentParser):
             (x for x in parser._actions if isinstance(x, _SubParsersAction)),
             None,
         )
+
+        excludes = self.__get_excludes(exclude_prefixes)
+
         if command:
             msg = docstring.short_description
             subcommand = command.add_parser(
@@ -220,7 +244,9 @@ class Parser(ArgumentParser):
             )
             subcommand.set_defaults(mod=module)
             parser.formatter_class = ArgufyHelpFormatter
-        self.add_commands(module, exclude_prefix, subcommand)
+        self.add_commands(
+            module=module, parser=subcommand, exclude_prefixes=excludes
+        )
         return self
 
     def __set_module_arguments(
@@ -269,6 +295,7 @@ class Parser(ArgumentParser):
         ns: Optional[Namespace] = None,
     ) -> Optional[Callable[[F], F]]:
         '''Call command with arguments.'''
+        # TODO: support command chaining at same level
         arguments, namespace = self.retrieve(args, ns)
         if 'fn' in namespace:
             fn = vars(namespace).pop('fn')
