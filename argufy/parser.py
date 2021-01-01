@@ -4,6 +4,7 @@
 '''Argufy is an inspection based CLI parser.'''
 
 import inspect
+import logging
 import sys
 from argparse import ArgumentParser, Namespace, _SubParsersAction
 from inspect import _ParameterKind
@@ -23,6 +24,8 @@ from docstring_parser import parse
 
 from .argument import Argument
 from .formatter import ArgufyHelpFormatter
+
+log = logging.getLogger(__name__)
 
 # Define function as parameters for MyPy
 F = TypeVar('F', bound=Callable[..., Any])
@@ -67,6 +70,8 @@ class Parser(ArgumentParser):
             unambiguous
 
         '''
+        # TODO: handle environment variables
+
         module = self.__get_parent_module()
         if module:
             docstring = parse(module.__doc__)
@@ -76,11 +81,20 @@ class Parser(ArgumentParser):
         if module and 'prog' not in kwargs:
             kwargs['prog'] = module.__name__.split('.')[0]
 
-        if 'version' in kwargs:
-            self.version = kwargs.pop('version')
+        # if 'prefix' in kwargs:
+        #     self.prefix = kwargs.pop('prefix')
+        # else:
+        #     self.prefix = kwargs['prog'].upper()
+        # print(self.prefix)
 
         if 'formatter_class' not in kwargs:
             self.formatter_class = ArgufyHelpFormatter
+
+        if 'log_level' in kwargs:
+            log.setLevel(getattr(logging, kwargs.pop('log_level').upper()))
+
+        if 'version' in kwargs:
+            self.prog_version = kwargs.pop('version')
 
         self.command_type = kwargs.pop('command_type', None)
 
@@ -95,6 +109,14 @@ class Parser(ArgumentParser):
         self._optionals.title = ArgufyHelpFormatter.font(
             self._optionals.title or 'flags'
         )
+
+        if hasattr(self, 'prog_version'):
+            self.add_argument(
+                '--version',
+                action='version',
+                version=f"%(prog)s {self.prog_version}",
+                help='display package version'
+            )
 
     @staticmethod
     def __get_parent_module() -> Optional[ModuleType]:
@@ -139,6 +161,7 @@ class Parser(ArgumentParser):
             )
             argument = Argument(signature.parameters[arg], description)
             arguments = self.__get_args(argument)
+            log.warning('arguments', arguments)
             name = arguments.pop('name')
             parser.add_argument(*name, **arguments)
         return self
@@ -194,6 +217,7 @@ class Parser(ArgumentParser):
                             cmd.set_defaults(fn=value)
                             parser.formatter_class = ArgufyHelpFormatter
                         # print('command', name, value, cmd)
+                        log.debug(f"command {name} {value} {cmd}")
                         self.add_arguments(value, cmd)
                 elif isinstance(value, (float, int, str, list, dict, tuple)):
                     # TODO: Reconcile inspect parameters with dict
@@ -271,7 +295,9 @@ class Parser(ArgumentParser):
         return ns
 
     def retrieve(
-        self, args: Sequence[str] = None, ns: Optional[Namespace] = None,
+        self,
+        args: Sequence[str] = sys.argv[1:],
+        ns: Optional[Namespace] = None,
     ) -> Tuple[List[str], Namespace]:
         '''Retrieve values from CLI.'''
         # TODO: handle invalid argument
