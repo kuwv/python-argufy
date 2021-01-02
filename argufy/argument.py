@@ -4,6 +4,7 @@
 '''Arguments for inspection based CLI parser.'''
 
 import inspect
+from ast import literal_eval
 from typing import Any, Dict, List
 
 from docstring_parser.common import DocstringParam
@@ -34,7 +35,7 @@ class Argument:
                     arg = args.pop(0)
                     # NOTE: Limit input that eval will parse
                     if arg in types:
-                        self.type = eval(arg)  # nosec
+                        self.type = literal_eval(arg) if arg != 'str' else str
                 # TODO: Parse choices
             if not hasattr(self, 'type'):
                 # NOTE: Limit input that eval will parse
