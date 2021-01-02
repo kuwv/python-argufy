@@ -1,21 +1,9 @@
 '''Simple argparse.'''
 
-import logging
 import sys
-from typing import Optional, Union
-
 from argufy import Parser
 
 module = sys.modules[__name__]
-
-log = logging.getLogger(__name__)
-log.setLevel(logging.DEBUG)
-
-t = Union[str, None]
-if t.__origin__ is Union and isinstance(None, t.__args__):  # type: ignore
-    print('awesome')
-else:
-    print('blah')
 
 
 def switch():  # type: ignore
@@ -38,13 +26,6 @@ def example_choice(choice_check='A'):  # type: ignore
     print(choice_check)
 
 
-def optional(variable: Optional[str] = None) -> None:
-    if variable:
-        print(variable)
-    else:
-        print('optional is not set')
-
-
-parser = Parser(version='1.2.3', log_level='DEBUG')
+parser = Parser(version='1.2.3')
 parser.add_commands(module)
 parser.dispatch()

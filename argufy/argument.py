@@ -4,8 +4,10 @@
 '''Arguments for inspection based CLI parser.'''
 
 import inspect
+import re
+import typing
 from ast import literal_eval
-from typing import Any, Dict, List
+from typing import Any, List, Union
 
 from docstring_parser.common import DocstringParam
 
@@ -15,28 +17,46 @@ types = {'bool', 'dict', 'float', 'int', 'list', 'str', 'set', 'tuple'}
 class Argument:
     '''Represent argparse arguments.'''
 
-    __short_flags: List[str] = []
+    __short_flags: List[str] = ['-h']
 
     def __init__(
         self, parameters: inspect.Parameter, docstring: DocstringParam,
     ) -> None:
         '''Initialize argparse argument.'''
-        self.attributes: Dict[Any, Any] = {}
+        # self.attributes: Dict[Any, Any] = {}
 
         self.default = parameters.default
         self.name = parameters.name.replace('_', '-')  # type: ignore
 
         if parameters.annotation != inspect._empty:  # type: ignore
-            self.type = parameters.annotation
+            if typing.get_origin(parameters.annotation) is Union:
+                annotation = typing.get_args(parameters.annotation)
+                for x in annotation:
+                    if x is None:
+                        self.nargs = '?'
+                    else:
+                        self.type = x
+            else:
+                self.type = parameters.annotation
+        elif self.default is not None:
+            self.type = type(self.default)
         if docstring and docstring.type_name:
             if ',' in docstring.type_name:
-                args = docstring.type_name.split(',', 1)
-                if not hasattr(self, 'type'):
-                    arg = args.pop(0)
-                    # NOTE: Limit input that eval will parse
-                    if arg in types:
-                        self.type = literal_eval(arg) if arg != 'str' else str
-                # TODO: Parse choices
+                for arg in docstring.type_name.split(',', 1):
+                    if not hasattr(self, 'type'):
+                        # NOTE: Limit input that eval will parse
+                        if arg in types:
+                            self.type = (
+                                literal_eval(arg) if arg != 'str' else str
+                            )
+                        # print('default', self.default)
+                    if (
+                        arg.lower() == 'optional' and
+                        not hasattr(self, 'default')
+                    ):
+                        self.default = None
+                    if re.search(r'^\s*\{.*\}\s*$', arg):
+                        self.choices = literal_eval(arg.strip())
             if not hasattr(self, 'type'):
                 # NOTE: Limit input that eval will parse
                 if docstring.type_name in types:
@@ -104,14 +124,17 @@ class Argument:
             self.action = 'append'
         elif annotation == list:
             self.__type = annotation
-            self.nargs = '+'
+            self.nargs = '*'
         elif annotation == tuple:
             self.__type = annotation
+            self.nargs = '+'
         elif annotation == set:
             self.__type = annotation
+            self.nargs = '+'
         else:
             # print('unmatched annotation:', annotation)
             self.__type = annotation
+            self.nargs = 1
 
     # @property
     # def const(self) -> str:
@@ -153,26 +176,26 @@ class Argument:
         '''Set argparse argument action.'''
         self.__action = action
 
-    # @property
-    # def choices(self) -> str:
-    #     '''Get argparse argument choices.'''
-    #     return self.__choices
+    @property
+    def choices(self) -> List[str]:
+        '''Get argparse argument choices.'''
+        return self.__choices
 
-    # @choices.setter
-    # def choices(self, choices: str) -> None:
-    #     '''Set argparse argument choices.'''
-    #     self.__choices = choices
+    @choices.setter
+    def choices(self, choices: set) -> None:
+        '''Set argparse argument choices.'''
+        self.__choices = list(choices)
 
     @property
-    def nargs(self) -> str:
+    def nargs(self) -> Union[int, str]:
         '''Get argparse argument nargs.'''
         return self.__nargs
 
     @nargs.setter
-    def nargs(self, nargs: str) -> None:
+    def nargs(self, nargs: Union[int, str]) -> None:
         '''Set argparse argument nargs.'''
         # TODO: map nargs to argparse with typing
-        # 3: set number of values
+        # 1: set number of values
         # ?: a single optional value
         # *: a flexible list of values
         # +: like * requiring at least one value
@@ -189,6 +212,8 @@ class Argument:
         '''Set argparse argument default.'''
         if default != inspect._empty:  # type: ignore
             self.__default = default
+        # else:
+        #     self.__default = None
 
     @property
     def help(self) -> str:
