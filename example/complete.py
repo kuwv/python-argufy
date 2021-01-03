@@ -13,12 +13,19 @@ log.setLevel(logging.DEBUG)
 
 
 def switch():  # type: ignore
-    '''Empty function to check switch.'''
+    '''Run empty function to check switch.'''
     print('test empty switch')
 
 
-def positional(test: str):  # type: ignore
-    '''Run example positional.'''
+def positional(test: str) -> None:
+    '''Run example positional.
+
+    Parameters
+    ----------
+    test: str
+        example test variable
+
+    '''
     print(test)
 
 
@@ -48,7 +55,17 @@ def optional(variable: Optional[str] = None) -> None:
 
 
 def arguments(*args: str, **kwargs: str) -> None:
-    '''Run example optional.'''
+    '''Run example optional.
+
+    Parameters
+    ----------
+    test1: str
+        kwargs test one
+
+    test2: str
+        kwargs test two
+
+    '''
     if args != []:
         print(args)
 
@@ -56,6 +73,6 @@ def arguments(*args: str, **kwargs: str) -> None:
         print(kwargs)
 
 
-parser = Parser(version='1.2.3', log_level='DEBUG')
+parser = Parser(prog=__name__, version='1.2.3', log_level='DEBUG')
 parser.add_commands(module)
 parser.dispatch()

@@ -38,9 +38,7 @@ class Argument:
                         self.type = x
             else:
                 self.type = parameters.annotation
-        elif self.default is not None:
-            self.type = type(self.default)
-        if docstring and docstring.type_name:
+        elif docstring and docstring.type_name:
             if ',' in docstring.type_name:
                 for arg in docstring.type_name.split(',', 1):
                     if not hasattr(self, 'type'):
@@ -49,7 +47,6 @@ class Argument:
                             self.type = (
                                 literal_eval(arg) if arg != 'str' else str
                             )
-                        # print('default', self.default)
                     if (
                         arg.lower() == 'optional' and
                         not hasattr(self, 'default')
@@ -61,6 +58,8 @@ class Argument:
                 # NOTE: Limit input that eval will parse
                 if docstring.type_name in types:
                     self.type = eval(docstring.type_name)  # nosec
+        elif self.default is not None:
+            self.type = type(self.default)
 
         # if hasattr(self, 'type'):
         #     self.metavar = (self.type.__name__)
@@ -134,7 +133,7 @@ class Argument:
         else:
             # print('unmatched annotation:', annotation)
             self.__type = annotation
-            self.nargs = 1
+            # self.nargs = 1
 
     # @property
     # def const(self) -> str:

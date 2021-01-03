@@ -157,7 +157,8 @@ class Parser(ArgumentParser):
         signature = inspect.signature(obj)
         for arg in signature.parameters:
             description = next(
-                (d for d in docstring.params if d.arg_name == arg), None,
+                (d for d in docstring.params if d.arg_name == arg),
+                None,
             )
             argument = Argument(signature.parameters[arg], description)
             arguments = self.__get_args(argument)
