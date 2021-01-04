@@ -1,5 +1,6 @@
 '''Simple argparse.'''
 
+import inspect
 import logging
 import sys
 from typing import Optional
@@ -54,7 +55,7 @@ def optional(variable: Optional[str] = None) -> None:
         print('optional is not set')
 
 
-def arguments(*args: str, **kwargs: str) -> None:
+def arguments(arg: str = 'test', *args: str, **kwargs: str) -> None:
     '''Run example optional.
 
     Parameters
@@ -73,6 +74,12 @@ def arguments(*args: str, **kwargs: str) -> None:
         print(kwargs)
 
 
-parser = Parser(prog=__name__, version='1.2.3', log_level='DEBUG')
+print(inspect.getfullargspec(arguments))
+parser = Parser(
+    prog=__name__,
+    version='1.2.3',
+    log_level='DEBUG',
+    log_handler=sys.stderr,  # type: ignore
+)
 parser.add_commands(module)
 parser.dispatch()
