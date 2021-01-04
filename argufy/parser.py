@@ -116,7 +116,7 @@ class Parser(ArgumentParser):
                 '--version',
                 action='version',
                 version=f"%(prog)s {self.prog_version}",
-                help='display package version'
+                help='display package version',
             )
 
     @staticmethod
@@ -140,9 +140,7 @@ class Parser(ArgumentParser):
     @staticmethod
     def _get_excludes(exclude_prefixes: tuple = tuple()) -> tuple:
         if exclude_prefixes != []:
-            return (
-                tuple(exclude_prefixes) + Parser.exclude_prefixes
-            )
+            return tuple(exclude_prefixes) + Parser.exclude_prefixes
         else:
             return Parser.exclude_prefixes
 
@@ -156,8 +154,7 @@ class Parser(ArgumentParser):
         signature = inspect.signature(obj)
         for arg in signature.parameters:
             description = next(
-                (d for d in docstring.params if d.arg_name == arg),
-                None,
+                (d for d in docstring.params if d.arg_name == arg), None,
             )
             arguments = self.__get_args(
                 Argument(signature.parameters[arg], description)
@@ -289,7 +286,7 @@ class Parser(ArgumentParser):
         self.add_commands(
             module=module,
             parser=subcommand,
-            exclude_prefixes=Parser._get_excludes(exclude_prefixes)
+            exclude_prefixes=Parser._get_excludes(exclude_prefixes),
         )
         return self
 

@@ -47,9 +47,8 @@ class Argument:
                             self.type = (
                                 literal_eval(arg) if arg != 'str' else str
                             )
-                    if (
-                        arg.lower() == 'optional' and
-                        not hasattr(self, 'default')
+                    if arg.lower() == 'optional' and not hasattr(
+                        self, 'default'
                     ):
                         self.default = None
                     if re.search(r'^\s*\{.*\}\s*$', arg):
