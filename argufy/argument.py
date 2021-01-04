@@ -29,7 +29,8 @@ class Argument:
         self.name = parameters.name.replace('_', '-')  # type: ignore
 
         if parameters.annotation != inspect._empty:  # type: ignore
-            if typing.get_origin(parameters.annotation) is Union:
+            # if typing.get_origin(parameters.annotation) is Union:
+            if hasattr(parameters.annotation, '__origin__'):
                 annotation = typing.get_args(parameters.annotation)
                 for x in annotation:
                     if x is None:
@@ -51,6 +52,7 @@ class Argument:
                         self, 'default'
                     ):
                         self.default = None
+                    # TODO: tighten regex
                     if re.search(r'^\s*\{.*\}\s*$', arg):
                         self.choices = literal_eval(arg.strip())
             if not hasattr(self, 'type'):
