@@ -139,6 +139,7 @@ class Parser(ArgumentParser):
 
     @staticmethod
     def _get_excludes(exclude_prefixes: tuple = tuple()) -> tuple:
+        '''Combine class excludes with instance.'''
         if exclude_prefixes != []:
             return tuple(exclude_prefixes) + Parser.exclude_prefixes
         else:

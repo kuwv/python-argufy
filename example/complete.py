@@ -60,10 +60,11 @@ def arguments(arg: str = 'test', *args: str, **kwargs: str) -> None:
 
     Parameters
     ----------
-    test1: str
+    arg: str, optional
+        test argument with value
+    test1: str, optional
         kwargs test one
-
-    test2: str
+    test2: str, optional
         kwargs test two
 
     '''
@@ -74,12 +75,26 @@ def arguments(arg: str = 'test', *args: str, **kwargs: str) -> None:
         print(kwargs)
 
 
-print(inspect.getfullargspec(arguments))
+# frame = inspect.currentframe()
+# args, args_paramname, kwargs_paramname, values = (
+#     inspect.getargvalues(frame)
+# )
+# print(args, args_paramname, kwargs_paramname, values)
+# for k, v in dict(values).items():
+#     print(k, v)
+# print(inspect.getfullargspec(arguments))
+# for x in inspect.getmembers(arguments):
+#     print(x)
+
+sig = inspect.signature(arguments)
+print(sig.parameters['args'])
+print(sig.parameters['kwargs'])
+
 parser = Parser(
     prog=__name__,
     version='1.2.3',
-    log_level='DEBUG',
-    log_handler=sys.stderr,  # type: ignore
+    # log_level='DEBUG',
+    # log_handler=sys.stderr,  # type: ignore
 )
 parser.add_commands(module)
 parser.dispatch()
