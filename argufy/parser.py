@@ -85,7 +85,7 @@ class Parser(ArgumentParser):
         #     self.prefix = kwargs.pop('prefix')
         # else:
         #     self.prefix = kwargs['prog'].upper()
-        # print(self.prefix)
+        # log.debug(self.prefix)
 
         if 'formatter_class' not in kwargs:
             self.formatter_class = ArgufyHelpFormatter
@@ -155,12 +155,13 @@ class Parser(ArgumentParser):
         signature = inspect.signature(obj)
         for arg in signature.parameters:
             description = next(
-                (d for d in docstring.params if d.arg_name == arg), None,
+                (d for d in docstring.params if d.arg_name == arg),
+                None,
             )
             arguments = self.__get_args(
                 Argument(signature.parameters[arg], description)
             )
-            log.debug(f"arguments {arguments}")
+            # log.debug(f"arguments {arguments}")
             name = arguments.pop('name')
             parser.add_argument(*name, **arguments)
         return self
@@ -224,7 +225,7 @@ class Parser(ArgumentParser):
                             )
                             cmd.set_defaults(fn=value)
                             parser.formatter_class = ArgufyHelpFormatter
-                        log.debug(f"command {name} {value} {cmd}")
+                        # log.debug(f"command {name} {value} {cmd}")
                         self.add_arguments(value, cmd)
 
                 # create arguments from module varibles
@@ -348,10 +349,11 @@ class Parser(ArgumentParser):
 
         # parse variables
         arguments, namespace = self.retrieve(args, ns)
+        log.debug("%s %s", arguments, namespace)
 
         # call function with variables
         if 'fn' in namespace:
             fn = vars(namespace).pop('fn')
             namespace = self.__set_module_arguments(fn, namespace)
-            return fn(**vars(namespace))
-        return None
+            fn(**vars(namespace))
+        return self.dispatch(arguments) if arguments != [] else None
