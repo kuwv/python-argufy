@@ -91,10 +91,11 @@ print(sig.parameters['args'])
 print(sig.parameters['kwargs'])
 
 parser = Parser(
-    prog=__name__,
+    prog='complete',
     version='1.2.3',
-    # log_level='DEBUG',
-    # log_handler=sys.stderr,  # type: ignore
+    log_level='DEBUG',
+    log_handler=sys.stderr,  # type: ignore
+    command_scheme='chain',
 )
 parser.add_commands(module)
 parser.dispatch()

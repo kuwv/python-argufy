@@ -10,7 +10,7 @@ from . import cmd1, cmd2
 
 def main() -> None:
     '''Demonstrate main with CLI.'''
-    parser = Parser()
+    parser = Parser(command_type='subcommand')
     parser.add_commands(cmd1)
     parser.add_commands(cmd2)
     parser.dispatch()

@@ -29,8 +29,8 @@ def test_help():
     # 0 displays help
     # 2 dumps error (invalid choice)
 
-    parser = Parser(version=__version__)
-    parser.add_subcommands(subcommands_parser, exclude_prefixes=['test_'])
+    parser = Parser(__version__, command_type='subcommand')
+    parser.add_commands(subcommands_parser, exclude_prefixes=['test_'])
 
     with pytest.raises(SystemExit) as blank_err:
         parser.dispatch([])
@@ -49,12 +49,12 @@ def test_help():
 
 def test_bool(capsys):
     '''Do main function for CLI.'''
-    parser = Parser()
-    parser.add_subcommands(subcommands_parser, exclude_prefixes=['test_'])
+    parser = Parser(command_type='subcommand')
+    parser.add_commands(subcommands_parser, exclude_prefixes=['test_'])
     parser.dispatch([
         'subcommands-parser',
         'example-bool',
-        '--bool-check'
+        '--bool-check',
     ])
     capture = capsys.readouterr()
     assert literal_eval(capture.out) is True
@@ -62,13 +62,13 @@ def test_bool(capsys):
 
 def test_choice(capsys):
     '''Do main function for CLI.'''
-    parser = Parser()
-    parser.add_subcommands(subcommands_parser, exclude_prefixes=['test_'])
+    parser = Parser(command_type='subcommand')
+    parser.add_commands(subcommands_parser, exclude_prefixes=['test_'])
     parser.dispatch([
         'subcommands-parser',
         'example-choice',
         '--choice-check',
-        'B'
+        'B',
     ])
     capture = capsys.readouterr()
     assert literal_eval(capture.out) is True
