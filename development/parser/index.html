@@ -413,13 +413,6 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#argufy.parser.Parser.add_subcommands" class="md-nav__link">
-    add_subcommands()
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
   <a href="#argufy.parser.Parser.dispatch" class="md-nav__link">
     dispatch()
   </a>
@@ -515,13 +508,6 @@
           <li class="md-nav__item">
   <a href="#argufy.parser.Parser.add_commands" class="md-nav__link">
     add_commands()
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#argufy.parser.Parser.add_subcommands" class="md-nav__link">
-    add_subcommands()
   </a>
   
 </li>
@@ -699,7 +685,7 @@ unambiguous</p>
     <span class="c1">#     self.prefix = kwargs.pop('prefix')</span>
     <span class="c1"># else:</span>
     <span class="c1">#     self.prefix = kwargs['prog'].upper()</span>
-    <span class="c1"># print(self.prefix)</span>
+    <span class="c1"># log.debug(self.prefix)</span>
 
     <span class="k">if</span> <span class="s1">'formatter_class'</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">:</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">formatter_class</span> <span class="o">=</span> <span class="n">ArgufyHelpFormatter</span>
@@ -714,6 +700,7 @@ unambiguous</p>
         <span class="bp">self</span><span class="o">.</span><span class="n">prog_version</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">'version'</span><span class="p">)</span>
 
     <span class="bp">self</span><span class="o">.</span><span class="n">command_type</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">'command_type'</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">command_scheme</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">'command_scheme'</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
 
     <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>  <span class="c1"># type: ignore</span>
 
@@ -811,11 +798,32 @@ add_commands<span class="p">(</span><span class="bp">self</span><span class="p">
         <span class="p">(</span><span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">parser</span><span class="o">.</span><span class="n">_actions</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">_SubParsersAction</span><span class="p">)),</span>
         <span class="kc">None</span><span class="p">,</span>
     <span class="p">)</span>
+    <span class="n">excludes</span> <span class="o">=</span> <span class="n">Parser</span><span class="o">.</span><span class="n">_get_excludes</span><span class="p">(</span><span class="n">exclude_prefixes</span><span class="p">)</span>
 
     <span class="c1"># set command name scheme</span>
     <span class="k">if</span> <span class="n">command_type</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">command_type</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">command_type</span>
-    <span class="n">excludes</span> <span class="o">=</span> <span class="n">Parser</span><span class="o">.</span><span class="n">_get_excludes</span><span class="p">(</span><span class="n">exclude_prefixes</span><span class="p">)</span>
+
+    <span class="c1"># create subcommand for command</span>
+    <span class="k">if</span> <span class="n">command_type</span> <span class="o">==</span> <span class="s1">'subcommand'</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">command</span><span class="p">:</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="n">docstring</span><span class="o">.</span><span class="n">short_description</span>
+            <span class="n">subcommand</span> <span class="o">=</span> <span class="n">command</span><span class="o">.</span><span class="n">add_parser</span><span class="p">(</span>
+                <span class="n">module_name</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">'_'</span><span class="p">,</span> <span class="s1">'-'</span><span class="p">),</span>
+                <span class="n">description</span><span class="o">=</span><span class="n">msg</span><span class="p">,</span>
+                <span class="n">formatter_class</span><span class="o">=</span><span class="n">ArgufyHelpFormatter</span><span class="p">,</span>
+                <span class="n">help</span><span class="o">=</span><span class="n">msg</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="n">subcommand</span><span class="o">.</span><span class="n">set_defaults</span><span class="p">(</span><span class="n">mod</span><span class="o">=</span><span class="n">module</span><span class="p">)</span>
+            <span class="n">parser</span><span class="o">.</span><span class="n">formatter_class</span> <span class="o">=</span> <span class="n">ArgufyHelpFormatter</span>
+
+        <span class="c1"># append subcommand to exsiting command or create a new one</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">add_commands</span><span class="p">(</span>
+            <span class="n">module</span><span class="o">=</span><span class="n">module</span><span class="p">,</span>
+            <span class="n">parser</span><span class="o">=</span><span class="n">subcommand</span><span class="p">,</span>
+            <span class="n">exclude_prefixes</span><span class="o">=</span><span class="n">Parser</span><span class="o">.</span><span class="n">_get_excludes</span><span class="p">(</span><span class="n">exclude_prefixes</span><span class="p">),</span>
+            <span class="n">command_type</span><span class="o">=</span><span class="s1">'command'</span><span class="p">,</span>
+        <span class="p">)</span>
 
     <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">inspect</span><span class="o">.</span><span class="n">getmembers</span><span class="p">(</span><span class="n">module</span><span class="p">):</span>
         <span class="c1"># TODO: Possible singledispatch candidate</span>
@@ -833,7 +841,7 @@ add_commands<span class="p">(</span><span class="bp">self</span><span class="p">
                 <span class="p">):</span>
                     <span class="k">if</span> <span class="n">command</span><span class="p">:</span>
                         <span class="c1"># apply command name scheme</span>
-                        <span class="k">if</span> <span class="n">command_type</span> <span class="o">==</span> <span class="s1">'chain'</span><span class="p">:</span>
+                        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">command_scheme</span> <span class="o">==</span> <span class="s1">'chain'</span><span class="p">:</span>
                             <span class="n">cmd_name</span> <span class="o">=</span> <span class="n">module_name</span> <span class="o">+</span> <span class="s1">'.'</span> <span class="o">+</span> <span class="n">name</span>
                         <span class="k">else</span><span class="p">:</span>
                             <span class="n">cmd_name</span> <span class="o">=</span> <span class="n">name</span>
@@ -846,7 +854,7 @@ add_commands<span class="p">(</span><span class="bp">self</span><span class="p">
                         <span class="p">)</span>
                         <span class="n">cmd</span><span class="o">.</span><span class="n">set_defaults</span><span class="p">(</span><span class="n">fn</span><span class="o">=</span><span class="n">value</span><span class="p">)</span>
                         <span class="n">parser</span><span class="o">.</span><span class="n">formatter_class</span> <span class="o">=</span> <span class="n">ArgufyHelpFormatter</span>
-                    <span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">"command </span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">value</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">cmd</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+                    <span class="c1"># log.debug(f"command {name} {value} {cmd}")</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">add_arguments</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">cmd</span><span class="p">)</span>
 
             <span class="c1"># create arguments from module varibles</span>
@@ -867,67 +875,6 @@ add_commands<span class="p">(</span><span class="bp">self</span><span class="p">
                 <span class="p">)</span>
                 <span class="n">name</span> <span class="o">=</span> <span class="n">arguments</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">'name'</span><span class="p">)</span>
                 <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="o">*</span><span class="n">name</span><span class="p">,</span> <span class="o">**</span><span class="n">arguments</span><span class="p">)</span>
-    <span class="k">return</span> <span class="bp">self</span>
-</code></pre>
-</div>
-</details>
-</div>
-</div>
-<div class="doc doc-object doc-method">
-<h3 class="doc doc-heading" id="argufy.parser.Parser.add_subcommands">
-
-        <code class="highlight language-python">
-add_subcommands<span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">module</span><span class="p">,</span> <span class="n">parser</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">exclude_prefixes</span><span class="o">=</span><span class="p">())</span>        </code>
-
-
-      </h3>
-<div class="doc doc-contents ">
-<p>Add subcommands.</p>
-<details class="quote">
-          <summary>Source code in <code>argufy/parser.py</code></summary>
-          <div class="highlight">
-<pre><span></span><code><span class="k">def</span> <span class="nf">add_subcommands</span><span class="p">(</span>
-    <span class="bp">self</span><span class="p">,</span>
-    <span class="n">module</span><span class="p">:</span> <span class="n">ModuleType</span><span class="p">,</span>
-    <span class="n">parser</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">ArgumentParser</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-    <span class="n">exclude_prefixes</span><span class="p">:</span> <span class="nb">tuple</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(),</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">'Parser'</span><span class="p">:</span>
-    <span class="sd">'''Add subcommands.'''</span>
-    <span class="n">module_name</span> <span class="o">=</span> <span class="n">module</span><span class="o">.</span><span class="vm">__name__</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">'.'</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
-    <span class="n">docstring</span> <span class="o">=</span> <span class="n">parse</span><span class="p">(</span><span class="n">module</span><span class="o">.</span><span class="vm">__doc__</span><span class="p">)</span>
-
-    <span class="c1"># use self or an existing parser</span>
-    <span class="k">if</span> <span class="ow">not</span> <span class="n">parser</span><span class="p">:</span>
-        <span class="n">parser</span> <span class="o">=</span> <span class="bp">self</span>
-
-    <span class="c1"># use exsiting subparser or create a new one</span>
-    <span class="k">if</span> <span class="ow">not</span> <span class="nb">any</span><span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">_SubParsersAction</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">parser</span><span class="o">.</span><span class="n">_actions</span><span class="p">):</span>
-        <span class="n">parser</span><span class="o">.</span><span class="n">add_subparsers</span><span class="p">(</span><span class="n">dest</span><span class="o">=</span><span class="n">module_name</span><span class="p">,</span> <span class="n">parser_class</span><span class="o">=</span><span class="n">Parser</span><span class="p">)</span>
-
-    <span class="c1"># check if command exists</span>
-    <span class="n">command</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span>
-        <span class="p">(</span><span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">parser</span><span class="o">.</span><span class="n">_actions</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">_SubParsersAction</span><span class="p">)),</span>
-        <span class="kc">None</span><span class="p">,</span>
-    <span class="p">)</span>
-
-    <span class="c1"># create subcommand for command</span>
-    <span class="k">if</span> <span class="n">command</span><span class="p">:</span>
-        <span class="n">msg</span> <span class="o">=</span> <span class="n">docstring</span><span class="o">.</span><span class="n">short_description</span>
-        <span class="n">subcommand</span> <span class="o">=</span> <span class="n">command</span><span class="o">.</span><span class="n">add_parser</span><span class="p">(</span>
-            <span class="n">module_name</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">'_'</span><span class="p">,</span> <span class="s1">'-'</span><span class="p">),</span>
-            <span class="n">description</span><span class="o">=</span><span class="n">msg</span><span class="p">,</span>
-            <span class="n">formatter_class</span><span class="o">=</span><span class="n">ArgufyHelpFormatter</span><span class="p">,</span>
-            <span class="n">help</span><span class="o">=</span><span class="n">msg</span><span class="p">,</span>
-        <span class="p">)</span>
-        <span class="n">subcommand</span><span class="o">.</span><span class="n">set_defaults</span><span class="p">(</span><span class="n">mod</span><span class="o">=</span><span class="n">module</span><span class="p">)</span>
-        <span class="n">parser</span><span class="o">.</span><span class="n">formatter_class</span> <span class="o">=</span> <span class="n">ArgufyHelpFormatter</span>
-
-    <span class="c1"># append subcommand to exsiting command or create a new one</span>
-    <span class="bp">self</span><span class="o">.</span><span class="n">add_commands</span><span class="p">(</span>
-        <span class="n">module</span><span class="o">=</span><span class="n">module</span><span class="p">,</span>
-        <span class="n">parser</span><span class="o">=</span><span class="n">subcommand</span><span class="p">,</span>
-        <span class="n">exclude_prefixes</span><span class="o">=</span><span class="n">Parser</span><span class="o">.</span><span class="n">_get_excludes</span><span class="p">(</span><span class="n">exclude_prefixes</span><span class="p">),</span>
-    <span class="p">)</span>
     <span class="k">return</span> <span class="bp">self</span>
 </code></pre>
 </div>
@@ -957,13 +904,14 @@ dispatch<span class="p">(</span><span class="bp">self</span><span class="p">,</s
 
     <span class="c1"># parse variables</span>
     <span class="n">arguments</span><span class="p">,</span> <span class="n">namespace</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">retrieve</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="n">ns</span><span class="p">)</span>
+    <span class="c1"># log.debug("%s %s", arguments, namespace)</span>
 
     <span class="c1"># call function with variables</span>
     <span class="k">if</span> <span class="s1">'fn'</span> <span class="ow">in</span> <span class="n">namespace</span><span class="p">:</span>
         <span class="n">fn</span> <span class="o">=</span> <span class="nb">vars</span><span class="p">(</span><span class="n">namespace</span><span class="p">)</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">'fn'</span><span class="p">)</span>
         <span class="n">namespace</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__set_module_arguments</span><span class="p">(</span><span class="n">fn</span><span class="p">,</span> <span class="n">namespace</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">fn</span><span class="p">(</span><span class="o">**</span><span class="nb">vars</span><span class="p">(</span><span class="n">namespace</span><span class="p">))</span>
-    <span class="k">return</span> <span class="kc">None</span>
+        <span class="n">fn</span><span class="p">(</span><span class="o">**</span><span class="nb">vars</span><span class="p">(</span><span class="n">namespace</span><span class="p">))</span>
+    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">dispatch</span><span class="p">(</span><span class="n">arguments</span><span class="p">)</span> <span class="k">if</span> <span class="n">arguments</span> <span class="o">!=</span> <span class="p">[]</span> <span class="k">else</span> <span class="kc">None</span>
 </code></pre>
 </div>
 </details>
