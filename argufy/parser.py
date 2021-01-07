@@ -81,14 +81,14 @@ class Parser(ArgumentParser):
             if 'prog' not in kwargs:
                 kwargs['prog'] = module.__name__.split('.')[0]
 
+        if 'version' in kwargs:
+            self.prog_version = kwargs.pop('version')
+
         # if 'prefix' in kwargs:
         #     self.prefix = kwargs.pop('prefix')
         # else:
         #     self.prefix = kwargs['prog'].upper()
         # log.debug(self.prefix)
-
-        if 'formatter_class' not in kwargs:
-            self.formatter_class = ArgufyHelpFormatter
 
         if 'log_level' in kwargs:
             log.setLevel(getattr(logging, kwargs.pop('log_level').upper()))
@@ -96,11 +96,12 @@ class Parser(ArgumentParser):
             log_handler = kwargs.pop('log_handler')
             log.addHandler(logging.StreamHandler(log_handler))  # type: ignore
 
-        if 'version' in kwargs:
-            self.prog_version = kwargs.pop('version')
-
+        self.use_module_args = kwargs.pop('use_module_args', False)
         self.command_type = kwargs.pop('command_type', None)
         self.command_scheme = kwargs.pop('command_scheme', None)
+
+        if 'formatter_class' not in kwargs:
+            self.formatter_class = ArgufyHelpFormatter
 
         super().__init__(**kwargs)  # type: ignore
 
@@ -149,7 +150,21 @@ class Parser(ArgumentParser):
     def add_arguments(
         self, obj: Any, parser: Optional[ArgumentParser] = None
     ) -> 'Parser':
-        '''Add arguments to parser/subparser.'''
+        '''Add arguments to parser/subparser.
+
+        Parameters:
+        -----------
+        obj: Any
+            Verious module, function, or arguments that can be inspected.
+        parser: ArgumentParser, optional
+            Parser/Subparser that arguments will be added.
+
+        Returns:
+        --------
+        self:
+            Return object itself to allow chaining functions.
+
+        '''
         if not parser:
             parser = self
         docstring = parse(obj.__doc__)
@@ -173,7 +188,25 @@ class Parser(ArgumentParser):
         exclude_prefixes: tuple = tuple(),
         command_type: Optional[str] = None,
     ) -> 'Parser':
-        '''Add commands.'''
+        '''Add commands.
+
+        Parameters
+        ----------
+        module: ModuleType,
+            Module used to import functions for CLI commands.
+        parser: ArgumentParser, optional
+            Parser used to append subparsers to create subcommands.
+        exclude_prefixes: tuple,
+            Methods from a module that should be excluded.
+        command_type: str, optional
+            Choose format type of commands to be created.
+
+        Returns
+        -------
+        self:
+            Return object itself to allow chaining functions.
+
+        '''
         module_name = module.__name__.split('.')[-1]
         docstring = parse(module.__doc__)
 
@@ -250,7 +283,10 @@ class Parser(ArgumentParser):
                         self.add_arguments(value, cmd)
 
                 # create arguments from module varibles
-                elif isinstance(value, (float, int, str, list, dict, tuple)):
+                elif (
+                    self.use_module_args and
+                    isinstance(value, (float, int, str, list, dict, tuple))
+                ):
                     # TODO: Reconcile inspect parameters with dict
                     parameters = inspect.Parameter(
                         name,
@@ -270,9 +306,25 @@ class Parser(ArgumentParser):
         return self
 
     def __set_module_arguments(
-        self, fn: Callable[[F], F], ns: Namespace
+        self,
+        fn: Callable[[F], F],
+        ns: Namespace
     ) -> Namespace:
-        '''Separe module arguments from functions.'''
+        '''Separe module arguments from functions.
+
+        Paramters
+        ---------
+        fn: Callable
+            Function used to seperate module arguments from function.
+        ns: Namespace
+            Argparse namespace object for a command.
+
+        Returns
+        -------
+        Namespace:
+            Argparse namespace object with command arguments.
+
+        '''
         if 'mod' in ns:
             mod = vars(ns).pop('mod')
         else:
@@ -287,7 +339,7 @@ class Parser(ArgumentParser):
         ]
 
         # set module variables
-        if mod:
+        if mod and self.use_module_args:
             for arg in args:
                 for k, v in arg.items():
                     mod.__dict__[k] = v
@@ -298,7 +350,23 @@ class Parser(ArgumentParser):
         args: Sequence[str] = sys.argv[1:],
         ns: Optional[Namespace] = None,
     ) -> Tuple[List[str], Namespace]:
-        '''Retrieve values from CLI.'''
+        '''Retrieve values from CLI.
+
+        Paramters
+        ---------
+        args: Sequence[str]
+            Command line arguments passed to the parser.
+        ns: Optional[Namespace]
+            Argparse namespace object for a command.
+
+        Returns
+        -------
+        List[str]:
+            Argparse remaining unparse arguments.
+        Namespace:
+            Argparse namespace object with command arguments.
+
+        '''
         # TODO: handle invalid argument
 
         # show help when no arguments provided
@@ -321,9 +389,23 @@ class Parser(ArgumentParser):
         args: Sequence[str] = sys.argv[1:],
         ns: Optional[Namespace] = None,
     ) -> Optional[Callable[[F], F]]:
-        '''Call command with arguments.'''
-        # TODO: support command chaining at same level
+        '''Call command with arguments.
 
+        Paramters
+        ---------
+        args: Sequence[str]
+            Command line arguments passed to the parser.
+        ns: Optional[Namespace]
+            Argparse namespace object for a command.
+
+        Returns
+        -------
+        List[str]:
+            Argparse remaining unparse arguments.
+        Namespace:
+            Argparse namespace object with command arguments.
+
+        '''
         # parse variables
         arguments, namespace = self.retrieve(args, ns)
         # log.debug("%s %s", arguments, namespace)
