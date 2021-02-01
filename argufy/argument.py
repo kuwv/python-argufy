@@ -29,36 +29,9 @@ class Argument:
         self.name = parameters.name.replace('_', '-')  # type: ignore
 
         if parameters.annotation != inspect._empty:  # type: ignore
-            # if typing.get_origin(parameters.annotation) is Union:
-            if hasattr(parameters.annotation, '__origin__'):
-                annotation = typing.get_args(parameters.annotation)
-                for x in annotation:
-                    if x is None:
-                        self.nargs = '?'
-                    else:
-                        self.type = x
-            else:
-                self.type = parameters.annotation
+            self.__parse_parameters(parameters)
         elif docstring and docstring.type_name:
-            if ',' in docstring.type_name:
-                for arg in docstring.type_name.split(',', 1):
-                    if not hasattr(self, 'type'):
-                        # NOTE: Limit input that eval will parse
-                        if arg in types:
-                            self.type = (
-                                literal_eval(arg) if arg != 'str' else str
-                            )
-                    if arg.lower() == 'optional' and not hasattr(
-                        self, 'default'
-                    ):
-                        self.default = None
-                    # TODO: tighten regex
-                    if re.search(r'^\s*\{.*\}\s*$', arg):
-                        self.choices = literal_eval(arg.strip())
-            if not hasattr(self, 'type'):
-                # NOTE: Limit input that eval will parse
-                if docstring.type_name in types:
-                    self.type = eval(docstring.type_name)  # nosec
+            self.__parse_docstring(docstring)
         elif self.default is not None:
             self.type = type(self.default)
 
@@ -67,6 +40,39 @@ class Argument:
 
         if docstring:
             self.help = docstring.description
+
+    def __parse_parameters(self, parameters: inspect.Parameter) -> None:
+        # if typing.get_origin(parameters.annotation) is Union:
+        if hasattr(parameters.annotation, '__origin__'):
+            annotation = typing.get_args(parameters.annotation)
+            for x in annotation:
+                if x is None:
+                    self.nargs = '?'
+                else:
+                    self.type = x
+        else:
+            self.type = parameters.annotation
+
+    def __parse_docstring(self, docstring: DocstringParam) -> None:
+        if ',' in docstring.type_name:
+            for arg in docstring.type_name.split(',', 1):
+                if not hasattr(self, 'type'):
+                    # NOTE: Limit input that eval will parse
+                    if arg in types:
+                        self.type = (
+                            literal_eval(arg) if arg != 'str' else str
+                        )
+                if arg.lower() == 'optional' and not hasattr(
+                    self, 'default'
+                ):
+                    self.default = None
+                # TODO: tighten regex
+                if re.search(r'^\s*\{.*\}\s*$', arg):
+                    self.choices = literal_eval(arg.strip())
+        if not hasattr(self, 'type'):
+            # NOTE: Limit input that eval will parse
+            if docstring.type_name in types:
+                self.type = eval(docstring.type_name)  # nosec
 
     @property
     def name(self) -> List[str]:
