@@ -173,12 +173,16 @@ class Parser(ArgumentParser):
             description = next(
                 (d for d in docstring.params if d.arg_name == arg), None,
             )
-            arguments = self.__get_args(
-                Argument(signature.parameters[arg], description)
-            )
-            log.debug(f"arguments {arguments}")
-            name = arguments.pop('name')
-            parser.add_argument(*name, **arguments)
+            # TODO fix splat arguments
+            if not str(signature.parameters[arg]).startswith('**'):
+                arguments = self.__get_args(
+                    Argument(signature.parameters[arg], description)
+                )
+                log.debug(f"arguments {arguments}")
+                name = arguments.pop('name')
+                parser.add_argument(*name, **arguments)
+        # TODO for any docstring not collected parse here (args, kwargs)
+        # log.debug('docstring params', docstring.params)
         return self
 
     def add_commands(
@@ -256,7 +260,6 @@ class Parser(ArgumentParser):
                 # skip classes for now
                 if inspect.isclass(value):
                     continue  # pragma: no cover
-
                 # create commands from functions
                 elif inspect.isfunction(value):  # or inspect.ismethod(value):
                     # TODO: Turn parameter-less function into switch
@@ -281,7 +284,6 @@ class Parser(ArgumentParser):
                             parser.formatter_class = ArgufyHelpFormatter
                         # log.debug(f"command {name} {value} {cmd}")
                         self.add_arguments(value, cmd)
-
                 # create arguments from module varibles
                 elif (
                     self.use_module_args and
