@@ -4,6 +4,7 @@
 '''Arguments for inspection based CLI parser.'''
 
 import inspect
+# import logging
 import re
 import typing
 from ast import literal_eval
@@ -64,12 +65,8 @@ class Argument:
                 if not hasattr(self, 'type'):
                     # NOTE: Limit input that eval will parse
                     if arg in types:
-                        self.type = (
-                            literal_eval(arg) if arg != 'str' else str
-                        )
-                if arg.lower() == 'optional' and not hasattr(
-                    self, 'default'
-                ):
+                        self.type = literal_eval(arg) if arg != 'str' else str
+                if arg.lower() == 'optional' and not hasattr(self, 'default'):
                     self.default = None
                 # TODO: tighten regex
                 if re.search(r'^\s*\{.*\}\s*$', arg):
@@ -127,7 +124,7 @@ class Argument:
     @type.setter
     def type(self, annotation: Any) -> None:
         '''Set argparse argument type.'''
-        # print('prematched annotation:', annotation)
+        # log.debug('prematched annotation:', annotation)
         if annotation == bool:
             # NOTE: these store bool type internally
             if self.default or not hasattr(self, 'default'):
@@ -147,7 +144,7 @@ class Argument:
             self.__type = annotation
             self.nargs = '+'
         else:
-            # print('unmatched annotation:', annotation)
+            # log.debug('unmatched annotation:', annotation)
             self.__type = annotation
             # self.nargs = 1
 

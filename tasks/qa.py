@@ -53,7 +53,7 @@ def coverage(ctx, report=None):  # type: ignore
     ctx.run("pytest {} ./tests/".format(' '.join(args)))
 
 
-@task(pre=[autoformat, lint, unit_test, static_analysis, coverage])
+@task(pre=[lint, unit_test, static_analysis, coverage])
 def test(ctx):  # type: ignore
     '''Run all tests.'''
     pass

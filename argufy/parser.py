@@ -152,15 +152,15 @@ class Parser(ArgumentParser):
     ) -> 'Parser':
         '''Add arguments to parser/subparser.
 
-        Parameters:
-        -----------
+        Parameters
+        ----------
         obj: Any
             Verious module, function, or arguments that can be inspected.
         parser: ArgumentParser, optional
             Parser/Subparser that arguments will be added.
 
-        Returns:
-        --------
+        Returns
+        -------
         self:
             Return object itself to allow chaining functions.
 
@@ -285,9 +285,8 @@ class Parser(ArgumentParser):
                         # log.debug(f"command {name} {value} {cmd}")
                         self.add_arguments(value, cmd)
                 # create arguments from module varibles
-                elif (
-                    self.use_module_args and
-                    isinstance(value, (float, int, str, list, dict, tuple))
+                elif self.use_module_args and isinstance(
+                    value, (float, int, str, list, dict, tuple)
                 ):
                     # TODO: Reconcile inspect parameters with dict
                     parameters = inspect.Parameter(
@@ -308,9 +307,7 @@ class Parser(ArgumentParser):
         return self
 
     def __set_module_arguments(
-        self,
-        fn: Callable[[F], F],
-        ns: Namespace
+        self, fn: Callable[[F], F], ns: Namespace
     ) -> Namespace:
         '''Separe module arguments from functions.
 

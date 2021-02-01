@@ -47,15 +47,15 @@ def choice(choice_check='A'):  # type: ignore
     print(choice_check)
 
 
-def optional(variable: Optional[str] = None) -> None:
+def optional(variable: Optional[str]) -> None:
     '''Run example optional.'''
     if variable:
         print(variable)
     else:
-        print('optional is not set')
+        print('yey! optional is not set')
 
 
-def arguments(arg: str = 'test', *args: str, **kwargs: str) -> None:
+def arguments(test_arg: str = 'test', *args: str, **kwargs: str) -> None:
     '''Run example optional.
 
     Parameters
@@ -68,11 +68,12 @@ def arguments(arg: str = 'test', *args: str, **kwargs: str) -> None:
         kwargs test two
 
     '''
+    print('test_arg', test_arg)
     if args != []:
-        print(args)
+        print('args', args)
 
     if kwargs != {}:
-        print(kwargs)
+        print('kwargs', kwargs)
 
 
 # frame = inspect.currentframe()
@@ -87,15 +88,15 @@ def arguments(arg: str = 'test', *args: str, **kwargs: str) -> None:
 #     print(x)
 
 sig = inspect.signature(arguments)
-print(sig.parameters['args'])
-print(sig.parameters['kwargs'])
+# print(sig.parameters['args'])
+# print(sig.parameters['kwargs'])
 
 parser = Parser(
     prog='complete',
     version='1.2.3',
     log_level='DEBUG',
     log_handler=sys.stderr,  # type: ignore
-    command_scheme='chain',
+    # command_scheme='chain',
 )
 parser.add_commands(module)
 parser.dispatch()
