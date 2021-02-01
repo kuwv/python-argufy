@@ -26,7 +26,7 @@ class Argument:
         # self.attributes: Dict[Any, Any] = {}
 
         self.default = parameters.default
-        self.name = parameters.name.replace('_', '-')  # type: ignore
+        self.name = parameters  # type: ignore
 
         if parameters.annotation != inspect._empty:  # type: ignore
             self.__parse_parameters(parameters)
@@ -42,11 +42,14 @@ class Argument:
             self.help = docstring.description
 
     def __parse_parameters(self, parameters: inspect.Parameter) -> None:
+        '''Get parameter types from type inspection.'''
         # if typing.get_origin(parameters.annotation) is Union:
         if hasattr(parameters.annotation, '__origin__'):
             annotation = typing.get_args(parameters.annotation)
             for x in annotation:
-                if x is None:
+                # check if annotation is optional
+                if isinstance(None, x):
+                    # TODO: get nested types
                     self.nargs = '?'
                 else:
                     self.type = x
@@ -54,6 +57,8 @@ class Argument:
             self.type = parameters.annotation
 
     def __parse_docstring(self, docstring: DocstringParam) -> None:
+        '''Get parameter types from docstring.'''
+        # Parse docstring for parameter types and defaults
         if ',' in docstring.type_name:
             for arg in docstring.type_name.split(',', 1):
                 if not hasattr(self, 'type'):
@@ -80,10 +85,14 @@ class Argument:
         return self.__name
 
     @name.setter
-    def name(self, name: str) -> None:
+    def name(self, parameters: inspect.Parameter) -> None:
         '''Set argparse command/argument name.'''
-        if not hasattr(self, 'default'):
+        name = parameters.name.replace('_', '-')
+
+        if not hasattr(self, 'default') and '*' not in str(parameters):
             self.__name = [name]
+        elif str(parameters).startswith('**'):
+            pass
         else:
             flags = ['--' + name]
             # NOTE: check for conflicting flags
