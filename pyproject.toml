@@ -40,7 +40,7 @@ requires = [
 classifiers = ["License :: OSI Approved :: Apache Software License"]
 
 [tool.black]
-line-length = 79
+line-length = 80
 include = '\.pyi?$'
 exclude = '''
 

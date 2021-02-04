@@ -33,8 +33,8 @@ class Argument:
             self.default = None
 
         if (
-            parameters and
-            parameters.annotation != inspect._empty  # type: ignore
+            parameters
+            and parameters.annotation != inspect._empty  # type: ignore
         ):
             self.__parse_parameters(parameters)
         elif docstring and docstring.type_name:
@@ -49,8 +49,7 @@ class Argument:
             self.help = docstring.description
 
     def __parse_parameters(
-        self,
-        parameters: Optional[inspect.Parameter]
+        self, parameters: Optional[inspect.Parameter]
     ) -> None:
         '''Get parameter types from type inspection.'''
         # if typing.get_origin(parameters.annotation) is Union:

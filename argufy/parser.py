@@ -7,7 +7,7 @@ import inspect
 import logging
 import sys
 from argparse import ArgumentParser, Namespace, _SubParsersAction
-from inspect import _ParameterKind, Signature
+from inspect import Signature, _ParameterKind
 from types import ModuleType
 from typing import (
     Any,
@@ -149,31 +149,26 @@ class Parser(ArgumentParser):
 
     @staticmethod
     def __get_description(
-        name: str,
-        docstring: DocstringParam,
+        name: str, docstring: DocstringParam,
     ) -> Optional[str]:
-        return next(
-            (d for d in docstring.params if d.arg_name == name),
-            None,
-        )
+        '''Get argument description from docstring.'''
+        return next((d for d in docstring.params if d.arg_name == name), None,)
 
     @staticmethod
     def __get_keyword_args(
-        signature: Signature,
-        docstring: DocstringParam,
+        signature: Signature, docstring: DocstringParam,
     ) -> List[str]:
+        '''Get keyward arguments from docstring.'''
         parameters = [x for x in signature.parameters]
         return [
-            x.arg_name
-            for x in docstring.params
-            if x.arg_name not in parameters
+            x.arg_name for x in docstring.params if x.arg_name not in parameters
         ]
 
     @staticmethod
     def __generate_parameter(
-        name: str,
-        module: ModuleType,
+        name: str, module: ModuleType,
     ) -> inspect.Parameter:
+        '''Generate inpect parameter.'''
         return inspect.Parameter(
             name,
             _ParameterKind.POSITIONAL_OR_KEYWORD,  # type: ignore
@@ -327,8 +322,8 @@ class Parser(ArgumentParser):
                         self.add_arguments(value, cmd)
                 # create arguments from module varibles
                 elif (
-                    self.use_module_args and
-                    value.__class__.__module__ == 'builtins'
+                    self.use_module_args
+                    and value.__class__.__module__ == 'builtins'
                 ):
                     # TODO: Reconcile inspect parameters with dict
                     arguments = self.__get_args(
