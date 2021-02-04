@@ -7,7 +7,7 @@ import inspect
 import logging
 import sys
 from argparse import ArgumentParser, Namespace, _SubParsersAction
-from inspect import _ParameterKind
+from inspect import _ParameterKind, Signature
 from types import ModuleType
 from typing import (
     Any,
@@ -20,7 +20,7 @@ from typing import (
     TypeVar,
 )
 
-from docstring_parser import parse
+from docstring_parser import DocstringParam, parse
 
 from .argument import Argument
 from .formatter import ArgufyHelpFormatter
@@ -147,6 +147,40 @@ class Parser(ArgumentParser):
         else:
             return Parser.exclude_prefixes
 
+    @staticmethod
+    def __get_description(
+        name: str,
+        docstring: DocstringParam,
+    ) -> Optional[str]:
+        return next(
+            (d for d in docstring.params if d.arg_name == name),
+            None,
+        )
+
+    @staticmethod
+    def __get_keyword_args(
+        signature: Signature,
+        docstring: DocstringParam,
+    ) -> List[str]:
+        parameters = [x for x in signature.parameters]
+        return [
+            x.arg_name
+            for x in docstring.params
+            if x.arg_name not in parameters
+        ]
+
+    @staticmethod
+    def __generate_parameter(
+        name: str,
+        module: ModuleType,
+    ) -> inspect.Parameter:
+        return inspect.Parameter(
+            name,
+            _ParameterKind.POSITIONAL_OR_KEYWORD,  # type: ignore
+            default=getattr(module, name),
+            annotation=inspect._empty,  # type: ignore
+        )
+
     def add_arguments(
         self, obj: Any, parser: Optional[ArgumentParser] = None
     ) -> 'Parser':
@@ -167,20 +201,27 @@ class Parser(ArgumentParser):
         '''
         if not parser:
             parser = self
+
         docstring = parse(obj.__doc__)
         signature = inspect.signature(obj)
+
+        # determine keyword arguments from docstring
         for arg in signature.parameters:
-            description = next(
-                (d for d in docstring.params if d.arg_name == arg), None,
-            )
+            description = self.__get_description(arg, docstring)
             # TODO fix splat arguments
-            if not str(signature.parameters[arg]).startswith('**'):
-                arguments = self.__get_args(
-                    Argument(signature.parameters[arg], description)
-                )
-                log.debug(f"arguments {arguments}")
+            param = signature.parameters[arg]
+            # log.debug(f"{param}, {param.kind}")
+            if not param.kind == inspect.Parameter.VAR_KEYWORD:
+                arguments = self.__get_args(Argument(description, param))
                 name = arguments.pop('name')
                 parser.add_argument(*name, **arguments)
+
+        # log.debug(f"params {params}")
+        for arg in self.__get_keyword_args(signature, docstring):
+            description = self.__get_description(arg, docstring)
+            arguments = self.__get_args(Argument(description))
+            parser.add_argument(f"--{arg}", **arguments)
+        # log.debug(f"arguments {arguments}")
         # TODO for any docstring not collected parse here (args, kwargs)
         # log.debug('docstring params', docstring.params)
         return self
@@ -211,12 +252,12 @@ class Parser(ArgumentParser):
             Return object itself to allow chaining functions.
 
         '''
-        module_name = module.__name__.split('.')[-1]
-        docstring = parse(module.__doc__)
-
         # use self or an existing parser
         if not parser:
             parser = self
+
+        module_name = module.__name__.split('.')[-1]
+        docstring = parse(module.__doc__)
 
         # use exsiting subparser or create a new one
         if not any(isinstance(x, _SubParsersAction) for x in parser._actions):
@@ -268,9 +309,9 @@ class Parser(ArgumentParser):
                         and not name.startswith(', '.join(excludes))
                     ):
                         if command:
-                            # apply command name scheme
+                            # control command name format
                             if self.command_scheme == 'chain':
-                                cmd_name = module_name + '.' + name
+                                cmd_name = f"{module_name}.{name}"
                             else:
                                 cmd_name = name
                             msg = parse(value.__doc__).short_description
@@ -285,22 +326,16 @@ class Parser(ArgumentParser):
                         # log.debug(f"command {name} {value} {cmd}")
                         self.add_arguments(value, cmd)
                 # create arguments from module varibles
-                elif self.use_module_args and isinstance(
-                    value, (float, int, str, list, dict, tuple)
+                elif (
+                    self.use_module_args and
+                    value.__class__.__module__ == 'builtins'
                 ):
                     # TODO: Reconcile inspect parameters with dict
-                    parameters = inspect.Parameter(
-                        name,
-                        _ParameterKind.POSITIONAL_OR_KEYWORD,  # type: ignore
-                        default=getattr(module, name),
-                        annotation=inspect._empty,  # type: ignore
-                    )
-                    description = next(
-                        (d for d in docstring.params if d.arg_name == name),
-                        None,
-                    )
                     arguments = self.__get_args(
-                        Argument(parameters, description)
+                        Argument(
+                            self.__get_description(name, docstring),
+                            self.__generate_parameter(name, module),
+                        )
                     )
                     name = arguments.pop('name')
                     parser.add_argument(*name, **arguments)
@@ -331,11 +366,16 @@ class Parser(ArgumentParser):
 
         # separate namespace from other variables
         signature = inspect.signature(fn)
+        docstring = parse(fn.__doc__)
+
+        # inspect non-signature keyword args
+        keywords = self.__get_keyword_args(signature, docstring)
         args = [
             {k: vars(ns).pop(k)}
             for k in list(vars(ns).keys()).copy()
-            if not signature.parameters.get(k)
+            if not signature.parameters.get(k) and k not in keywords
         ]
+        log.debug(f"arguments {args}, {keywords}")
 
         # set module variables
         if mod and self.use_module_args:
@@ -407,7 +447,7 @@ class Parser(ArgumentParser):
         '''
         # parse variables
         arguments, namespace = self.retrieve(args, ns)
-        # log.debug("%s %s", arguments, namespace)
+        log.debug("%s %s", arguments, namespace)
 
         # call function with variables
         if 'fn' in namespace:

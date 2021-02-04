@@ -56,11 +56,11 @@ def optional(variable: Optional[str]) -> None:
 
 
 def arguments(test_arg: str = 'test', *args: str, **kwargs: str) -> None:
-    '''Run example optional.
+    '''Run example key arguments.
 
     Parameters
     ----------
-    arg: str, optional
+    test_arg: str, optional
         test argument with value
     test1: str, optional
         kwargs test one

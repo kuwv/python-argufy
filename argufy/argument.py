@@ -8,11 +8,9 @@ import inspect
 import re
 import typing
 from ast import literal_eval
-from typing import Any, List, Union
+from typing import Any, List, Optional, Union
 
 from docstring_parser.common import DocstringParam
-
-types = {'bool', 'dict', 'float', 'int', 'list', 'str', 'set', 'tuple'}
 
 
 class Argument:
@@ -21,15 +19,23 @@ class Argument:
     __short_flags: List[str] = ['-h']
 
     def __init__(
-        self, parameters: inspect.Parameter, docstring: DocstringParam,
+        self,
+        docstring: DocstringParam,
+        parameters: Optional[inspect.Parameter] = None,
     ) -> None:
         '''Initialize argparse argument.'''
         # self.attributes: Dict[Any, Any] = {}
 
-        self.default = parameters.default
-        self.name = parameters  # type: ignore
+        if parameters:
+            self.default = parameters.default
+            self.name = parameters  # type: ignore
+        else:
+            self.default = None
 
-        if parameters.annotation != inspect._empty:  # type: ignore
+        if (
+            parameters and
+            parameters.annotation != inspect._empty  # type: ignore
+        ):
             self.__parse_parameters(parameters)
         elif docstring and docstring.type_name:
             self.__parse_docstring(docstring)
@@ -42,20 +48,24 @@ class Argument:
         if docstring:
             self.help = docstring.description
 
-    def __parse_parameters(self, parameters: inspect.Parameter) -> None:
+    def __parse_parameters(
+        self,
+        parameters: Optional[inspect.Parameter]
+    ) -> None:
         '''Get parameter types from type inspection.'''
         # if typing.get_origin(parameters.annotation) is Union:
-        if hasattr(parameters.annotation, '__origin__'):
-            annotation = typing.get_args(parameters.annotation)
-            for x in annotation:
-                # check if annotation is optional
-                if isinstance(None, x):
-                    # TODO: get nested types
-                    self.nargs = '?'
-                else:
-                    self.type = x
-        else:
-            self.type = parameters.annotation
+        if parameters:
+            if hasattr(parameters.annotation, '__origin__'):
+                annotation = typing.get_args(parameters.annotation)
+                for x in annotation:
+                    # check if annotation is optional
+                    if isinstance(None, x):
+                        # TODO: get nested types
+                        self.nargs = '?'
+                    else:
+                        self.type = x
+            else:
+                self.type = parameters.annotation
 
     def __parse_docstring(self, docstring: DocstringParam) -> None:
         '''Get parameter types from docstring.'''
@@ -64,7 +74,7 @@ class Argument:
             for arg in docstring.type_name.split(',', 1):
                 if not hasattr(self, 'type'):
                     # NOTE: Limit input that eval will parse
-                    if arg in types:
+                    if arg.__class__.__module__ == 'builtins':
                         self.type = literal_eval(arg) if arg != 'str' else str
                 if arg.lower() == 'optional' and not hasattr(self, 'default'):
                     self.default = None
@@ -73,7 +83,7 @@ class Argument:
                     self.choices = literal_eval(arg.strip())
         if not hasattr(self, 'type'):
             # NOTE: Limit input that eval will parse
-            if docstring.type_name in types:
+            if docstring.type_name.__class__.__module__ == 'builtins':
                 self.type = eval(docstring.type_name)  # nosec
 
     @property
@@ -88,20 +98,20 @@ class Argument:
 
         if not hasattr(self, 'default') and '*' not in str(parameters):
             self.__name = [name]
-        elif str(parameters).startswith('**'):
-            pass
         else:
-            flags = ['--' + name]
+            if str(parameters).startswith('*'):
+                self.nargs = '*'
+            flags = [f"--{name}"]
             # NOTE: check for conflicting flags
             if '-' not in name:
                 # TODO: check if common short flag (ex: version)
                 n = name[:1]
                 if n not in Argument.__short_flags:
                     Argument.__short_flags.append(n)
-                    flags.append('-' + n)
+                    flags.append(f"-{n}")
                 elif n.upper() not in Argument.__short_flags:
                     Argument.__short_flags.append(n.upper())
-                    flags.append('-' + n.upper())
+                    flags.append(f"-{n.upper()}")
             self.__name = flags
 
     @property
