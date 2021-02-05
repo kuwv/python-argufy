@@ -757,7 +757,7 @@ type: <span class="n">Any</span>        </code>
 <h3 class="doc doc-heading" id="argufy.argument.Argument.__init__">
 
         <code class="highlight language-python">
-__init__<span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parameters</span><span class="p">,</span> <span class="n">docstring</span><span class="p">)</span>        </code>
+__init__<span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">docstring</span><span class="p">,</span> <span class="n">parameters</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>        </code>
 
   <span class="doc doc-properties">
       <small class="doc doc-property doc-property-special"><code>special</code></small>
@@ -770,45 +770,26 @@ __init__<span class="p">(</span><span class="bp">self</span><span class="p">,</s
           <summary>Source code in <code>argufy/argument.py</code></summary>
           <div class="highlight">
 <pre><span></span><code><span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
-    <span class="bp">self</span><span class="p">,</span> <span class="n">parameters</span><span class="p">:</span> <span class="n">inspect</span><span class="o">.</span><span class="n">Parameter</span><span class="p">,</span> <span class="n">docstring</span><span class="p">:</span> <span class="n">DocstringParam</span><span class="p">,</span>
+    <span class="bp">self</span><span class="p">,</span>
+    <span class="n">docstring</span><span class="p">:</span> <span class="n">DocstringParam</span><span class="p">,</span>
+    <span class="n">parameters</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">inspect</span><span class="o">.</span><span class="n">Parameter</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
     <span class="sd">'''Initialize argparse argument.'''</span>
     <span class="c1"># self.attributes: Dict[Any, Any] = {}</span>
 
-    <span class="bp">self</span><span class="o">.</span><span class="n">default</span> <span class="o">=</span> <span class="n">parameters</span><span class="o">.</span><span class="n">default</span>
-    <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">parameters</span><span class="o">.</span><span class="n">name</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">'_'</span><span class="p">,</span> <span class="s1">'-'</span><span class="p">)</span>  <span class="c1"># type: ignore</span>
+    <span class="k">if</span> <span class="n">parameters</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">default</span> <span class="o">=</span> <span class="n">parameters</span><span class="o">.</span><span class="n">default</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">parameters</span>  <span class="c1"># type: ignore</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">default</span> <span class="o">=</span> <span class="kc">None</span>
 
-    <span class="k">if</span> <span class="n">parameters</span><span class="o">.</span><span class="n">annotation</span> <span class="o">!=</span> <span class="n">inspect</span><span class="o">.</span><span class="n">_empty</span><span class="p">:</span>  <span class="c1"># type: ignore</span>
-        <span class="c1"># if typing.get_origin(parameters.annotation) is Union:</span>
-        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">parameters</span><span class="o">.</span><span class="n">annotation</span><span class="p">,</span> <span class="s1">'__origin__'</span><span class="p">):</span>
-            <span class="n">annotation</span> <span class="o">=</span> <span class="n">typing</span><span class="o">.</span><span class="n">get_args</span><span class="p">(</span><span class="n">parameters</span><span class="o">.</span><span class="n">annotation</span><span class="p">)</span>
-            <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">annotation</span><span class="p">:</span>
-                <span class="k">if</span> <span class="n">x</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">nargs</span> <span class="o">=</span> <span class="s1">'?'</span>
-                <span class="k">else</span><span class="p">:</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">type</span> <span class="o">=</span> <span class="n">x</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">type</span> <span class="o">=</span> <span class="n">parameters</span><span class="o">.</span><span class="n">annotation</span>
+    <span class="k">if</span> <span class="p">(</span>
+        <span class="n">parameters</span>
+        <span class="ow">and</span> <span class="n">parameters</span><span class="o">.</span><span class="n">annotation</span> <span class="o">!=</span> <span class="n">inspect</span><span class="o">.</span><span class="n">_empty</span>  <span class="c1"># type: ignore</span>
+    <span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__parse_parameters</span><span class="p">(</span><span class="n">parameters</span><span class="p">)</span>
     <span class="k">elif</span> <span class="n">docstring</span> <span class="ow">and</span> <span class="n">docstring</span><span class="o">.</span><span class="n">type_name</span><span class="p">:</span>
-        <span class="k">if</span> <span class="s1">','</span> <span class="ow">in</span> <span class="n">docstring</span><span class="o">.</span><span class="n">type_name</span><span class="p">:</span>
-            <span class="k">for</span> <span class="n">arg</span> <span class="ow">in</span> <span class="n">docstring</span><span class="o">.</span><span class="n">type_name</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">','</span><span class="p">,</span> <span class="mi">1</span><span class="p">):</span>
-                <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">'type'</span><span class="p">):</span>
-                    <span class="c1"># NOTE: Limit input that eval will parse</span>
-                    <span class="k">if</span> <span class="n">arg</span> <span class="ow">in</span> <span class="n">types</span><span class="p">:</span>
-                        <span class="bp">self</span><span class="o">.</span><span class="n">type</span> <span class="o">=</span> <span class="p">(</span>
-                            <span class="n">literal_eval</span><span class="p">(</span><span class="n">arg</span><span class="p">)</span> <span class="k">if</span> <span class="n">arg</span> <span class="o">!=</span> <span class="s1">'str'</span> <span class="k">else</span> <span class="nb">str</span>
-                        <span class="p">)</span>
-                <span class="k">if</span> <span class="n">arg</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="s1">'optional'</span> <span class="ow">and</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span>
-                    <span class="bp">self</span><span class="p">,</span> <span class="s1">'default'</span>
-                <span class="p">):</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">default</span> <span class="o">=</span> <span class="kc">None</span>
-                <span class="c1"># TODO: tighten regex</span>
-                <span class="k">if</span> <span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="sa">r</span><span class="s1">'^\s*\{.*\}\s*$'</span><span class="p">,</span> <span class="n">arg</span><span class="p">):</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">choices</span> <span class="o">=</span> <span class="n">literal_eval</span><span class="p">(</span><span class="n">arg</span><span class="o">.</span><span class="n">strip</span><span class="p">())</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">'type'</span><span class="p">):</span>
-            <span class="c1"># NOTE: Limit input that eval will parse</span>
-            <span class="k">if</span> <span class="n">docstring</span><span class="o">.</span><span class="n">type_name</span> <span class="ow">in</span> <span class="n">types</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">type</span> <span class="o">=</span> <span class="nb">eval</span><span class="p">(</span><span class="n">docstring</span><span class="o">.</span><span class="n">type_name</span><span class="p">)</span>  <span class="c1"># nosec</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__parse_docstring</span><span class="p">(</span><span class="n">docstring</span><span class="p">)</span>
     <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">default</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">type</span> <span class="o">=</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">default</span><span class="p">)</span>
 
