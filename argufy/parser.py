@@ -36,7 +36,7 @@ class Parser(ArgumentParser):
 
     exclude_prefixes = ('@', '_')
 
-    def __init__(self, *args: str, **kwargs: str) -> None:
+    def __init__(self, *args: str, **kwargs: Any) -> None:
         '''Initialize parser.
 
         Parameters
@@ -94,7 +94,7 @@ class Parser(ArgumentParser):
             log.setLevel(getattr(logging, kwargs.pop('log_level').upper()))
         if 'log_handler' in kwargs:
             log_handler = kwargs.pop('log_handler')
-            log.addHandler(logging.StreamHandler(log_handler))  # type: ignore
+            log.addHandler(logging.StreamHandler(log_handler))
 
         self.use_module_args = kwargs.pop('use_module_args', False)
         self.command_type = kwargs.pop('command_type', None)
@@ -103,7 +103,7 @@ class Parser(ArgumentParser):
         if 'formatter_class' not in kwargs:
             self.formatter_class = ArgufyHelpFormatter
 
-        super().__init__(**kwargs)  # type: ignore
+        super().__init__(**kwargs)
 
         # NOTE: cannot move to formatter
         self._positionals.title = ArgufyHelpFormatter.font(
@@ -215,7 +215,7 @@ class Parser(ArgumentParser):
         for arg in self.__get_keyword_args(signature, docstring):
             description = self.__get_description(arg, docstring)
             arguments = self.__get_args(Argument(description))
-            parser.add_argument(f"--{arg}", **arguments)
+            parser.add_argument(f"--{arg.replace('_', '-')}", **arguments)
         # log.debug(f"arguments {arguments}")
         # TODO for any docstring not collected parse here (args, kwargs)
         # log.debug('docstring params', docstring.params)

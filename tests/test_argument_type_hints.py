@@ -36,7 +36,7 @@ def test_argument_type_hints_simple() -> None:
             Argument(parameters=sig.parameters[arg], docstring=document)
         )
     # print('Arguments: ', arguments[0].__dict__)
-    assert not hasattr(arguments[0], 'default')
+    assert arguments[0].default is None
     # assert arguments[0].metavar == 'INT'
 
 
