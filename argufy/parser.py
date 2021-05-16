@@ -113,6 +113,7 @@ class Parser(ArgumentParser):
             self._optionals.title or 'flags'
         )
 
+        # XXX version lookup infinite loop when absent
         if hasattr(self, 'prog_version'):
             self.add_argument(
                 '--version',
@@ -316,7 +317,7 @@ class Parser(ArgumentParser):
                                 formatter_class=ArgufyHelpFormatter,
                                 help=msg,
                             )
-                            cmd.set_defaults(fn=value)
+                            cmd.set_defaults(mod=module, fn=value)
                             parser.formatter_class = ArgufyHelpFormatter
                         # log.debug(f"command {name} {value} {cmd}")
                         self.add_arguments(value, cmd)
@@ -354,6 +355,7 @@ class Parser(ArgumentParser):
             Argparse namespace object with command arguments.
 
         '''
+        # XXX: only works on subcommands
         if 'mod' in ns:
             mod = vars(ns).pop('mod')
         else:

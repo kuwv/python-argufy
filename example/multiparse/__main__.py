@@ -12,8 +12,9 @@ from . import cmd1, cmd2
 def main() -> None:
     '''Demonstrate main with CLI.'''
     parser = Parser(
-        command_type='subcommand',
+        # command_type='subcommand',
         use_module_args=True,
+        version='0.1.0',
         log_level='debug',
         log_handler=sys.stderr,
     )

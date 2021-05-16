@@ -40,8 +40,8 @@ def unit_test(ctx, capture=None):  # type: ignore
 @task
 def static_analysis(ctx):  # type: ignore
     '''Perform static code analysis on imports.'''
-    # TODO: ignore tornado vulnurability due to no update
-    ctx.run('safety check --ignore=39462')
+    # TODO: handle pip issue elsewhere
+    ctx.run('safety check --ignore=40291')
     ctx.run('bandit -r argufy')
 
 
