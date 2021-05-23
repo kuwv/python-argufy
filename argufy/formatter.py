@@ -68,16 +68,26 @@ class ArgufyHelpFormatter(HelpFormatter):
 
     def _format_action(self, action: Action) -> str:
         '''Format arguments.'''
+        # TODO: calculate correct spacing
         if isinstance(action, argparse._SubParsersAction._ChoicesPseudoAction):
             subcommand = self.shade(
                 self.font(self._format_action_invocation(action))
             )
             help_text = self._expand_help(action)
-            # TODO: calculate correct spacing
-            return f"    {subcommand.ljust(37)}{help_text}\n"
+            return f"    {subcommand.ljust(50)}{help_text}\n"
+        elif (
+            isinstance(action, argparse.Action)
+            and not isinstance(action, argparse._SubParsersAction)
+        ):
+            # XXX: short flags are not ordered
+            option_strings = ', '.join([
+                self.font(self.shade(option))
+                for option in action.option_strings
+            ])
+            help_text = self._expand_help(action)
+            # fix multi-argument justification for single flags
+            width = 67 if len(action.option_strings) > 1 else 50
+            out = f"    {option_strings.ljust(width)}{help_text}\n"
+            return out
         else:
-            # action.option_strings = [
-            #     self.font(self.shade(option))
-            #     for option in action.option_strings
-            # ]
             return super(ArgufyHelpFormatter, self)._format_action(action)

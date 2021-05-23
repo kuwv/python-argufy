@@ -3,6 +3,13 @@
 # :license: Apache 2.0, see LICENSE for more details.
 '''Test parser.'''
 
+# from . import config
+#
+#
+# def check_config() -> None:
+#     '''Demonstrate variable imported from config.'''
+#     print(config.setting)
+
 
 def example_args(*args_check: str) -> None:
     '''Demonstrate example arguments.
@@ -16,13 +23,26 @@ def example_args(*args_check: str) -> None:
     print(args_check)
 
 
-def example_kwargs(**kwargs_check: str) -> None:
+def example_kwargs(**kwargs: str) -> None:
     '''Demonstrate example keyword arguments.
 
     Parameters
     ----------
-    kwargs_check: str, {'A': 'a', 'B': 'b', 'C': 'c'}
-        example keyword arguments
+    variable_one: str
+        variable one
+
+    variable_test: str
+        variable two
+
+    variable_three: str
+        variable three
 
     '''
-    print(kwargs_check)
+    if kwargs.get('variable_one'):
+        print(kwargs['variable_one'])
+
+    if kwargs.get('variable_two'):
+        print(kwargs['variable_two'])
+
+    if kwargs.get('variable_three'):
+        print(kwargs['variable_three'])

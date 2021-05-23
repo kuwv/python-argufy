@@ -5,17 +5,17 @@
 
 Attributes
 ----------
-example_variable: str
+variable: str
     Example variable for testing
 
 '''
 
-example_variable = 'ex_var'
+variable = 'ex_var'
 
 
-def print_example_variable() -> None:
+def print_variable() -> None:
     '''Print example variable.'''
-    print('example_varible', example_variable)
+    print('example_varible', variable)
 
 
 def example_bool(bool_check: bool = False) -> None:

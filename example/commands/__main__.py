@@ -13,7 +13,7 @@ example_variable = 'ex_var'
 
 def main() -> None:
     '''Demonstrate main with CLI.'''
-    parser = Parser()
+    parser = Parser(version='0.1.0')
     parser.add_commands(cmd1)
     parser.add_commands(cmd2)
     parser.dispatch()
