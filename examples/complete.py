@@ -35,6 +35,14 @@ def boolean(bool_check=False):  # type: ignore
     print(bool_check)
 
 
+def optional_boolean(bool_check: Optional[bool] = None) -> None:
+    '''Run example bool.'''
+    if bool_check:
+        print(bool_check)
+    else:
+        print('nothing to see here')
+
+
 def choice(choice_check='A'):  # type: ignore
     '''Run example choice.
 
@@ -95,7 +103,7 @@ parser = Parser(
     prog='complete',
     version='1.2.3',
     log_level='DEBUG',
-    log_handler=sys.stderr,  # type: ignore
+    log_handler=sys.stderr,
     # command_scheme='chain',
 )
 parser.add_commands(module)

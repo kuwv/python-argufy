@@ -107,10 +107,10 @@ class Argument:
                 n = name[:1]
                 if n not in Argument.__short_flags:
                     Argument.__short_flags.append(n)
-                    flags.append(f"-{n}")
+                    flags.insert(0, f"-{n}")
                 elif n.upper() not in Argument.__short_flags:
                     Argument.__short_flags.append(n.upper())
-                    flags.append(f"-{n.upper()}")
+                    flags.insert(0, f"-{n.upper()}")
             self.__name = flags
 
     @property

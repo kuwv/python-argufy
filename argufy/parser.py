@@ -436,10 +436,8 @@ class Parser(ArgumentParser):
 
         Returns
         -------
-        List[str]:
-            Argparse remaining unparse arguments.
-        Namespace:
-            Argparse namespace object with command arguments.
+        Optional[Callable[[F], F]]:
+            Call function with arguments.
 
         '''
         # parse variables
