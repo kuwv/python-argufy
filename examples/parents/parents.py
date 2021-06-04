@@ -1,5 +1,6 @@
+'''Provide prototype for group design.'''
 import argparse
-from argufy import Parser
+# from argufy import Parser
 
 parent_parser = argparse.ArgumentParser(add_help=False)
 parent_parser.add_argument('--parent', type=int)
