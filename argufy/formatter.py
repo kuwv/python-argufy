@@ -27,22 +27,22 @@ class ArgufyHelpFormatter(HelpFormatter):
         '''Format usage message.'''
         if prefix is not None:
             prefix = self.font(prefix)
-        print('usage', usage, actions, groups, prefix)
+        # print('usage', usage, actions, groups, prefix)
         super(ArgufyHelpFormatter, self).add_usage(
             usage, actions, groups, prefix
         )
 
-    def start_section(self, heading: Optional[str]) -> None:
-        print('start section', heading)
-        super().start_section(heading)
+    # def start_section(self, heading: Optional[str]) -> None:
+    #     print('start section', heading)
+    #     super().start_section(heading)
 
-    def end_section(self) -> None:
-        print('end section')
-        super().end_section()
+    # def end_section(self) -> None:
+    #     print('end section')
+    #     super().end_section()
 
-    def add_text(self, text):
-        print('add text', text)
-        super().add_text(text)
+    # def add_text(self, text: Optional[str]) -> None:
+    #     print('add text', text)
+    #     super().add_text(text)
 
     @staticmethod
     def font(text: str, width: str = 'BRIGHT') -> str:
@@ -66,9 +66,7 @@ class ArgufyHelpFormatter(HelpFormatter):
                     parser = action.choices.pop(choice)
                     choice = self.shade(choice)
                     action.choices[choice] = parser
-        super(
-            ArgufyHelpFormatter, self
-        ).add_argument(action)
+        super(ArgufyHelpFormatter, self).add_argument(action)
 
     def _expand_help(self, action: Action) -> str:
         '''Format help message.'''

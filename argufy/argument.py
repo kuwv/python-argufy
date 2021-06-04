@@ -56,13 +56,11 @@ class Argument:
         if parameters:
             if hasattr(parameters.annotation, '__origin__'):
                 annotation = typing.get_args(parameters.annotation)
-                for x in annotation:
-                    # check if annotation is optional
-                    if isinstance(None, x):
-                        # TODO: get nested types
-                        self.nargs = '?'
-                    else:
-                        self.type = x
+                # check if annotation is optional
+                if type(None) in annotation:
+                    self.nargs = '?'
+                else:
+                    self.type = annotation
             else:
                 self.type = parameters.annotation
 

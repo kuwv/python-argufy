@@ -7,10 +7,7 @@ authors = ["Jesse P. Johnson <jpj6652@gmail.com>"]
 [tool.poetry.dependencies]
 python = "^3.6"
 docstring-parser = "^0.7.2"
-argparse_color_formatter = "^1.2.2"
 colorama = "^0.4.4"
-argcomplete = "^1.12.2"
-mkdocs-material = "^7.1.4"
 
 [tool.poetry.dev-dependencies]
 pytest = "^5.2"
@@ -28,15 +25,14 @@ mkdocs = "^1.1.2"
 docstr-coverage = "^1.2.0"
 mkdocstrings = "^0.13.2"
 pydocstyle = "^5.0.2"
+mkdocs-material = "^7.1.6"
 
 [tool.flit.metadata]
 module = "argufy"
 author = "Jesse P. Johnson"
 author-email = "jpj6652@gmail.com"
 home-page = "https://github.com/kuwv/python-argufy"
-requires = [
-    "docstring-parser",
-]
+requires = ["docstring-parser"]
 classifiers = ["License :: OSI Approved :: Apache Software License"]
 
 [tool.black]

@@ -1,3 +1,4 @@
+#!/usr/bin/python3
 '''Simple argparse.'''
 
 import sys

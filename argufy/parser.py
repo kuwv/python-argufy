@@ -22,8 +22,8 @@ from typing import (
 
 from docstring_parser import DocstringParam, parse
 
-from .argument import Argument
-from .formatter import ArgufyHelpFormatter
+from argufy.argument import Argument
+from argufy.formatter import ArgufyHelpFormatter
 
 log = logging.getLogger(__name__)
 
@@ -153,7 +153,7 @@ class Parser(ArgumentParser):
         name: str, docstring: DocstringParam,
     ) -> Optional[str]:
         '''Get argument description from docstring.'''
-        return next((d for d in docstring.params if d.arg_name == name), None,)
+        return next((d for d in docstring.params if d.arg_name == name), None)
 
     @staticmethod
     def __get_keyword_args(
@@ -296,6 +296,8 @@ class Parser(ArgumentParser):
             if not name.startswith(excludes):
                 # skip classes for now
                 if inspect.isclass(value):
+                    # TODO: check if dataclass instance
+                    # TODO: check if class instance
                     continue  # pragma: no cover
                 # create commands from functions
                 elif inspect.isfunction(value):  # or inspect.ismethod(value):

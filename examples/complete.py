@@ -35,14 +35,6 @@ def boolean(bool_check=False):  # type: ignore
     print(bool_check)
 
 
-def optional_boolean(bool_check: Optional[bool] = None) -> None:
-    '''Run example bool.'''
-    if bool_check:
-        print(bool_check)
-    else:
-        print('nothing to see here')
-
-
 def choice(choice_check='A'):  # type: ignore
     '''Run example choice.
 
