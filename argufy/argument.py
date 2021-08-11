@@ -240,8 +240,8 @@ class Argument:
         '''Set argparse argument default.'''
         if default != inspect._empty:  # type: ignore
             self.__default = default
-        else:
-            self.__default = None
+        # else:
+        #     self.__default = None
 
     @property
     def help(self) -> str:
