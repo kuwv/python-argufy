@@ -7,6 +7,7 @@ import inspect
 import logging
 import sys
 from argparse import ArgumentParser, Namespace, _SubParsersAction
+# from dataclasses import is_dataclass
 from inspect import Signature, _ParameterKind
 from types import ModuleType
 from typing import (
@@ -135,7 +136,7 @@ class Parser(ArgumentParser):
     def __get_args(argument: Argument) -> Dict[Any, Any]:
         '''Retrieve arguments from Argument.'''
         return {
-            k[len('_Argument__') :]: v  # noqa
+            k[len('_Argument__'):]: v
             for k, v in vars(argument).items()
             if k.startswith('_Argument__')
         }
@@ -162,7 +163,9 @@ class Parser(ArgumentParser):
         '''Get keyward arguments from docstring.'''
         parameters = [x for x in signature.parameters]
         return [
-            x.arg_name for x in docstring.params if x.arg_name not in parameters
+            x.arg_name
+            for x in docstring.params
+            if x.arg_name not in parameters
         ]
 
     @staticmethod
@@ -203,14 +206,23 @@ class Parser(ArgumentParser):
 
         # determine keyword arguments from docstring
         for arg in signature.parameters:
-            description = self.__get_description(arg, docstring)
             # TODO fix splat arguments
             param = signature.parameters[arg]
-            # log.debug(f"{param}, {param.kind}")
+            description = self.__get_description(arg, docstring)
+            log.debug(f"param: {param}, {param.kind}")
+
             if not param.kind == inspect.Parameter.VAR_KEYWORD:
-                arguments = self.__get_args(Argument(description, param))
-                name = arguments.pop('name')
-                parser.add_argument(*name, **arguments)
+                log.debug(f"param annotation: {param.annotation}")
+
+                # TODO: handle dataclasses
+                # if is_dataclass(param.annotation):
+                #     for x, v in inspect.getmembers(arg):
+                #         print(x, v)
+                #     log.debug(f"param annotation: {param.annotation}")
+
+                argument = self.__get_args(Argument(description, param))
+                name = argument.pop('name')
+                parser.add_argument(*name, **argument)
 
         # log.debug(f"params {params}")
         for arg in self.__get_keyword_args(signature, docstring):
@@ -312,6 +324,7 @@ class Parser(ArgumentParser):
                                 cmd_name = f"{module_name}.{name}"
                             else:
                                 cmd_name = name
+
                             msg = parse(value.__doc__).short_description
                             cmd = command.add_parser(
                                 cmd_name.replace('_', '-'),

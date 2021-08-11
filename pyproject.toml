@@ -36,7 +36,7 @@ requires = ["docstring-parser"]
 classifiers = ["License :: OSI Approved :: Apache Software License"]
 
 [tool.black]
-line-length = 80
+line-length = 79
 include = '\.pyi?$'
 exclude = '''
 

@@ -26,12 +26,14 @@ class Argument:
         '''Initialize argparse argument.'''
         # self.attributes: Dict[Any, Any] = {}
 
+        # set parameter default
         if parameters:
             self.default = parameters.default
             self.name = parameters  # type: ignore
-        else:
-            self.default = None
+        # else:
+        #     self.default = None
 
+        # set parameter type
         if (
             parameters
             and parameters.annotation != inspect._empty  # type: ignore
@@ -45,6 +47,7 @@ class Argument:
         # if hasattr(self, 'type'):
         #     self.metavar = (self.type.__name__)
 
+        # set parameter help message
         if docstring:
             self.help = docstring.description
 
@@ -56,6 +59,7 @@ class Argument:
         if parameters:
             if hasattr(parameters.annotation, '__origin__'):
                 annotation = typing.get_args(parameters.annotation)
+
                 # check if annotation is optional
                 if type(None) in annotation:
                     self.nargs = '?'
@@ -93,8 +97,13 @@ class Argument:
         '''Set argparse command/argument name.'''
         name = parameters.name.replace('_', '-')
 
-        if not hasattr(self, 'default') and '*' not in str(parameters):
+        # parse positional argument
+        if (
+            not hasattr(self, 'default')
+            and not str(parameters).startswith('**')
+        ):
             self.__name = [name]
+        # parse optional argument
         else:
             if str(parameters).startswith('*'):
                 self.nargs = '*'
