@@ -465,7 +465,8 @@ class Parser(ArgumentParser):
             fn = ns_vars.pop('fn')
             namespace = self.__set_module_arguments(fn, namespace)
 
-            # TODO: attempt to plug paramters using inspect
+            # XXX: only takes standard types
+            # attempt to plug paramters using inspect
             splat = None
             signature = inspect.signature(fn)
             for arg in signature.parameters:
