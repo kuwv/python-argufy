@@ -11,13 +11,11 @@ log = logging.getLogger(__name__)
 log.setLevel(logging.DEBUG)
 
 
-def arguments(test: str, *args: str, **kwargs: str) -> None:
+def find(*args: str, **kwargs: str) -> None:
     '''Run example key arguments.
 
     Parameters
     ----------
-    test: str
-        positional argument
     test1: str, optional
         kwargs test one
     test2: str, optional
@@ -31,12 +29,16 @@ def arguments(test: str, *args: str, **kwargs: str) -> None:
         print('kwargs', kwargs)
 
 
+def ignore(test: str) -> None:
+    '''Ignore this.'''
+    print('this should be ignored:', test)
+
+
 parser = Parser(
     prog='complete',
     version='1.2.3',
-    log_level='debug',
-    log_handler=sys.stderr,
-    # command_scheme='chain',
+    # log_level='debug',
+    # log_handler=sys.stderr,
 )
 parser.add_commands(module)
 parser.dispatch()

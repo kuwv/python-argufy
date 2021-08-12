@@ -125,7 +125,7 @@ class Parser(ArgumentParser):
 
     @staticmethod
     def __get_parent_module() -> Optional[ModuleType]:
-        '''Get parent name importing this module.'''
+        '''Get name of module importing this module.'''
         stack = inspect.stack()
         # TODO: need way to better identify parent module
         stack_frame = stack[2]
@@ -173,12 +173,13 @@ class Parser(ArgumentParser):
         name: str, module: ModuleType,
     ) -> inspect.Parameter:
         '''Generate inpect parameter.'''
-        return inspect.Parameter(
+        parameter = inspect.Parameter(
             name,
             _ParameterKind.POSITIONAL_OR_KEYWORD,  # type: ignore
             default=getattr(module, name),
             annotation=inspect._empty,  # type: ignore
         )
+        return parameter
 
     def add_arguments(
         self, obj: Any, parser: Optional[ArgumentParser] = None
@@ -206,7 +207,6 @@ class Parser(ArgumentParser):
 
         # determine keyword arguments from docstring
         for arg in signature.parameters:
-            # TODO fix splat arguments
             param = signature.parameters[arg]
             description = self.__get_description(arg, docstring)
             log.debug(f"param: {param}, {param.kind}")
@@ -457,11 +457,27 @@ class Parser(ArgumentParser):
         '''
         # parse variables
         arguments, namespace = self.retrieve(args, ns)
-        log.debug("%s %s", arguments, namespace)
+        log.debug(f"dispatch: {arguments}, {namespace}")
 
         # call function with variables
         if 'fn' in namespace:
-            fn = vars(namespace).pop('fn')
+            ns_vars = vars(namespace)
+            fn = ns_vars.pop('fn')
             namespace = self.__set_module_arguments(fn, namespace)
-            fn(**vars(namespace))
+
+            # TODO: attempt to plug paramters using inspect
+            splat = None
+            signature = inspect.signature(fn)
+            for arg in signature.parameters:
+                param = signature.parameters[arg]
+                if (
+                    str(param).startswith('*')
+                    and not str(param).startswith('**')
+                ):
+                    splat = ns_vars.pop(arg)
+
+            if splat:
+                fn(*splat, **ns_vars)
+            else:
+                fn(**ns_vars)
         return self.dispatch(arguments) if arguments != [] else None

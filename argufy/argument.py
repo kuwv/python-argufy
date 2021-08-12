@@ -30,8 +30,8 @@ class Argument:
         if parameters:
             self.default = parameters.default
             self.name = parameters  # type: ignore
-        # else:
-        #     self.default = None
+        else:
+            self.default = None
 
         # set parameter type
         if (
@@ -103,9 +103,11 @@ class Argument:
             and not str(parameters).startswith('**')
         ):
             self.__name = [name]
+            if str(parameters).startswith('*'):
+                self.nargs = '*'
         # parse optional argument
         else:
-            if str(parameters).startswith('*'):
+            if str(parameters).startswith('**'):
                 self.nargs = '*'
             flags = [f"--{name}"]
             # NOTE: check for conflicting flags
@@ -240,6 +242,7 @@ class Argument:
         '''Set argparse argument default.'''
         if default != inspect._empty:  # type: ignore
             self.__default = default
+        # XXX: this keeps conflicting with positional arguments
         # else:
         #     self.__default = None
 

@@ -17,6 +17,8 @@ def optional_boolean(
     bool_check: Optional[bool] = None,
 ) -> None:
     '''Run example bool.'''
+    print('check is:', check)
+
     if bool_check:
         print(bool_check)
     else:
