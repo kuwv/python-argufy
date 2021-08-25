@@ -12,14 +12,14 @@ log = logging.getLogger(__name__)
 log.setLevel(logging.DEBUG)
 
 
-def find(*args: Any, **kwargs: str) -> None:
+def find(*args: str, **kwargs: str) -> None:
     '''Run example key arguments.
 
     Parameters
     ----------
-    test1: str, optional
+    test_one: str, optional
         kwargs test one
-    test2: str, optional
+    test_two: str, optional
         kwargs test two
 
     '''
