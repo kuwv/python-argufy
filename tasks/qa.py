@@ -1,60 +1,65 @@
 # -*- coding: utf-8 -*-
+# type: ignore
 # copyright: (c) 2020 by Jesse Johnson.
 # license: Apache 2.0, see LICENSE for more details.
 '''Test Task-Runner.'''
 
+from typing import Optional, TYPE_CHECKING
+
 from invoke import task
+
+if TYPE_CHECKING:
+    from invoke import Context
 
 
 @task
-def autoformat(ctx, check=True):  # type: ignore
+def style(ctx, check=True):  # type: (Context, bool) -> None
     '''Format project source code to PEP-8 standard.'''
     args = ['--skip-string-normalization']
     if check:
         args.append('--check')
     ctx.run('isort --atomic **/*.py')
-    ctx.run("black **/*.py {}".format(' '.join(args)))
+    ctx.run(f"black **/*.py {' '.join(args)}")
 
 
 @task
-def lint(ctx):  # type: ignore
+def lint(ctx):  # type: (Context) -> None
     '''Check project source code for linting errors.'''
     ctx.run('flake8')
 
 
 @task
-def type_check(ctx, path='.'):  # type: ignore
+def type_check(ctx, path='.'):  # type: (Context, str) -> None
     '''Check project source types.'''
-    ctx.run("mypy {}".format(path))
+    ctx.run(f"mypy {path}")
 
 
 @task
-def unit_test(ctx, capture=None):  # type: ignore
+def unit_test(ctx, capture=None):  # type: (Context, Optional[str]) -> None
     '''Perform unit tests.'''
     args = []
     if capture:
-        args.append('--capture=' + capture)
-    ctx.run("pytest {}".format(' '.join(args)))
+        args.append(f"--capture={capture}")
+    ctx.run(f"pytest {' '.join(args)}")
 
 
 @task
-def static_analysis(ctx):  # type: ignore
+def static_analysis(ctx):  # type: (Context) -> None
     '''Perform static code analysis on imports.'''
-    # TODO: handle pip issue elsewhere
-    ctx.run('safety check --ignore=40291')
+    ctx.run('safety check')
     ctx.run('bandit -r argufy')
 
 
 @task
-def coverage(ctx, report=None):  # type: ignore
+def coverage(ctx, report=None):  # type: (Context, Optional[str]) -> None
     '''Perform coverage checks for tests.'''
     args = ['--cov=argufy']
     if report:
-        args.append('--cov-report={}'.format(report))
-    ctx.run("pytest {} ./tests/".format(' '.join(args)))
+        args.append(f"--cov-report={report}")
+    ctx.run(f"pytest {' '.join(args)} ./tests/")
 
 
-@task(pre=[lint, unit_test, static_analysis, coverage])
-def test(ctx):  # type: ignore
+@task(pre=[style, lint, unit_test, static_analysis, coverage])
+def test(ctx):
     '''Run all tests.'''
     pass

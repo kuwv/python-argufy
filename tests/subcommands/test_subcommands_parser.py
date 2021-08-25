@@ -16,8 +16,7 @@ import sys
 
 import pytest
 
-from argufy import Parser
-from argufy.__version__ import __version__
+from argufy import __version__, Parser
 
 sys.path.append('.')
 import subcommands_parser  # noqa: E402
