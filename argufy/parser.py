@@ -339,8 +339,7 @@ class Parser(ArgumentParser):
                 # create arguments from module varibles
                 elif (
                     self.use_module_args
-                    and value.__class__.__module__ == 'builtins'
-                    and not isinstance(value, ModuleType)
+                    and isinstance(value, (float, int, str, list, dict, tuple))
                 ):
                     # TODO: Reconcile inspect parameters with dict
                     arguments = self.__get_args(
