@@ -6,6 +6,7 @@
 import inspect
 import logging
 import sys
+import typing
 from argparse import ArgumentParser, Namespace, _SubParsersAction
 # from dataclasses import is_dataclass
 from inspect import Signature, _ParameterKind
@@ -339,7 +340,8 @@ class Parser(ArgumentParser):
                 # create arguments from module varibles
                 elif (
                     self.use_module_args
-                    and isinstance(value, (float, int, str, list, dict, tuple))
+                    and not isinstance(value, ModuleType)
+                    and not hasattr(typing, name)
                 ):
                     # TODO: Reconcile inspect parameters with dict
                     arguments = self.__get_args(

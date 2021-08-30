@@ -84,7 +84,9 @@ class Argument:
                     self.choices = literal_eval(arg.strip())
         if not hasattr(self, 'type'):
             # NOTE: Limit input that eval will parse
-            if docstring.type_name.__class__.__module__ == 'builtins':
+            if docstring.type_name in (
+                ('float', 'int', 'str', 'list', 'dict', 'tuple')
+            ):
                 self.type = eval(docstring.type_name)  # nosec
 
     @property

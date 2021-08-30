@@ -5,17 +5,22 @@
 
 Attributes
 ----------
-variable: str
+example_variable: str
     Example variable for testing
 
 '''
 
-variable = 'ex_var'
+import json  # noqa
+from typing import Optional
+
+example_variable = 'ex_var'
+optional_variable: Optional[str] = None
 
 
 def print_variable() -> None:
     '''Print example variable.'''
-    print('example_varible', variable)
+    print('example_varible', example_variable)
+    print('optional_varible', optional_variable)
 
 
 def example_bool(bool_check: bool = False) -> None:
