@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "argufy"
-version = "0.1.2-a3"
+version = "0.1.2-a4"
 description = "Inspection based parser based on argparse."
 authors = ["Jesse P. Johnson <jpj6652@gmail.com>"]
 
