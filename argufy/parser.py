@@ -22,7 +22,7 @@ from typing import (
     TypeVar,
 )
 
-from docstring_parser import DocstringParam, parse
+from docstring_parser import DocstringParam, parse as docstring_parse
 
 from argufy.argument import Argument
 from argufy.formatter import ArgufyHelpFormatter
@@ -76,7 +76,7 @@ class Parser(ArgumentParser):
 
         module = self.__get_parent_module()
         if module:
-            docstring = parse(module.__doc__)
+            docstring = docstring_parse(module.__doc__)
             if not kwargs.get('description'):
                 kwargs['description'] = docstring.short_description
 
@@ -99,6 +99,7 @@ class Parser(ArgumentParser):
             log.addHandler(logging.StreamHandler(log_handler))
 
         self.use_module_args = kwargs.pop('use_module_args', False)
+        self.main_args_builder = kwargs.pop('main_args_builder', None)
         self.command_type = kwargs.pop('command_type', None)
         self.command_scheme = kwargs.pop('command_scheme', None)
 
@@ -134,8 +135,8 @@ class Parser(ArgumentParser):
         return result
 
     @staticmethod
-    def __get_args(argument: Argument) -> Dict[Any, Any]:
-        '''Retrieve arguments from Argument.'''
+    def __clean_args(argument: Argument) -> Dict[Any, Any]:
+        '''Retrieve cleaned parameters from an Argument.'''
         return {
             k[len('_Argument__'):]: v
             for k, v in vars(argument).items()
@@ -182,59 +183,6 @@ class Parser(ArgumentParser):
         )
         return parameter
 
-    def add_arguments(
-        self, obj: Any, parser: Optional[ArgumentParser] = None
-    ) -> 'Parser':
-        '''Add arguments to parser/subparser.
-
-        Parameters
-        ----------
-        obj: Any
-            Verious module, function, or arguments that can be inspected.
-        parser: ArgumentParser, optional
-            Parser/Subparser that arguments will be added.
-
-        Returns
-        -------
-        self:
-            Return object itself to allow chaining functions.
-
-        '''
-        if not parser:
-            parser = self
-
-        docstring = parse(obj.__doc__)
-        signature = inspect.signature(obj)
-
-        # determine keyword arguments from docstring
-        for arg in signature.parameters:
-            param = signature.parameters[arg]
-            description = self.__get_description(arg, docstring)
-            log.debug(f"param: {param}, {param.kind}")
-
-            if not param.kind == inspect.Parameter.VAR_KEYWORD:
-                log.debug(f"param annotation: {param.annotation}")
-
-                # TODO: handle dataclasses
-                # if is_dataclass(param.annotation):
-                #     for x, v in inspect.getmembers(arg):
-                #         print(x, v)
-                #     log.debug(f"param annotation: {param.annotation}")
-
-                argument = self.__get_args(Argument(description, param))
-                name = argument.pop('name')
-                parser.add_argument(*name, **argument)
-
-        # log.debug(f"params {params}")
-        for arg in self.__get_keyword_args(signature, docstring):
-            description = self.__get_description(arg, docstring)
-            arguments = self.__get_args(Argument(description))
-            parser.add_argument(f"--{arg.replace('_', '-')}", **arguments)
-        # log.debug(f"arguments {arguments}")
-        # TODO for any docstring not collected parse here (args, kwargs)
-        # log.debug('docstring params', docstring.params)
-        return self
-
     def add_commands(
         self,
         module: ModuleType,
@@ -264,12 +212,15 @@ class Parser(ArgumentParser):
         # use self or an existing parser
         if not parser:
             parser = self
+        parser.formatter_class = ArgufyHelpFormatter
 
         module_name = module.__name__.split('.')[-1]
-        docstring = parse(module.__doc__)
+        docstring = docstring_parse(module.__doc__)
+        excludes = Parser._get_excludes(exclude_prefixes)
 
         # use exsiting subparser or create a new one
         if not any(isinstance(x, _SubParsersAction) for x in parser._actions):
+            # TODO: use metavar for hidden commands
             parser.add_subparsers(dest=module_name, parser_class=Parser)
 
         # check if command exists
@@ -277,7 +228,6 @@ class Parser(ArgumentParser):
             (x for x in parser._actions if isinstance(x, _SubParsersAction)),
             None,
         )
-        excludes = Parser._get_excludes(exclude_prefixes)
 
         # set command name scheme
         if command_type is None:
@@ -290,11 +240,10 @@ class Parser(ArgumentParser):
                 subcommand = command.add_parser(
                     module_name.replace('_', '-'),
                     description=msg,
-                    formatter_class=ArgufyHelpFormatter,
+                    formatter_class=self.formatter_class,
                     help=msg,
                 )
                 subcommand.set_defaults(mod=module)
-                parser.formatter_class = ArgufyHelpFormatter
 
             # append subcommand to exsiting command or create a new one
             return self.add_commands(
@@ -312,13 +261,28 @@ class Parser(ArgumentParser):
                     # TODO: check if dataclass instance
                     # TODO: check if class instance
                     continue  # pragma: no cover
+
                 # create commands from functions
-                elif inspect.isfunction(value):  # or inspect.ismethod(value):
+                elif inspect.isfunction(value):
                     # TODO: Turn parameter-less function into switch
+
+                    # merge builder function maing_args into parser
                     if (
+                        self.main_args_builder
+                        and name == self.main_args_builder['function']
+                    ):
+                        self.add_arguments(value, parser)
+
+                    # create commands from functions
+                    elif (
                         module.__name__ == value.__module__
                         and not name.startswith(', '.join(excludes))
+                        or (
+                            self.main_args_builder
+                            and name == self.main_args_builder['function']
+                        )
                     ):
+                        # create command from function
                         if command:
                             # control command name format
                             if self.command_scheme == 'chain':
@@ -326,25 +290,32 @@ class Parser(ArgumentParser):
                             else:
                                 cmd_name = name
 
-                            msg = parse(value.__doc__).short_description
+                            msg = docstring_parse(value.__doc__)\
+                                .short_description
                             cmd = command.add_parser(
                                 cmd_name.replace('_', '-'),
                                 description=msg,
-                                formatter_class=ArgufyHelpFormatter,
+                                formatter_class=self.formatter_class,
                                 help=msg,
                             )
                             cmd.set_defaults(mod=module, fn=value)
-                            parser.formatter_class = ArgufyHelpFormatter
+                        # add arguments from function
                         # log.debug(f"command {name} {value} {cmd}")
                         self.add_arguments(value, cmd)
+
                 # create arguments from module varibles
                 elif (
                     self.use_module_args
                     and not isinstance(value, ModuleType)
                     and not hasattr(typing, name)
+                    and (
+                        self.main_args_builder
+                        and name != self.main_args_builder['instance']
+                    )
                 ):
                     # TODO: Reconcile inspect parameters with dict
-                    arguments = self.__get_args(
+                    # TODO: use argparse.SUPPRESS for hidden arguments
+                    arguments = self.__clean_args(
                         Argument(
                             self.__get_description(name, docstring),
                             self.__generate_parameter(name, module),
@@ -354,10 +325,87 @@ class Parser(ArgumentParser):
                     parser.add_argument(*name, **arguments)
         return self
 
+    def add_arguments(
+        self, obj: Any, parser: Optional[ArgumentParser] = None
+    ) -> 'Parser':
+        '''Add arguments to parser/subparser.
+
+        Parameters
+        ----------
+        obj: Any
+            Verious module, function, or arguments that can be inspected.
+        parser: ArgumentParser, optional
+            Parser/Subparser that arguments will be added.
+
+        Returns
+        -------
+        self:
+            Return object itself to allow chaining functions.
+
+        '''
+        if not parser:
+            parser = self
+
+        # prep object for inspection
+        docstring = docstring_parse(obj.__doc__)
+        signature = inspect.signature(obj)
+
+        # populate subcommand with keyword arguments
+        for arg in signature.parameters:
+            param = signature.parameters[arg]
+            description = self.__get_description(arg, docstring)
+            # log.debug(f"param: {param}, {param.kind}")
+
+            if not param.kind == inspect.Parameter.VAR_KEYWORD:
+                log.debug(f"param annotation: {param.annotation}")
+                argument = self.__clean_args(Argument(description, param))
+                name = argument.pop('name')
+                parser.add_argument(*name, **argument)
+
+        # populate options
+        # log.debug(f"params {params}")
+        for arg in self.__get_keyword_args(signature, docstring):
+            description = self.__get_description(arg, docstring)
+            arguments = self.__clean_args(Argument(description))
+            parser.add_argument(f"--{arg.replace('_', '-')}", **arguments)
+
+        # log.debug(f"arguments {arguments}")
+        # TODO for any docstring not collected parse here (args, kwargs)
+        # log.debug('docstring params', docstring.params)
+        return self
+
+    def __set_main_arguments(self, ns: Namespace) -> Namespace:
+        '''Separate and set main arguments from builder function.
+
+        Paramters
+        ---------
+        ns: Namespace
+            Argparse namespace object for a command.
+
+        Returns
+        -------
+        Namespace:
+            Argparse namespace object with command arguments.
+
+        '''
+        # pass main arguments to builder function
+        if self.main_args_builder:
+            builder_mod = sys.modules[self.main_args_builder['module']]
+            builder = getattr(builder_mod, self.main_args_builder['function'])
+            builder_signature = inspect.signature(builder)
+            builder_args = {}
+            for param in builder_signature.parameters:
+                if param in vars(ns):
+                    builder_args[param] = vars(ns).pop(param)
+            builder_mod.__dict__[
+                self.main_args_builder['instance']
+            ] = builder(**builder_args)
+        return ns
+
     def __set_module_arguments(
         self, fn: Callable[[F], F], ns: Namespace
     ) -> Namespace:
-        '''Separe module arguments from functions.
+        '''Separate and set module arguments from functions.
 
         Paramters
         ---------
@@ -372,7 +420,7 @@ class Parser(ArgumentParser):
             Argparse namespace object with command arguments.
 
         '''
-        # XXX: only works on subcommands
+        # XXX: only works on subcommands that use 'mod'
         if 'mod' in ns:
             mod = vars(ns).pop('mod')
         else:
@@ -380,7 +428,7 @@ class Parser(ArgumentParser):
 
         # separate namespace from other variables
         signature = inspect.signature(fn)
-        docstring = parse(fn.__doc__)
+        docstring = docstring_parse(fn.__doc__)
 
         # inspect non-signature keyword args
         keywords = self.__get_keyword_args(signature, docstring)
@@ -403,7 +451,7 @@ class Parser(ArgumentParser):
         args: Sequence[str] = sys.argv[1:],
         ns: Optional[Namespace] = None,
     ) -> Tuple[List[str], Namespace]:
-        '''Retrieve values from CLI.
+        '''Retrieve parsed values from CLI input.
 
         Paramters
         ---------
@@ -461,14 +509,17 @@ class Parser(ArgumentParser):
         arguments, namespace = self.retrieve(args, ns)
         log.debug(f"dispatch: {arguments}, {namespace}")
 
+        main_ns_result = self.__set_main_arguments(namespace)
+
         # call function with variables
         if 'fn' in namespace:
             ns_vars = vars(namespace)
             fn = ns_vars.pop('fn')
-            namespace = self.__set_module_arguments(fn, namespace)
+
+            self.__set_module_arguments(fn, main_ns_result)
 
             # XXX: only takes standard types
-            # attempt to plug paramters using inspect
+            # attempt to plug parameters using inspect
             splat = None
             signature = inspect.signature(fn)
             for arg in signature.parameters:
@@ -479,6 +530,7 @@ class Parser(ArgumentParser):
                 ):
                     splat = ns_vars.pop(arg)
 
+            # XXX: only works with splat and kwargs
             if splat:
                 fn(*splat, **ns_vars)
             else:

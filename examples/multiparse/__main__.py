@@ -13,8 +13,16 @@ def main() -> None:
     '''Demonstrate main with CLI.'''
     parser = Parser(
         # command_type='subcommand',
-        use_module_args=True,
         version='0.1.0',
+        use_module_args=True,
+        main_args_builder={
+            'module': 'examples.multiparse.cmd2',
+            'function': 'builder',
+            'instance': '_settings',
+            'variables': {
+                'var1': 'yey'
+            }
+        },
         log_level='debug',
         log_handler=sys.stderr,
     )

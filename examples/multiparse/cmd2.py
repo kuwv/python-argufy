@@ -3,12 +3,14 @@
 # :license: Apache 2.0, see LICENSE for more details.
 '''Test parser.'''
 
-# from . import config
-#
-#
-# def check_config() -> None:
-#     '''Demonstrate variable imported from config.'''
-#     print(config.setting)
+from . import builder
+
+_settings = builder()
+
+
+def example_builder() -> None:
+    '''Demonstrate variable imported from config.'''
+    print('---', _settings, '---')
 
 
 def example_args(*args_check: str) -> None:

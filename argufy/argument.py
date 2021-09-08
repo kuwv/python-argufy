@@ -125,18 +125,6 @@ class Argument:
             self.__name = flags
 
     @property
-    def metavar(self) -> str:
-        '''Get argparse argument metavar.'''
-        return self.__metavar
-
-    @metavar.setter
-    def metavar(self, metavar: str) -> None:
-        '''Set argparse argument metavar.'''
-        # NOTE: Only positional arguments use metavars
-        if not hasattr(self, 'default'):
-            self.__metavar = metavar
-
-    @property
     def type(self) -> Any:
         '''Get argparse argument type.'''
         return self.__type  # type: ignore
@@ -167,6 +155,18 @@ class Argument:
             # log.debug('unmatched annotation:', annotation)
             self.__type = annotation
             # self.nargs = 1
+
+    @property
+    def metavar(self) -> str:
+        '''Get argparse argument metavar.'''
+        return self.__metavar
+
+    @metavar.setter
+    def metavar(self, metavar: str) -> None:
+        '''Set argparse argument metavar.'''
+        # NOTE: Only positional arguments use metavars
+        if not hasattr(self, 'default'):
+            self.__metavar = metavar
 
     # @property
     # def const(self) -> str:
