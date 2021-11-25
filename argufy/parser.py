@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # copyright: (c) 2020 by Jesse Johnson.
 # license: Apache 2.0, see LICENSE for more details.
-'''Argufy is an inspection based CLI parser.'''
+"""Argufy is an inspection based CLI parser."""
 
 import inspect
 import logging
@@ -34,12 +34,12 @@ F = TypeVar('F', bound=Callable[..., Any])
 
 
 class Parser(ArgumentParser):
-    '''Provide CLI parser for function.'''
+    """Provide CLI parser for function."""
 
     exclude_prefixes = ('@', '_')
 
     def __init__(self, *args: str, **kwargs: Any) -> None:
-        '''Initialize parser.
+        """Initialize parser.
 
         Parameters
         ----------
@@ -71,7 +71,7 @@ class Parser(ArgumentParser):
             Allows long options to be abbreviated if the abbreviation is
             unambiguous
 
-        '''
+        """
         # TODO: handle environment variables
 
         module = self.__get_parent_module()
@@ -127,7 +127,7 @@ class Parser(ArgumentParser):
 
     @staticmethod
     def __get_parent_module() -> Optional[ModuleType]:
-        '''Get name of module importing this module.'''
+        """Get name of module importing this module."""
         stack = inspect.stack()
         # TODO: need way to better identify parent module
         stack_frame = stack[2]
@@ -136,7 +136,7 @@ class Parser(ArgumentParser):
 
     @staticmethod
     def __clean_args(argument: Argument) -> Dict[Any, Any]:
-        '''Retrieve cleaned parameters from an Argument.'''
+        """Retrieve cleaned parameters from an Argument."""
         return {
             k[len('_Argument__'):]: v
             for k, v in vars(argument).items()
@@ -145,7 +145,7 @@ class Parser(ArgumentParser):
 
     @staticmethod
     def _get_excludes(exclude_prefixes: tuple = tuple()) -> tuple:
-        '''Combine class excludes with instance.'''
+        """Combine class excludes with instance."""
         if exclude_prefixes != []:
             return tuple(exclude_prefixes) + Parser.exclude_prefixes
         else:
@@ -155,14 +155,14 @@ class Parser(ArgumentParser):
     def __get_description(
         name: str, docstring: DocstringParam,
     ) -> Optional[str]:
-        '''Get argument description from docstring.'''
+        """Get argument description from docstring."""
         return next((d for d in docstring.params if d.arg_name == name), None)
 
     @staticmethod
     def __get_keyword_args(
         signature: Signature, docstring: DocstringParam,
     ) -> List[str]:
-        '''Get keyward arguments from docstring.'''
+        """Get keyward arguments from docstring."""
         parameters = [x for x in signature.parameters]
         return [
             x.arg_name
@@ -174,7 +174,7 @@ class Parser(ArgumentParser):
     def __generate_parameter(
         name: str, module: ModuleType,
     ) -> inspect.Parameter:
-        '''Generate inpect parameter.'''
+        """Generate inpect parameter."""
         parameter = inspect.Parameter(
             name,
             _ParameterKind.POSITIONAL_OR_KEYWORD,  # type: ignore
@@ -190,7 +190,7 @@ class Parser(ArgumentParser):
         exclude_prefixes: tuple = tuple(),
         command_type: Optional[str] = None,
     ) -> 'Parser':
-        '''Add commands.
+        """Add commands.
 
         Parameters
         ----------
@@ -208,7 +208,7 @@ class Parser(ArgumentParser):
         self:
             Return object itself to allow chaining functions.
 
-        '''
+        """
         # use self or an existing parser
         if not parser:
             parser = self
@@ -253,6 +253,7 @@ class Parser(ArgumentParser):
                 command_type='command',
             )
 
+        # TODO: separate into method
         for name, value in inspect.getmembers(module):
             # TODO: Possible singledispatch candidate
             if not name.startswith(excludes):
@@ -328,7 +329,7 @@ class Parser(ArgumentParser):
     def add_arguments(
         self, obj: Any, parser: Optional[ArgumentParser] = None
     ) -> 'Parser':
-        '''Add arguments to parser/subparser.
+        """Add arguments to parser/subparser.
 
         Parameters
         ----------
@@ -342,7 +343,7 @@ class Parser(ArgumentParser):
         self:
             Return object itself to allow chaining functions.
 
-        '''
+        """
         if not parser:
             parser = self
 
@@ -375,7 +376,7 @@ class Parser(ArgumentParser):
         return self
 
     def __set_main_arguments(self, ns: Namespace) -> Namespace:
-        '''Separate and set main arguments from builder function.
+        """Separate and set main arguments from builder function.
 
         Paramters
         ---------
@@ -387,7 +388,7 @@ class Parser(ArgumentParser):
         Namespace:
             Argparse namespace object with command arguments.
 
-        '''
+        """
         # pass main arguments to builder function
         if self.main_args_builder:
             builder_mod = sys.modules[self.main_args_builder['module']]
@@ -405,7 +406,7 @@ class Parser(ArgumentParser):
     def __set_module_arguments(
         self, fn: Callable[[F], F], ns: Namespace
     ) -> Namespace:
-        '''Separate and set module arguments from functions.
+        """Separate and set module arguments from functions.
 
         Paramters
         ---------
@@ -419,7 +420,7 @@ class Parser(ArgumentParser):
         Namespace:
             Argparse namespace object with command arguments.
 
-        '''
+        """
         # XXX: only works on subcommands that use 'mod'
         if 'mod' in ns:
             mod = vars(ns).pop('mod')
@@ -451,7 +452,7 @@ class Parser(ArgumentParser):
         args: Sequence[str] = sys.argv[1:],
         ns: Optional[Namespace] = None,
     ) -> Tuple[List[str], Namespace]:
-        '''Retrieve parsed values from CLI input.
+        """Retrieve parsed values from CLI input.
 
         Paramters
         ---------
@@ -467,7 +468,7 @@ class Parser(ArgumentParser):
         Namespace:
             Argparse namespace object with command arguments.
 
-        '''
+        """
         # TODO: handle invalid argument
 
         # show help when no arguments provided
@@ -490,7 +491,7 @@ class Parser(ArgumentParser):
         args: Sequence[str] = sys.argv[1:],
         ns: Optional[Namespace] = None,
     ) -> Optional[Callable[[F], F]]:
-        '''Call command with arguments.
+        """Call command with arguments.
 
         Paramters
         ---------
@@ -504,7 +505,7 @@ class Parser(ArgumentParser):
         Optional[Callable[[F], F]]:
             Call function with arguments.
 
-        '''
+        """
         # parse variables
         arguments, namespace = self.retrieve(args, ns)
         log.debug(f"dispatch: {arguments}, {namespace}")

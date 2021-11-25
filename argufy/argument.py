@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # copyright: (c) 2020 by Jesse Johnson.
 # license: Apache 2.0, see LICENSE for more details.
-'''Arguments for inspection based CLI parser.'''
+"""Arguments for inspection based CLI parser."""
 
 import inspect
 # import logging
@@ -14,7 +14,7 @@ from docstring_parser.common import DocstringParam
 
 
 class Argument:
-    '''Represent argparse arguments.'''
+    """Represent argparse arguments."""
 
     __short_flags: List[str] = ['-h']
 
@@ -23,7 +23,7 @@ class Argument:
         docstring: DocstringParam,
         parameters: Optional[inspect.Parameter] = None,
     ) -> None:
-        '''Initialize argparse argument.'''
+        """Initialize argparse argument."""
         # self.attributes: Dict[Any, Any] = {}
 
         # set parameter default
@@ -54,7 +54,7 @@ class Argument:
     def __parse_parameters(
         self, parameters: Optional[inspect.Parameter]
     ) -> None:
-        '''Get parameter types from type inspection.'''
+        """Get parameter types from type inspection."""
         # if typing.get_origin(parameters.annotation) is Union:
         if parameters:
             if hasattr(parameters.annotation, '__origin__'):
@@ -69,7 +69,7 @@ class Argument:
                 self.type = parameters.annotation
 
     def __parse_docstring(self, docstring: DocstringParam) -> None:
-        '''Get parameter types from docstring.'''
+        """Get parameter types from docstring."""
         # Parse docstring for parameter types and defaults
         if ',' in docstring.type_name:
             for arg in docstring.type_name.split(',', 1):
@@ -78,6 +78,7 @@ class Argument:
                     if arg.__class__.__module__ == 'builtins':
                         self.type = literal_eval(arg) if arg != 'str' else str
                 if arg.lower() == 'optional' and not hasattr(self, 'default'):
+                    # XXX: should optional not exist instead of 'None'
                     self.default = None
                 # TODO: tighten regex
                 if re.search(r'^\s*\{.*\}\s*$', arg):
@@ -91,12 +92,12 @@ class Argument:
 
     @property
     def name(self) -> List[str]:
-        '''Get argparse command/argument name.'''
+        """Get argparse command/argument name."""
         return self.__name
 
     @name.setter
     def name(self, parameters: inspect.Parameter) -> None:
-        '''Set argparse command/argument name.'''
+        """Set argparse command/argument name."""
         name = parameters.name.replace('_', '-')
 
         # parse positional argument
@@ -126,12 +127,12 @@ class Argument:
 
     @property
     def type(self) -> Any:
-        '''Get argparse argument type.'''
+        """Get argparse argument type."""
         return self.__type  # type: ignore
 
     @type.setter
     def type(self, annotation: Any) -> None:
-        '''Set argparse argument type.'''
+        """Set argparse argument type."""
         # log.debug('prematched annotation:', annotation)
         if annotation == bool:
             # NOTE: these store bool type internally
@@ -158,74 +159,74 @@ class Argument:
 
     @property
     def metavar(self) -> str:
-        '''Get argparse argument metavar.'''
+        """Get argparse argument metavar."""
         return self.__metavar
 
     @metavar.setter
     def metavar(self, metavar: str) -> None:
-        '''Set argparse argument metavar.'''
+        """Set argparse argument metavar."""
         # NOTE: Only positional arguments use metavars
         if not hasattr(self, 'default'):
             self.__metavar = metavar
 
     # @property
     # def const(self) -> str:
-    #     '''Get argparse argument const.'''
+    #     """Get argparse argument const."""
     #     return self.__const
 
     # @const.setter
     # def const(self, const: str) -> None:
-    #     '''Set argparse argument const.'''
+    #     """Set argparse argument const."""
     #     self.__const = const
 
     # @property
     # def dest(self) -> str:
-    #     '''Get argparse command/argument dest.'''
+    #     """Get argparse command/argument dest."""
     #     return self.__dest
 
     # @dest.setter
     # def dest(self, dest: str) -> None:
-    #     '''Set argparse command/argument dest.'''
+    #     """Set argparse command/argument dest."""
     #     self.__dest = dest
 
     # @property
     # def required(self) -> bool:
-    #     '''Get argparse required argument.'''
+    #     """Get argparse required argument."""
     #     return self.__required
 
     # @required.setter
     # def required(self, required: bool) -> None:
-    #     '''Set argparse required argument.'''
+    #     """Set argparse required argument."""
     #     self.__required = required
 
     @property
     def action(self) -> str:
-        '''Get argparse argument action.'''
+        """Get argparse argument action."""
         return self.__action
 
     @action.setter
     def action(self, action: str) -> None:
-        '''Set argparse argument action.'''
+        """Set argparse argument action."""
         self.__action = action
 
     @property
     def choices(self) -> List[str]:
-        '''Get argparse argument choices.'''
+        """Get argparse argument choices."""
         return self.__choices
 
     @choices.setter
     def choices(self, choices: set) -> None:
-        '''Set argparse argument choices.'''
+        """Set argparse argument choices."""
         self.__choices = list(choices)
 
     @property
     def nargs(self) -> Union[int, str]:
-        '''Get argparse argument nargs.'''
+        """Get argparse argument nargs."""
         return self.__nargs
 
     @nargs.setter
     def nargs(self, nargs: Union[int, str]) -> None:
-        '''Set argparse argument nargs.'''
+        """Set argparse argument nargs."""
         # TODO: map nargs to argparse with typing
         # 1: set number of values
         # ?: a single optional value
@@ -236,12 +237,12 @@ class Argument:
 
     @property
     def default(self) -> Any:
-        '''Get argparse argument default.'''
+        """Get argparse argument default."""
         return self.__default
 
     @default.setter
     def default(self, default: Any) -> None:
-        '''Set argparse argument default.'''
+        """Set argparse argument default."""
         if default != inspect._empty:  # type: ignore
             self.__default = default
         # XXX: this keeps conflicting with positional arguments
@@ -250,10 +251,10 @@ class Argument:
 
     @property
     def help(self) -> str:
-        '''Get argparse command/argument help message.'''
+        """Get argparse command/argument help message."""
         return self.__help
 
     @help.setter
     def help(self, description: str) -> None:
-        '''Set argparse command/argument help message.'''
+        """Set argparse command/argument help message."""
         self.__help = description
