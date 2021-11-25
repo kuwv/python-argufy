@@ -1,4 +1,4 @@
-'''Example argument group.'''
+"""Example argument group."""
 
 # import argparse
 # import inspect

@@ -1,4 +1,4 @@
-'''Simple argparse.'''
+"""Simple argparse."""
 
 import logging
 import sys
@@ -16,7 +16,7 @@ def optional_boolean(
     check: str,
     bool_check: Optional[bool] = None,
 ) -> None:
-    '''Run example bool.'''
+    """Run example bool."""
     print('check is:', check)
 
     if bool_check:

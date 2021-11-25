@@ -1,4 +1,4 @@
-'''Simple argparse.'''
+"""Simple argparse."""
 
 import inspect
 import logging
@@ -14,41 +14,41 @@ log.setLevel(logging.DEBUG)
 
 
 def switch():  # type: ignore
-    '''Run empty function to check switch.'''
+    """Run empty function to check switch."""
     print('test empty switch')
 
 
 def positional(test: str) -> None:
-    '''Run example positional.
+    """Run example positional.
 
     Parameters
     ----------
     test: str
         example test variable
 
-    '''
+    """
     print(test)
 
 
 def boolean(bool_check=False):  # type: ignore
-    '''Run example bool.'''
+    """Run example bool."""
     print(bool_check)
 
 
 def choice(choice_check='A'):  # type: ignore
-    '''Run example choice.
+    """Run example choice.
 
     Parameters
     ----------
     choice_check: str, {'A', 'B', 'C'}
         example choice
 
-    '''
+    """
     print(choice_check)
 
 
 def optional(variable: Optional[str]) -> None:
-    '''Run example optional.'''
+    """Run example optional."""
     if variable:
         print(variable)
     else:
@@ -56,7 +56,7 @@ def optional(variable: Optional[str]) -> None:
 
 
 def arguments(test_arg: str = 'test', *args: str, **kwargs: str) -> None:
-    '''Run example key arguments.
+    """Run example key arguments.
 
     Parameters
     ----------
@@ -67,7 +67,7 @@ def arguments(test_arg: str = 'test', *args: str, **kwargs: str) -> None:
     test2: str, optional
         kwargs test two
 
-    '''
+    """
     print('test_arg', test_arg)
     if args != []:
         print('args', args)

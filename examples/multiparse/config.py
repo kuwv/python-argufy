@@ -1,11 +1,11 @@
-'''Provide example to update variable.'''
+"""Provide example to update variable."""
 
 from dataclasses import dataclass
 
 
 @dataclass
 class Settings:
-    '''Provide example configuration settings.
+    """Provide example configuration settings.
 
     Parameters
     ----------
@@ -14,7 +14,7 @@ class Settings:
     var2: str
         variable two.
 
-    '''
+    """
 
     var1: str
     var2: str

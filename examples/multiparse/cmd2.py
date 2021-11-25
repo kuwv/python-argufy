@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # :copyright: (c) 2020 by Jesse Johnson.
 # :license: Apache 2.0, see LICENSE for more details.
-'''Test parser.'''
+"""Test parser."""
 
 from . import builder
 
@@ -9,24 +9,24 @@ _settings = builder()
 
 
 def example_builder() -> None:
-    '''Demonstrate variable imported from config.'''
+    """Demonstrate variable imported from config."""
     print('---', _settings, '---')
 
 
 def example_args(*args_check: str) -> None:
-    '''Demonstrate example arguments.
+    """Demonstrate example arguments.
 
     Parameters
     ----------
     args_check: str
         example arguments
 
-    '''
+    """
     print(args_check)
 
 
 def example_kwargs(**kwargs: str) -> None:
-    '''Demonstrate example keyword arguments.
+    """Demonstrate example keyword arguments.
 
     Parameters
     ----------
@@ -39,7 +39,7 @@ def example_kwargs(**kwargs: str) -> None:
     variable_three: str
         variable three
 
-    '''
+    """
     if kwargs.get('variable_one'):
         print(kwargs['variable_one'])
 

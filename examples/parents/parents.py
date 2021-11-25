@@ -1,4 +1,4 @@
-'''Provide prototype for group design.'''
+"""Provide prototype for group design."""
 
 import argparse
 

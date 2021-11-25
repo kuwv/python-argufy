@@ -1,8 +1,7 @@
-'''Simple argparse.'''
+"""Simple argparse."""
 
 import logging
 import sys
-from typing import Any
 
 from argufy import Parser
 
@@ -13,7 +12,7 @@ log.setLevel(logging.DEBUG)
 
 
 def find(*args: str, **kwargs: str) -> None:
-    '''Run example key arguments.
+    """Run example key arguments.
 
     Parameters
     ----------
@@ -22,7 +21,7 @@ def find(*args: str, **kwargs: str) -> None:
     test_two: str, optional
         kwargs test two
 
-    '''
+    """
     if args != []:
         print('args', args)
 
@@ -31,7 +30,7 @@ def find(*args: str, **kwargs: str) -> None:
 
 
 def ignore(test: str) -> None:
-    '''Ignore this.'''
+    """Ignore this."""
     print('this should be ignored:', test)
 
 

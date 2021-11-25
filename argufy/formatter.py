@@ -1,4 +1,4 @@
-'''Simple argparse.'''
+"""Simple argparse."""
 
 # from pprint import pprint
 import argparse
@@ -12,7 +12,7 @@ colorama.init()
 
 
 class ArgufyHelpFormatter(HelpFormatter):
-    '''Provide formatting for Argufy.'''
+    """Provide formatting for Argufy."""
 
     # argparse.HelpFormatter(prog, max_help_position=80, width=130)
 
@@ -23,7 +23,7 @@ class ArgufyHelpFormatter(HelpFormatter):
         groups: Iterable[argparse._ArgumentGroup],
         prefix: Optional[str] = 'usage: ',
     ) -> None:
-        '''Format usage message.'''
+        """Format usage message."""
         if prefix is not None:
             prefix = self.font(prefix)
         super(ArgufyHelpFormatter, self).add_usage(
@@ -32,16 +32,16 @@ class ArgufyHelpFormatter(HelpFormatter):
 
     @staticmethod
     def font(text: str, width: str = 'BRIGHT') -> str:
-        '''Set the string thickness.'''
+        """Set the string thickness."""
         return getattr(Style, width) + text + Style.RESET_ALL
 
     @staticmethod
     def shade(text: str, color: str = 'CYAN') -> str:
-        '''Set the string color.'''
+        """Set the string color."""
         return getattr(Fore, color.upper()) + text + Style.RESET_ALL
 
     # def _format_action_invocation(self, action: Action) -> str:
-    #     '''Format arguments summary.'''
+    #     """Format arguments summary."""
     #     # TODO: find alternative that does not modify action
     #     if isinstance(action, argparse._SubParsersAction):
     #         if action.choices is not None:
@@ -54,7 +54,7 @@ class ArgufyHelpFormatter(HelpFormatter):
     #     )._format_action_invocation(action)
 
     def _expand_help(self, action: Action) -> str:
-        '''Format help message.'''
+        """Format help message."""
         if action.help:
             return self.shade(
                 super(ArgufyHelpFormatter, self)
@@ -67,7 +67,7 @@ class ArgufyHelpFormatter(HelpFormatter):
             return ''
 
     def _format_action(self, action: Action) -> str:
-        '''Format arguments.'''
+        """Format arguments."""
         if isinstance(action, argparse._SubParsersAction._ChoicesPseudoAction):
             subcommand = self.shade(
                 self.font(self._format_action_invocation(action))

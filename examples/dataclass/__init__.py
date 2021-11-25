@@ -1,1 +1,1 @@
-'''Provide initialization for multiparse.'''
+"""Provide initialization for multiparse."""

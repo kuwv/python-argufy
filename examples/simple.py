@@ -1,5 +1,5 @@
 #!/usr/bin/python3
-'''Simple argparse.'''
+"""Simple argparse."""
 
 import sys
 
@@ -9,22 +9,22 @@ module = sys.modules[__name__]
 
 
 def switch():  # type: ignore
-    '''Empty function to check switch.'''
+    """Empty function to check switch."""
     print('test empty switch')
 
 
 def positional(test: str):  # type: ignore
-    '''Run example positional.'''
+    """Run example positional."""
     print(test)
 
 
 def example_bool(bool_check=False):  # type: ignore
-    '''Run example bool.'''
+    """Run example bool."""
     print(bool_check)
 
 
 def example_choice(choice_check='A'):  # type: ignore
-    '''Run example choice.'''
+    """Run example choice."""
     print(choice_check)
 
 

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # copyright: (c) 2020 by Jesse Johnson.
 # license: Apache 2.0, see LICENSE for more details.
-'''Provide CLI for example.'''
+"""Provide CLI for example."""
 
 import sys
 from argufy import Parser
@@ -10,7 +10,7 @@ from . import cmd
 
 
 def main() -> None:
-    '''Demonstrate main with CLI.'''
+    """Demonstrate main with CLI."""
     parser = Parser(
         # command_type='subcommand',
         use_module_args=True,
