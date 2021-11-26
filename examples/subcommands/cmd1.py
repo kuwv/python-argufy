@@ -14,6 +14,18 @@ example_variable2: str
 example_variable1 = 'test1'
 
 
+def _example_hidden(check: str = 'hidden-result') -> None:
+    """Demonstrate example hidden command.
+
+    Parameters
+    ----------
+    check: str
+        example variable for hidden command
+
+    """
+    print(check)
+
+
 def example_bool(bool_check: bool = False) -> None:
     """Demonstrate example bool.
 

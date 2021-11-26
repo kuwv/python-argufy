@@ -108,11 +108,13 @@ class Argument:
             self.__name = [name]
             if str(parameters).startswith('*'):
                 self.nargs = '*'
+
         # parse optional argument
         else:
             if str(parameters).startswith('**'):
                 self.nargs = '*'
             flags = [f"--{name}"]
+
             # NOTE: check for conflicting flags
             if '-' not in name:
                 # TODO: check if common short flag (ex: version)
