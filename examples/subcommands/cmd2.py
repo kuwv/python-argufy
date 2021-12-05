@@ -9,28 +9,31 @@ example_variable: str
     Example variable for testing
 
 """
+
+from typing import List, Tuple
+
 example_variable2 = 'test2'
 
 
-def example_bool(bool_check: bool = False) -> None:
+def example_list(list_check: List[str] = []) -> None:
     """Demonstrate example bool.
 
     Parameters
     ----------
-    bool_check: bool, optional
+    list_check: list, optional
         example boolean
 
     """
-    print(bool_check)
+    print(list_check)
 
 
-def example_choice(choice_check: str = 'A') -> None:
+def example_tuple(tuple_check: Tuple[str, ...] = ('A', 'B', 'C')) -> None:
     """Demonstrate example choice.
 
     Parameters
     ----------
-    choice_check: str, {'A', 'B', 'C'}
+    tuple_check: tuple, ('A', 'B', 'C')
         example choice
 
     """
-    print(choice_check)
+    print(tuple_check)

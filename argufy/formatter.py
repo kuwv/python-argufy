@@ -18,7 +18,7 @@ class ArgufyHelpFormatter(HelpFormatter):
 
     def add_usage(
         self,
-        usage: str,
+        usage: Optional[str],
         actions: Iterable[Action],
         groups: Iterable[argparse._ArgumentGroup],
         prefix: Optional[str] = 'usage: ',

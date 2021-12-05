@@ -51,22 +51,26 @@ class Argument:
         if docstring:
             self.help = docstring.description
 
-    def __parse_parameters(
-        self, parameters: Optional[inspect.Parameter]
-    ) -> None:
+    def __parse_parameters(self, parameters: inspect.Parameter) -> None:
         """Get parameter types from type inspection."""
         # if typing.get_origin(parameters.annotation) is Union:
-        if parameters:
-            if hasattr(parameters.annotation, '__origin__'):
-                annotation = typing.get_args(parameters.annotation)
+        # XXX need to handle types from typing
+        # print(
+        #     '---', parameters.annotation,
+        #     typing.get_origin(parameters.annotation),
+        # )
+        if hasattr(parameters.annotation, '__origin__'):
+            annotation = typing.get_args(parameters.annotation)
+            # print('annotation', annotation, parameters.annotation)
 
-                # check if annotation is optional
-                if type(None) in annotation:
-                    self.nargs = '?'
-                else:
-                    self.type = annotation
+            # check if annotation is optional
+            if type(None) in annotation:
+                self.nargs = '?'
             else:
-                self.type = parameters.annotation
+                # self.type = annotation
+                self.type = typing.get_origin(parameters.annotation)
+        else:
+            self.type = parameters.annotation
 
     def __parse_docstring(self, docstring: DocstringParam) -> None:
         """Get parameter types from docstring."""
@@ -136,6 +140,7 @@ class Argument:
     def type(self, annotation: Any) -> None:
         """Set argparse argument type."""
         # log.debug('prematched annotation:', annotation)
+        # print(annotation)
         if annotation == bool:
             # NOTE: these store bool type internally
             if self.default or not hasattr(self, 'default'):
@@ -146,8 +151,8 @@ class Argument:
             self.__type = annotation
             self.action = 'append'
         elif annotation == list:
-            self.__type = annotation
-            self.nargs = '*'
+            self.__type = lambda v: int(v) if v.isdigit() else v
+            self.action = 'append'
         elif annotation == tuple:
             self.__type = annotation
             self.nargs = '+'

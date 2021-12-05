@@ -177,7 +177,7 @@ class Parser(ArgumentParser):
         """Generate inpect parameter."""
         parameter = inspect.Parameter(
             name,
-            _ParameterKind.POSITIONAL_OR_KEYWORD,  # type: ignore
+            _ParameterKind.POSITIONAL_OR_KEYWORD,
             default=getattr(module, name),
             annotation=inspect._empty,  # type: ignore
         )
@@ -361,6 +361,7 @@ class Parser(ArgumentParser):
                 log.debug(f"param annotation: {param.annotation}")
                 argument = self.__clean_args(Argument(description, param))
                 name = argument.pop('name')
+                # print(name, argument)
                 parser.add_argument(*name, **argument)
 
         # populate options

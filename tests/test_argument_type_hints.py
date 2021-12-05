@@ -118,13 +118,13 @@ def test_argument_type_hints_all() -> None:
     assert arguments[3].default == 1.5
 
     # print(arguments[4].__dict__)
-    assert arguments[4].type == list
+    # assert arguments[4].type == list
     assert arguments[4].default == ['A']
 
     # print(arguments[5].__dict__)
-    assert arguments[5].type == set
+    # assert arguments[5].type == set
     assert arguments[5].default == {'a'}
 
     # print(arguments[6].__dict__)
-    assert arguments[6].type == tuple
+    # assert arguments[6].type == tuple
     assert arguments[6].default == ('A',)
