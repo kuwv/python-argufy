@@ -3,6 +3,21 @@ name = "argufy"
 version = "0.1.2-a4"
 description = "Inspection based parser based on argparse."
 authors = ["Jesse P. Johnson <jpj6652@gmail.com>"]
+homepage = "https://github.com/kuwv/python-argufy"
+documentation = "https://kuwv.github.io/python-argufy/"
+license = "Apache-2.0"
+readme = "README.md"
+keywords = ["parser"]
+classifiers = [
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: Apache Software License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.5",
+    "Programming Language :: Python :: 3.6",
+    "Programming Language :: Python :: 3.7",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+]
 
 [tool.poetry.dependencies]
 python = "^3.6"
@@ -16,24 +31,18 @@ pytest-cov = "^2.10.0"
 isort = "^4.3.21"
 bandit = "^1.6.2"
 safety = "^1.9.0"
-bump2version = "^1.0.0"
 invoke = "^1.4.1"
 black = "^19.10b0"
-mypy = "^0.782"
 mkdocs = "^1.1.2"
 docstr-coverage = "^1.2.0"
 mkdocstrings = "^0.13.2"
-pydocstyle = "^5.0.2"
+pydocstyle = {extras = ["toml"], version = "^6.1.1"}
 mkdocs-material = "^7.1.6"
-flit = "^3.3.0"
+mypy = "^0.910"
 
-[tool.flit.metadata]
-module = "argufy"
-author = "Jesse P. Johnson"
-author-email = "jpj6652@gmail.com"
-home-page = "https://github.com/kuwv/python-argufy"
-requires = ["docstring-parser"]
-classifiers = ["License :: OSI Approved :: Apache Software License"]
+[tool.isort]
+profile = "black"
+line_length = 79
 
 [tool.black]
 line-length = 79
@@ -52,3 +61,20 @@ exclude = '''
   )
 )
 '''
+
+[tool.mypy]
+warn_redundant_casts = true
+warn_unused_ignores = true
+disallow_untyped_defs = true
+ignore_missing_imports = true
+
+[tool.pydocstyle]
+ignore = [
+    "D203",
+    "D213",
+    "D300"
+]
+
+[build-system]
+requires = ["poetry_core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
