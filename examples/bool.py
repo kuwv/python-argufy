@@ -20,7 +20,7 @@ def optional_boolean(
     print('check is:', check)
 
     if bool_check:
-        print(bool_check)
+        print(f"tis {bool_check}")
     else:
         print('nothing to see here')
 

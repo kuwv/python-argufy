@@ -122,7 +122,7 @@ class Parser(ArgumentParser):
                 '--version',
                 action='version',
                 version=f"%(prog)s {self.prog_version}",
-                help='display package version',
+                help='display application version',
             )
 
     @staticmethod
