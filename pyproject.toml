@@ -1,20 +1,22 @@
 [build-system]
-requires = ["poetry_core>=1.0.0"]
-build-backend = "poetry.core.masonry.api"
+requires = ["hatchling>=1.11.0"]
+build-backend = "hatchling.build"
 
-[tool.poetry]
+[project]
 name = "argufy"
 version = "0.1.2b1"
 description = "Inspection based parser based on argparse."
-authors = ["Jesse P. Johnson <jpj6652@gmail.com>"]
-homepage = "https://github.com/kuwv/python-argufy"
-documentation = "https://kuwv.github.io/python-argufy/"
-license = "Apache-2.0"
 readme = "README.md"
+license = {file = "LICENSE"}
 keywords = ["parser"]
+requires-python = ">=3.6.2"
+authors = [{name = "Jesse P. Johnson", email = "jpj6652@gmail.com"}]
+maintainers = [{name = "Jesse P. Johnson", email = "jpj6652@gmail.com"}]
 classifiers = [
+    "Development Status :: 3 - Alpha",
     "Intended Audience :: Developers",
     "License :: OSI Approved :: Apache Software License",
+    "Programming Language :: Python",
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3.5",
     "Programming Language :: Python :: 3.6",
@@ -22,34 +24,50 @@ classifiers = [
     "Programming Language :: Python :: 3.8",
     "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
+    "Topic :: Software Development :: Libraries"
 ]
-packages = [
-    { include = "argufy", from = "src" },
+dependencies = [
+    "docstring-parser>=0.7.2",
+    "colorama>=0.4.4",
 ]
 
-[tool.poetry.dependencies]
-python = "^3.6.2"
-docstring-parser = "^0.7.2"
-colorama = "^0.4.4"
+[project.optional-dependencies]
+build = [
+    "build",
+    "invoke>=1.4.1",
+    "proman-versioning>=0.5.0-alpha.2",
+]
+docs = [
+    "docstr-coverage>=1.2.0",
+    "mkdocs>=1.2.2",
+    "mkdocstrings>=0.16.2",
+    "mkdocs-material>=7.2.0",
+    "pydocstyle[toml]>=6.1.1",
+]
+test = [
+    "pytest>=6.2.5",
+    "pytest-cov>=2.10.0",
+    "tox>=3.25.0",
+]
+sca = [
+    "mypy>=0.942",
+    "bandit>=1.6.2",
+    "pylint>=2.9.5"
+]
+style = [
+    "black==22.3.0",
+    "isort>=5.10.1",
+    "flake8>=3.8.3",
+]
+sast = [
+    "bandit>=1.6.2",
+    "safety>=1.9.0",
+]
 
-[tool.poetry.dev-dependencies]
-pytest = "^6.2.5"
-flake8 = "^3.8.3"
-pytest-cov = "^2.10.0"
-isort = "^5.9.2"
-bandit = "^1.6.2"
-safety = "^1.9.0"
-invoke = "^1.4.1"
-black = "^22.1.0"
-mkdocs = "^1.2.2"
-mkdocstrings = "^0.16.2"
-mkdocs-material = "^7.2.0"
-docstr-coverage = "^1.2.0"
-pydocstyle = {extras = ["toml"], version = "^6.1.1"}
-# mypy = "^0.910"
-proman-versioning = "^0.1.1-beta.5"
-tox = "^3.24.0"
-pylint = "^2.9.5"
+[project.urls]
+homepage = "https://github.com/kuwv/python-argufy"
+repository = "https://github.com/kuwv/python-argufy"
+documentation = "https://kuwv.github.io/python-argufy/"
 
 [[tool.proman.versioning.files]]
 filepath = "src/argufy/__init__.py"
@@ -79,13 +97,11 @@ line-length = 79
 skip-string-normalization = true
 include = '\.pyi?$'
 exclude = '''
-
 (
   /(
     | \.git
     | \.mypy_cache
     | \.pytest_cache
-    | \.vagrant
     | _build
     | build
     | dist
