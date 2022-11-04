@@ -1,3 +1,7 @@
+[build-system]
+requires = ["poetry_core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
+
 [tool.poetry]
 name = "argufy"
 version = "0.1.2b1"
@@ -17,6 +21,7 @@ classifiers = [
     "Programming Language :: Python :: 3.7",
     "Programming Language :: Python :: 3.8",
     "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
 ]
 packages = [
     { include = "argufy", from = "src" },
@@ -28,21 +33,23 @@ docstring-parser = "^0.7.2"
 colorama = "^0.4.4"
 
 [tool.poetry.dev-dependencies]
-pytest = "^5.2"
+pytest = "^6.2.5"
 flake8 = "^3.8.3"
 pytest-cov = "^2.10.0"
-isort = "^4.3.21"
+isort = "^5.9.2"
 bandit = "^1.6.2"
 safety = "^1.9.0"
 invoke = "^1.4.1"
-black = "^19.10b0"
-mkdocs = "^1.1.2"
+black = "^22.1.0"
+mkdocs = "^1.2.2"
+mkdocstrings = "^0.16.2"
+mkdocs-material = "^7.2.0"
 docstr-coverage = "^1.2.0"
-mkdocstrings = "^0.13.2"
 pydocstyle = {extras = ["toml"], version = "^6.1.1"}
-mkdocs-material = "^7.1.6"
-mypy = "^0.910"
+# mypy = "^0.910"
 proman-versioning = "^0.1.1-beta.5"
+tox = "^3.24.0"
+pylint = "^2.9.5"
 
 [[tool.proman.versioning.files]]
 filepath = "src/argufy/__init__.py"
@@ -56,12 +63,20 @@ pattern = "__version__ == '${version}'"
 filepath = "pyproject.toml"
 pattern = "version = \"${version}\""
 
+[tool.pydocstyle]
+ignore = [
+    "D203",
+    "D213",
+    "D300"
+]
+
 [tool.isort]
 profile = "black"
 line_length = 79
 
 [tool.black]
 line-length = 79
+skip-string-normalization = true
 include = '\.pyi?$'
 exclude = '''
 
@@ -83,14 +98,3 @@ warn_redundant_casts = true
 warn_unused_ignores = true
 disallow_untyped_defs = true
 ignore_missing_imports = true
-
-[tool.pydocstyle]
-ignore = [
-    "D203",
-    "D213",
-    "D300"
-]
-
-[build-system]
-requires = ["poetry_core>=1.0.0"]
-build-backend = "poetry.core.masonry.api"
