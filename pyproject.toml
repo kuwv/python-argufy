@@ -53,7 +53,7 @@ test = [
 sca = [
     "mypy>=0.942",
     "bandit>=1.6.2",
-    "pylint>=2.9.5"
+    "pylint>=2.9.5",
 ]
 style = [
     "black==22.3.0",
