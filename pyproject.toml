@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "argufy"
-version = "0.1.2b2"
+version = "0.1.2b3"
 description = "Inspection based parser based on argparse."
 readme = "README.md"
 license = {file = "LICENSE"}
