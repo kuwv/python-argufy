@@ -36,10 +36,7 @@ build = [
     "build",
     "invoke>=1.4.1",
     "proman-versioning>=0.5.0-alpha.2",
-<<<<<<< HEAD
     "twine",
-=======
->>>>>>> d858560 (build: switch to pep621)
 ]
 docs = [
     "docstr-coverage>=1.2.0",
@@ -56,11 +53,7 @@ test = [
 sca = [
     "mypy>=0.942",
     "bandit>=1.6.2",
-<<<<<<< HEAD
     "pylint>=2.9.5",
-=======
-    "pylint>=2.9.5"
->>>>>>> d858560 (build: switch to pep621)
 ]
 style = [
     "black==22.3.0",
