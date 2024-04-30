@@ -6,14 +6,14 @@
 
 ## Overview
 
-Inspection based parser built on argparse. Build complex CLI interfaces by  
+Inspection based parser built on argparse. Build complex CLI interfaces by
 writing more code-complete applications.
 
 ## Motivation
 
-Argufy is designed to be an alternative to decorator based parsers such as  
-Click. Decorators have limitations that prevent effective use of inspection  
-without drawbacks. This parser easilly allows a CLI to be created with minimal  
+Argufy is designed to be an alternative to decorator based parsers such as
+Click. Decorators have limitations that prevent effective use of inspection
+without drawbacks. This parser easilly allows a CLI to be created with minimal
 effort while enabling inspection.
 
 ## Install
@@ -27,7 +27,7 @@ from argufy import Parser
 from . import cli
 
 def main():
-    '''Do main function for CLI.'''
+    """Do main function for CLI."""
     parser = Parser()
     parser.add_commands(cli)
     parser.dispatch()
@@ -39,21 +39,21 @@ if __name__ == '__main__':
 ## Create the command line subcommands and arguments.
 
 ```
-'''Example module named CLI.'''
+"""Example module named CLI."""
 
 def _ignored():
-    '''This function is ignored.'''
+    """This function is ignored."""
     pass
 
 def example(argument: bool = False):
-    '''Provide an example command.
+    """Provide an example command.
 
     Parameters
     ----------
     argument: bool, optional
         Provide an example argument.
 
-    '''
+    """
     if argument:
         print('This is a true argument')
     else:
