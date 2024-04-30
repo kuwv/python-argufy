@@ -9,12 +9,12 @@ jobs:
   version:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           ref: "${{ github.event.pull_request.head.sha }}"
           fetch-depth: 0
       - name: 'Set up Python 3.10'
-        uses: actions/setup-python@v4.5.0
+        uses: actions/setup-python@v5
         with:
           python-version: '3.10'
       - name: Setup gitconfig
@@ -36,7 +36,7 @@ jobs:
           fi
           version info --filepaths | tar -cvzf versioning.tar.gz -T -
       - name: Store versioned files
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: "versioning-${{ github.run_number }}"
           path: versioning.tar.gz
@@ -85,7 +85,7 @@ jobs:
           pip install build==0.8.0
           pip install .
       - name: Download versioned files
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: "versioning-${{ github.run_number }}"
       - name: Perform build
@@ -93,7 +93,7 @@ jobs:
           tar -xzf versioning.tar.gz
           python -m build
       - name: Store versioned files
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: dist
           path: dist
@@ -112,7 +112,7 @@ jobs:
       - name: Install dependencies
         run: tar -xzf versioning.tar.gz
       - name: Download versioned files
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: dist
           path: dist
@@ -135,7 +135,7 @@ jobs:
       - name: Install dependencies
         run: tar -xzf versioning.tar.gz
       - name: Download versioned files
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: dist
           path: dist
