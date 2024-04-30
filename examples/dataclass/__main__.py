@@ -4,6 +4,7 @@
 """Provide CLI for example."""
 
 import sys
+
 from argufy import Parser
 
 from . import cmd

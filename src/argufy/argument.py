@@ -6,7 +6,8 @@
 import re
 import typing
 from ast import literal_eval
-from inspect import Parameter, _empty as empty
+from inspect import Parameter
+from inspect import _empty as empty
 from typing import Any, List, Optional, Union
 
 from docstring_parser.common import DocstringParam
