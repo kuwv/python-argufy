@@ -11,12 +11,12 @@ check_attribute: bool
 
 '''
 
-from ast import literal_eval
 import sys
+from ast import literal_eval
 
 import pytest
 
-from argufy import __version__, Parser
+from argufy import Parser, __version__
 
 sys.path.append('.')
 import subcommands_parser  # noqa: E402

@@ -6,14 +6,13 @@ import inspect
 import logging
 import sys
 import typing
-from argparse import ArgumentParser, _SubParsersAction as SubParsersAction
+from argparse import ArgumentParser
+from argparse import _SubParsersAction as SubParsersAction
 
 # from dataclasses import is_dataclass
-from inspect import (
-    Parameter,
-    _ParameterKind as ParameterKind,
-    _empty as empty,
-)
+from inspect import Parameter
+from inspect import _empty as empty
+from inspect import _ParameterKind as ParameterKind
 from types import ModuleType
 from typing import (
     TYPE_CHECKING,
@@ -34,8 +33,9 @@ from argufy.formatter import ArgufyHelpFormatter
 
 if TYPE_CHECKING:
     from argparse import Namespace
-    from docstring_parser import DocstringParam
     from inspect import Signature
+
+    from docstring_parser import DocstringParam
 
 log = logging.getLogger(__name__)
 

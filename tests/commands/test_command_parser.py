@@ -12,15 +12,16 @@ check_attribute: bool
 
 '''
 
+import sys
 from ast import literal_eval
 
 import pytest
-import sys
 
-from argufy import __version__, Parser
+from argufy import Parser, __version__
 
 sys.path.append('.')
 import command_parser  # noqa: E402
+
 # module = sys.modules[__name__]
 
 
