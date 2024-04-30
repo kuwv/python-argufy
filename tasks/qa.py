@@ -1,8 +1,6 @@
-# -*- coding: utf-8 -*-
-# type: ignore
 # copyright: (c) 2020 by Jesse Johnson.
 # license: Apache 2.0, see LICENSE for more details.
-'''Test Task-Runner.'''
+"""Test Task-Runner."""
 
 from typing import Optional, TYPE_CHECKING
 
@@ -13,8 +11,8 @@ if TYPE_CHECKING:
 
 
 @task
-def style(ctx, check=True):  # type: (Context, bool) -> None
-    '''Format project source code to PEP-8 standard.'''
+def style(ctx: 'Context', check: bool = True) -> None:
+    """Format project source code to PEP-8 standard."""
     args = ['--skip-string-normalization']
     if check:
         args.append('--check')
@@ -23,20 +21,20 @@ def style(ctx, check=True):  # type: (Context, bool) -> None
 
 
 @task
-def lint(ctx):  # type: (Context) -> None
-    '''Check project source code for linting errors.'''
+def lint(ctx: 'Context') -> None:
+    """Check project source code for linting errors."""
     ctx.run('flake8')
 
 
 @task
-def type_check(ctx, path='.'):  # type: (Context, str) -> None
-    '''Check project source types.'''
+def type_check(ctx: 'Context', path: str = '.') -> None:
+    """Check project source types."""
     ctx.run(f"mypy {path}")
 
 
 @task
-def unit_test(ctx, capture=None):  # type: (Context, Optional[str]) -> None
-    '''Perform unit tests.'''
+def unit_test(ctx: 'Context', capture: Optional[str] = None) -> None:
+    """Perform unit tests."""
     args = []
     if capture:
         args.append(f"--capture={capture}")
@@ -44,15 +42,15 @@ def unit_test(ctx, capture=None):  # type: (Context, Optional[str]) -> None
 
 
 @task
-def static_analysis(ctx):  # type: (Context) -> None
-    '''Perform static code analysis on imports.'''
+def static_analysis(ctx: 'Context') -> None:
+    """Perform static code analysis on imports."""
     ctx.run('safety check')
     ctx.run('bandit -r argufy')
 
 
 @task
-def coverage(ctx, report=None):  # type: (Context, Optional[str]) -> None
-    '''Perform coverage checks for tests.'''
+def coverage(ctx: 'Context', report: Optional[str] = None) -> None:
+    """Perform coverage checks for tests."""
     args = ['--cov=argufy']
     if report:
         args.append(f"--cov-report={report}")
@@ -60,6 +58,6 @@ def coverage(ctx, report=None):  # type: (Context, Optional[str]) -> None
 
 
 @task(pre=[style, lint, unit_test, static_analysis, coverage])
-def test(ctx):
-    '''Run all tests.'''
+def test(ctx: 'Context') -> None:
+    """Run all tests."""
     pass

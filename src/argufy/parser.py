@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # copyright: (c) 2020 by Jesse Johnson.
 # license: Apache 2.0, see LICENSE for more details.
 """Argufy is an inspection based CLI parser."""
@@ -7,11 +6,17 @@ import inspect
 import logging
 import sys
 import typing
-from argparse import ArgumentParser, Namespace, _SubParsersAction
+from argparse import ArgumentParser, _SubParsersAction as SubParsersAction
+
 # from dataclasses import is_dataclass
-from inspect import Signature, _ParameterKind
+from inspect import (
+    Parameter,
+    _ParameterKind as ParameterKind,
+    _empty as empty,
+)
 from types import ModuleType
 from typing import (
+    TYPE_CHECKING,
     Any,
     Callable,
     Dict,
@@ -22,10 +27,15 @@ from typing import (
     TypeVar,
 )
 
-from docstring_parser import DocstringParam, parse as docstring_parse
+from docstring_parser import parse as docstring_parse
 
 from argufy.argument import Argument
 from argufy.formatter import ArgufyHelpFormatter
+
+if TYPE_CHECKING:
+    from argparse import Namespace
+    from docstring_parser import DocstringParam
+    from inspect import Signature
 
 log = logging.getLogger(__name__)
 
@@ -137,30 +147,33 @@ class Parser(ArgumentParser):
     @staticmethod
     def __clean_args(argument: Argument) -> Dict[Any, Any]:
         """Retrieve cleaned parameters from an Argument."""
+        size = len('_Argument__')
         return {
-            k[len('_Argument__'):]: v
+            k[size:]: v
             for k, v in vars(argument).items()
             if k.startswith('_Argument__')
         }
 
     @staticmethod
-    def _get_excludes(exclude_prefixes: tuple = tuple()) -> tuple:
+    def _get_excludes(exclude_prefixes: Tuple[str, ...] = tuple()) -> tuple:
         """Combine class excludes with instance."""
-        if exclude_prefixes != []:
+        if exclude_prefixes != ():
             return tuple(exclude_prefixes) + Parser.exclude_prefixes
         else:
             return Parser.exclude_prefixes
 
     @staticmethod
     def __get_description(
-        name: str, docstring: DocstringParam,
+        name: str,
+        docstring: 'DocstringParam',
     ) -> Optional[str]:
         """Get argument description from docstring."""
         return next((d for d in docstring.params if d.arg_name == name), None)
 
     @staticmethod
     def __get_keyword_args(
-        signature: Signature, docstring: DocstringParam,
+        signature: 'Signature',
+        docstring: 'DocstringParam',
     ) -> List[str]:
         """Get keyward arguments from docstring."""
         parameters = [x for x in signature.parameters]
@@ -172,14 +185,15 @@ class Parser(ArgumentParser):
 
     @staticmethod
     def __generate_parameter(
-        name: str, module: ModuleType,
-    ) -> inspect.Parameter:
+        name: str,
+        module: ModuleType,
+    ) -> Parameter:
         """Generate inpect parameter."""
-        parameter = inspect.Parameter(
+        parameter = Parameter(
             name,
-            _ParameterKind.POSITIONAL_OR_KEYWORD,
+            ParameterKind.POSITIONAL_OR_KEYWORD,
             default=getattr(module, name),
-            annotation=inspect._empty,  # type: ignore
+            annotation=empty,
         )
         return parameter
 
@@ -219,13 +233,13 @@ class Parser(ArgumentParser):
         excludes = Parser._get_excludes(exclude_prefixes)
 
         # use exsiting subparser or create a new one
-        if not any(isinstance(x, _SubParsersAction) for x in parser._actions):
+        if not any(isinstance(x, SubParsersAction) for x in parser._actions):
             # TODO: use metavar for hidden commands
             parser.add_subparsers(dest=module_name, parser_class=Parser)
 
         # check if command exists
         command = next(
-            (x for x in parser._actions if isinstance(x, _SubParsersAction)),
+            (x for x in parser._actions if isinstance(x, SubParsersAction)),
             None,
         )
 
@@ -291,8 +305,9 @@ class Parser(ArgumentParser):
                             else:
                                 cmd_name = name
 
-                            msg = docstring_parse(value.__doc__)\
-                                .short_description
+                            msg = docstring_parse(
+                                value.__doc__
+                            ).short_description
                             cmd = command.add_parser(
                                 cmd_name.replace('_', '-'),
                                 description=msg,
@@ -357,7 +372,7 @@ class Parser(ArgumentParser):
             description = self.__get_description(arg, docstring)
             # log.debug(f"param: {param}, {param.kind}")
 
-            if not param.kind == inspect.Parameter.VAR_KEYWORD:
+            if not param.kind == Parameter.VAR_KEYWORD:
                 log.debug(f"param annotation: {param.annotation}")
                 argument = self.__clean_args(Argument(description, param))
                 name = argument.pop('name')
@@ -376,7 +391,7 @@ class Parser(ArgumentParser):
         # log.debug('docstring params', docstring.params)
         return self
 
-    def __set_main_arguments(self, ns: Namespace) -> Namespace:
+    def __set_main_arguments(self, ns: 'Namespace') -> 'Namespace':
         """Separate and set main arguments from builder function.
 
         Paramters
@@ -399,14 +414,14 @@ class Parser(ArgumentParser):
             for param in builder_signature.parameters:
                 if param in vars(ns):
                     builder_args[param] = vars(ns).pop(param)
-            builder_mod.__dict__[
-                self.main_args_builder['instance']
-            ] = builder(**builder_args)
+            builder_mod.__dict__[self.main_args_builder['instance']] = builder(
+                **builder_args
+            )
         return ns
 
     def __set_module_arguments(
-        self, fn: Callable[[F], F], ns: Namespace
-    ) -> Namespace:
+        self, fn: Callable[[F], F], ns: 'Namespace'
+    ) -> 'Namespace':
         """Separate and set module arguments from functions.
 
         Paramters
@@ -451,8 +466,8 @@ class Parser(ArgumentParser):
     def retrieve(
         self,
         args: Sequence[str] = sys.argv[1:],
-        ns: Optional[Namespace] = None,
-    ) -> Tuple[List[str], Namespace]:
+        ns: Optional['Namespace'] = None,
+    ) -> Tuple[List[str], 'Namespace']:
         """Retrieve parsed values from CLI input.
 
         Paramters
@@ -478,19 +493,18 @@ class Parser(ArgumentParser):
         main_ns, main_args = self.parse_known_args(args, ns)
         if main_args == [] and 'fn' in vars(main_ns):
             return main_args, main_ns
-        else:
-            # default to help message for subcommand
-            if 'mod' in vars(main_ns):
-                a = []
-                a.append(vars(main_ns)['mod'].__name__.split('.')[-1])
-                a.append('--help')
-                self.parse_args(a)
-            return main_args, main_ns
+        # default to help message for subcommand
+        if 'mod' in vars(main_ns):
+            mod_args = []
+            mod_args.append(vars(main_ns)['mod'].__name__.split('.')[-1])
+            mod_args.append('--help')
+            self.parse_args(mod_args)
+        return main_args, main_ns
 
     def dispatch(
         self,
         args: Sequence[str] = sys.argv[1:],
-        ns: Optional[Namespace] = None,
+        ns: Optional['Namespace'] = None,
     ) -> Optional[Callable[[F], F]]:
         """Call command with arguments.
 
@@ -526,9 +540,8 @@ class Parser(ArgumentParser):
             signature = inspect.signature(fn)
             for arg in signature.parameters:
                 param = signature.parameters[arg]
-                if (
-                    str(param).startswith('*')
-                    and not str(param).startswith('**')
+                if str(param).startswith('*') and not str(param).startswith(
+                    '**'
                 ):
                     splat = ns_vars.pop(arg)
 

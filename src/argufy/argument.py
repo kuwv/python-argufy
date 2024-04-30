@@ -1,13 +1,12 @@
-# -*- coding: utf-8 -*-
 # copyright: (c) 2020 by Jesse Johnson.
 # license: Apache 2.0, see LICENSE for more details.
 """Arguments for inspection based CLI parser."""
 
-import inspect
 # import logging
 import re
 import typing
 from ast import literal_eval
+from inspect import Parameter, _empty as empty
 from typing import Any, List, Optional, Union
 
 from docstring_parser.common import DocstringParam
@@ -21,7 +20,7 @@ class Argument:
     def __init__(
         self,
         docstring: DocstringParam,
-        parameters: Optional[inspect.Parameter] = None,
+        parameters: Optional[Parameter] = None,
     ) -> None:
         """Initialize argparse argument."""
         # self.attributes: Dict[Any, Any] = {}
@@ -34,10 +33,7 @@ class Argument:
             self.default = None
 
         # set parameter type
-        if (
-            parameters
-            and parameters.annotation != inspect._empty  # type: ignore
-        ):
+        if parameters and parameters.annotation != empty:
             self.__parse_parameters(parameters)
         elif docstring and docstring.type_name:
             self.__parse_docstring(docstring)
@@ -48,10 +44,10 @@ class Argument:
         #     self.metavar = (self.type.__name__)
 
         # set parameter help message
-        if docstring:
+        if docstring and docstring.description:
             self.help = docstring.description
 
-    def __parse_parameters(self, parameters: inspect.Parameter) -> None:
+    def __parse_parameters(self, parameters: Parameter) -> None:
         """Get parameter types from type inspection."""
         # if typing.get_origin(parameters.annotation) is Union:
         # XXX need to handle types from typing
@@ -100,14 +96,13 @@ class Argument:
         return self.__name
 
     @name.setter
-    def name(self, parameters: inspect.Parameter) -> None:
+    def name(self, parameters: Parameter) -> None:
         """Set argparse command/argument name."""
         name = parameters.name.replace('_', '-')
 
         # parse positional argument
-        if (
-            not hasattr(self, 'default')
-            and not str(parameters).startswith('**')
+        if not hasattr(self, 'default') and not str(parameters).startswith(
+            '**'
         ):
             self.__name = [name]
             if str(parameters).startswith('*'):
@@ -250,7 +245,7 @@ class Argument:
     @default.setter
     def default(self, default: Any) -> None:
         """Set argparse argument default."""
-        if default != inspect._empty:  # type: ignore
+        if default != empty:
             self.__default = default
         # XXX: this keeps conflicting with positional arguments
         # else:

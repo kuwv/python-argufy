@@ -1,10 +1,8 @@
-# -*- coding: utf-8 -*-
-# type: ignore
 # copyright: (c) 2020 by Jesse Johnson.
 # license: Apache 2.0, see LICENSE for more details.
-'''Test Task-Runner.'''
+"""Test Task-Runner."""
 
-from typing import Optional, TYPE_CHECKING
+from typing import TYPE_CHECKING, Optional
 
 from invoke import call, task
 
@@ -25,27 +23,27 @@ else:
 
 
 @task
-def build(ctx, format=None):  # type: (Context, Optional[bool]) -> None
-    '''Build wheel package.'''
+def build(ctx: 'Context', format: Optional[bool] = None) -> None:
+    """Build wheel package."""
     if format:
         ctx.run(f"flit build --format={format}")
     else:
         ctx.run('flit build')
 
 
-@task(pre=[call(build, format='wheel')])
-def dev(ctx):  # type: (Context) -> None
-    '''Perform development runtime environment setup.'''
+@task(pre=[call(build, format='wheel')])  # type: ignore
+def dev(ctx: 'Context') -> None:
+    """Perform development runtime environment setup."""
     ctx.run('flit install --pth-file --python python3')
 
 
 @task
 def install(
-    ctx,
-    symlink=True,
-    dev=False,
-):  # type: (Context, bool, bool) -> None
-    '''Install within environment.'''
+    ctx: 'Context',
+    symlink: bool = True,
+    dev: bool = False,
+) -> None:
+    """Install within environment."""
     args = []
     if symlink:
         args.append('--symlink')
@@ -55,14 +53,14 @@ def install(
 
 
 @task
-def publish(ctx):  # type: (Context) -> None
-    '''Publish project distribution.'''
+def publish(ctx: 'Context') -> None:
+    """Publish project distribution."""
     ctx.run('flit publish')
 
 
 @task
-def clean(ctx):  # type: (Context) -> None
-    '''Clean project dependencies and build.'''
+def clean(ctx: 'Context') -> None:
+    """Clean project dependencies and build."""
     paths = ['dist', 'logs']
     paths.append('**/__pycache__')
     paths.append('**/*.pyc')
@@ -73,13 +71,13 @@ def clean(ctx):  # type: (Context) -> None
 
 @task
 def version(
-    ctx,
-    part=part,
-    tag=False,
-    commit=False,
-    message=None,
-):  # type: (Context, str, bool, bool, Optional[str]) -> None
-    '''Update project version and apply tags.'''
+    ctx: 'Context',
+    part: str = part,
+    tag: bool = False,
+    commit: bool = False,
+    message: Optional[str] = None,
+) -> None:
+    """Update project version and apply tags."""
     args = [part]
     if commit:
         args.append('--commit')
