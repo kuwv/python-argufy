@@ -8,4 +8,4 @@ from argufy import __version__
 
 def test_version() -> None:
     '''Test project version is managed.'''
-    assert __version__ == '0.1.2b2'
+    assert __version__ == '0.1.2b3'
