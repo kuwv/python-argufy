@@ -12,14 +12,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-        with:
-          # ref: "${{ github.event.pull_request.head.sha }}"
-          # fetch-depth: 0
-          ref: "${{ github.ref }}"
-      - name: 'Set up Python 3.10'
+      - name: 'Set up Python 3.11'
         uses: actions/setup-python@v5
         with:
-          python-version: '3.10'
+          python-version: '3.11'
       - name: Install dependencies
         run: |
           pip install --upgrade pip
@@ -42,10 +38,10 @@ jobs:
         with:
           ref: "${{ github.event.pull_request.head.sha }}"
           fetch-depth: 0
-      - name: 'Set up Python 3.10'
+      - name: 'Set up Python 3.11'
         uses: actions/setup-python@v5
         with:
-          python-version: '3.10'
+          python-version: '3.11'
       - name: Setup gitconfig
         run: |
           git config user.name 'autonomous-bot'
@@ -82,13 +78,10 @@ jobs:
     needs: [version, sca]
     steps:
       - uses: actions/checkout@v4
-        with:
-          ref: "${{ github.event.pull_request.head.sha }}"
-          fetch-depth: 0
-      - name: 'Set up Python 3.10'
+      - name: 'Set up Python 3.11'
         uses: actions/setup-python@v5
         with:
-          python-version: '3.10'
+          python-version: '3.11'
       - name: Install dependencies
         run: |
           pip install --upgrade pip
@@ -112,7 +105,7 @@ jobs:
     needs: build
     strategy:
       matrix:
-        python-version: ['3.7', '3.8', '3.9', '3.10', '3.11', '3.12']
+        python-version: ['3.7', '3.8', '3.9', '3.11', '3.11', '3.12']
     steps:
       - uses: actions/checkout@v4
         with:
@@ -142,9 +135,6 @@ jobs:
     needs: ['build', 'test']
     steps:
       - uses: actions/checkout@v4
-        with:
-          ref: "${{ github.event.pull_request.head.sha }}"
-          fetch-depth: 0
       - name: Download versioned files
         uses: actions/download-artifact@v4
         with:
@@ -156,10 +146,10 @@ jobs:
         with:
           name: dist
           path: dist
-      - name: 'Set up Python 3.10'
+      - name: 'Set up Python 3.11'
         uses: actions/setup-python@v5
         with:
-          python-version: '3.10'
+          python-version: '3.11'
       - name: Install dependencies
         run: |
           pip install --upgrade pip
