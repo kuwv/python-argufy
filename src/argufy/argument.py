@@ -72,7 +72,7 @@ class Argument:
     def __parse_docstring(self, docstring: DocstringParam) -> None:
         """Get parameter types from docstring."""
         # Parse docstring for parameter types and defaults
-        if ',' in docstring.type_name:
+        if docstring.type_name and ',' in docstring.type_name:
             for arg in docstring.type_name.split(',', 1):
                 if not hasattr(self, 'type'):
                     # NOTE: Limit input that eval will parse

@@ -44,7 +44,7 @@ dev = [
     "pytest-cov>=2.10.0",
     "tox>=3.25.0",
     # sca
-    "mypy>=0.942",
+    "mypy>=1",
     "bandit>=1.6.2",
     "pylint>=3",
     # style
@@ -113,8 +113,9 @@ fail-under = 9.0
 
 [tool.pylint."MESSAGES CONTROL"]
 disable = [
-    "R0903",
     "C0103",
+    "R0903",
+    "W0212",
     "W0715",
 ]
 

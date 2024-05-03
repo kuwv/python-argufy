@@ -48,7 +48,11 @@ class Parser(ArgumentParser):
 
     exclude_prefixes = ('@', '_')
 
-    def __init__(self, *args: str, **kwargs: Any) -> None:
+    def __init__(
+        self,
+        # *args: str,
+        **kwargs: Any,
+    ) -> None:
         """Initialize parser.
 
         Parameters
@@ -85,7 +89,7 @@ class Parser(ArgumentParser):
         # TODO: handle environment variables
 
         module = self.__get_parent_module()
-        if module:
+        if module and module.__doc__:
             docstring = docstring_parse(module.__doc__)
             if not kwargs.get('description'):
                 kwargs['description'] = docstring.short_description
@@ -159,8 +163,7 @@ class Parser(ArgumentParser):
         """Combine class excludes with instance."""
         if exclude_prefixes != ():
             return tuple(exclude_prefixes) + Parser.exclude_prefixes
-        else:
-            return Parser.exclude_prefixes
+        return Parser.exclude_prefixes
 
     @staticmethod
     def __get_description(
@@ -176,11 +179,10 @@ class Parser(ArgumentParser):
         docstring: 'DocstringParam',
     ) -> List[str]:
         """Get keyward arguments from docstring."""
-        parameters = [x for x in signature.parameters]
         return [
             x.arg_name
             for x in docstring.params
-            if x.arg_name not in parameters
+            if x.arg_name not in list(signature.parameters)
         ]
 
     @staticmethod
@@ -229,7 +231,7 @@ class Parser(ArgumentParser):
         parser.formatter_class = ArgufyHelpFormatter
 
         module_name = module.__name__.split('.')[-1]
-        docstring = docstring_parse(module.__doc__)
+        docstring = docstring_parse(module.__doc__) if module.__doc__ else None
         excludes = Parser._get_excludes(exclude_prefixes)
 
         # use exsiting subparser or create a new one
@@ -278,7 +280,7 @@ class Parser(ArgumentParser):
                     continue  # pragma: no cover
 
                 # create commands from functions
-                elif inspect.isfunction(value):
+                if inspect.isfunction(value):
                     # TODO: Turn parameter-less function into switch
 
                     # merge builder function maing_args into parser
@@ -373,14 +375,14 @@ class Parser(ArgumentParser):
             # log.debug(f"param: {param}, {param.kind}")
 
             if not param.kind == Parameter.VAR_KEYWORD:
-                log.debug(f"param annotation: {param.annotation}")
+                log.debug("param annotation: %s", param.annotation)
                 argument = self.__clean_args(Argument(description, param))
                 name = argument.pop('name')
                 # print(name, argument)
                 parser.add_argument(*name, **argument)
 
         # populate options
-        # log.debug(f"params {params}")
+        # log.debug("params %s", params)
         for arg in self.__get_keyword_args(signature, docstring):
             description = self.__get_description(arg, docstring)
             arguments = self.__clean_args(Argument(description))
@@ -445,7 +447,7 @@ class Parser(ArgumentParser):
 
         # separate namespace from other variables
         signature = inspect.signature(fn)
-        docstring = docstring_parse(fn.__doc__)
+        docstring = docstring_parse(fn.__doc__) if fn.__doc__ else None
 
         # inspect non-signature keyword args
         keywords = self.__get_keyword_args(signature, docstring)
@@ -454,7 +456,7 @@ class Parser(ArgumentParser):
             for k in list(vars(ns).keys()).copy()
             if not signature.parameters.get(k) and k not in keywords
         ]
-        log.debug(f"arguments {args}, {keywords}")
+        log.debug("arguments %s, %s", args, keywords)
 
         # set module variables
         if mod and self.use_module_args:
@@ -523,7 +525,7 @@ class Parser(ArgumentParser):
         """
         # parse variables
         arguments, namespace = self.retrieve(args, ns)
-        log.debug(f"dispatch: {arguments}, {namespace}")
+        log.debug("dispatch: %s, %s", arguments, namespace)
 
         main_ns_result = self.__set_main_arguments(namespace)
 
