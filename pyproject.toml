@@ -108,8 +108,8 @@ exclude = '''
 )
 '''
 
-# [tool.pylint]
-# fail-under = 9.0
+[tool.pylint]
+fail-under = 9.0
 
 [tool.pylint."MESSAGES CONTROL"]
 disable = [
