@@ -32,7 +32,6 @@ jobs:
           bandit -r src
   version:
     runs-on: ubuntu-latest
-    needs: [sca]
     steps:
       - uses: actions/checkout@v4
         with:
