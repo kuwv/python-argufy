@@ -3,10 +3,16 @@
 # from pprint import pprint
 import argparse
 from argparse import Action, HelpFormatter
-from typing import Iterable, Optional
+from typing import TYPE_CHECKING, Iterable, Optional
 
 import colorama
 from colorama import Fore, Style
+
+if TYPE_CHECKING:
+    from argparse import (
+        # _ArgumentGroup as ArgumentGroup,
+        _MutuallyExclusiveGroup as MutuallyExclusiveGroup,
+    )
 
 colorama.init()
 
@@ -20,15 +26,14 @@ class ArgufyHelpFormatter(HelpFormatter):
         self,
         usage: Optional[str],
         actions: Iterable[Action],
-        groups: Iterable[argparse._ArgumentGroup],
+        # groups: Iterable['ArgumentGroup'],
+        groups: Iterable['MutuallyExclusiveGroup'],
         prefix: Optional[str] = 'usage: ',
     ) -> None:
         """Format usage message."""
         if prefix is not None:
             prefix = self.font(prefix)
-        super(ArgufyHelpFormatter, self).add_usage(
-            usage, actions, groups, prefix
-        )
+        super().add_usage(usage, actions, groups, prefix)
 
     @staticmethod
     def font(text: str, width: str = 'BRIGHT') -> str:
@@ -57,14 +62,10 @@ class ArgufyHelpFormatter(HelpFormatter):
         """Format help message."""
         if action.help:
             return self.shade(
-                super(ArgufyHelpFormatter, self)
-                ._expand_help(action)
-                .rstrip('.')
-                .lower(),
+                super()._expand_help(action).rstrip('.').lower(),
                 'YELLOW',
             )
-        else:
-            return ''
+        return ''
 
     def _format_action(self, action: Action) -> str:
         """Format arguments."""
@@ -75,9 +76,8 @@ class ArgufyHelpFormatter(HelpFormatter):
             help_text = self._expand_help(action)
             # TODO: calculate correct spacing
             return f"    {subcommand.ljust(37)}{help_text}\n"
-        else:
-            # action.option_strings = [
-            #     self.font(self.shade(option))
-            #     for option in action.option_strings
-            # ]
-            return super(ArgufyHelpFormatter, self)._format_action(action)
+        # action.option_strings = [
+        #     self.font(self.shade(option))
+        #     for option in action.option_strings
+        # ]
+        return super()._format_action(action)
