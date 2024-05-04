@@ -60,7 +60,7 @@ dev = [
 docs = [
     "docstr-coverage>=1.2.0",
     "mkdocs>=1.2.2",
-    "mkdocstrings>=0.16.2",
+    "mkdocstrings[python]>=0.16.2",
     "mkdocs-material>=7.2.0",
     "pydocstyle[toml]>=6.1.1",
 ]
