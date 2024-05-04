@@ -47,6 +47,8 @@ jobs:
         run: |
           git config user.name 'autonomous-bot'
           git config user.email 'an.autonomous.bot@gmail.com'
+      - name: Install tar
+        run: sudo apt-get install -y tar
       - name: Install dependencies
         run: |
           pip install --upgrade pip
