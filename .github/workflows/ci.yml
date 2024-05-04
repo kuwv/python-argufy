@@ -48,7 +48,7 @@ jobs:
           pip install .[dev]
       - name: Bump version
         run: |
-          echo "$PATH"
+          PATH="${HOME}/.local/bin:${PATH}"
           version info
           if [ "${GITHUB_REF##*/}" == "main" ]; then
             version bump --commit --tag
