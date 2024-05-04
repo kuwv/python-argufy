@@ -32,6 +32,8 @@ jobs:
           bandit -r src
   version:
     runs-on: ubuntu-latest
+    env:
+       PATH: "${HOME}/.local/bin:${PATH}"
     steps:
       - uses: actions/checkout@v4
         with:
@@ -51,6 +53,7 @@ jobs:
           pip install .[dev]
       - name: Bump version
         run: |
+          echo "$PATH"
           version info
           if [ "${GITHUB_REF##*/}" == "main" ]; then
             version bump --commit --tag
