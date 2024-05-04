@@ -32,8 +32,6 @@ jobs:
           bandit -r src
   version:
     runs-on: ubuntu-latest
-    env:
-       PATH: "${HOME}/.local/bin:${PATH}"
     steps:
       - uses: actions/checkout@v4
       - name: 'Set up Python 3.11'
