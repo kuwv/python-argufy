@@ -48,15 +48,14 @@ jobs:
           pip install .[dev]
       - name: Bump version
         run: |
-          PATH="${HOME}/.local/bin:${PATH}"
-          version info
+          python -m version info
           if [ "${GITHUB_REF##*/}" == "main" ]; then
-            version bump --commit --tag
-            version push --password "${{ secrets.GITHUB_TOKEN }}"
+            python -m version bump --commit --tag
+            python -m version push --password "${{ secrets.GITHUB_TOKEN }}"
           else
-            version bump
+            python -m version bump
           fi
-          version info --filepaths | tar -cvzf versioning.tar.gz -T -
+          python -m version info --filepaths | tar -cvzf versioning.tar.gz -T -
       - name: Store versioned files
         uses: actions/upload-artifact@v4
         with:
@@ -131,7 +130,7 @@ jobs:
           pip install .[dev]
           pip install ./dist/*whl
       - name: Perform tests
-        run: pytest --cov=argufy --cov-report=xml tests
+        run: python -m pytest --cov=argufy --cov-report=xml tests
   publish:
     if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
@@ -159,7 +158,7 @@ jobs:
           pip install twine==4.0.0
       - name: Perform publish
         run: |
-          twine upload dist/* \
+          python -m twine upload dist/* \
             --non-interactive \
             --repository testpypi \
             --username __token__ \
