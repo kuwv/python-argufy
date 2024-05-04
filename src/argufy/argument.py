@@ -8,19 +8,20 @@ import typing
 from ast import literal_eval
 from inspect import Parameter
 from inspect import _empty as empty
+from pydoc import locate
 from typing import Any, List, Optional, Union
 
 from docstring_parser.common import DocstringParam
 
 
-class Argument:
+class Argument:  # pylint: disable=too-many-instance-attributes
     """Represent argparse arguments."""
 
     __short_flags: List[str] = ['-h']
 
     def __init__(
         self,
-        docstring: DocstringParam,
+        docstring: Optional[DocstringParam] = None,
         parameters: Optional[Parameter] = None,
     ) -> None:
         """Initialize argparse argument."""
@@ -89,7 +90,7 @@ class Argument:
             if docstring.type_name in (
                 ('float', 'int', 'str', 'list', 'dict', 'tuple')
             ):
-                self.type = eval(docstring.type_name)  # nosec
+                self.type = locate(docstring.type_name)
 
     @property
     def name(self) -> List[str]:

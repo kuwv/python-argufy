@@ -26,7 +26,7 @@ from typing import (
     TypeVar,
 )
 
-from docstring_parser import parse as docstring_parse
+from docstring_parser import parse as docparse
 
 from argufy.argument import Argument
 from argufy.formatter import ArgufyHelpFormatter
@@ -35,7 +35,7 @@ if TYPE_CHECKING:
     from argparse import Namespace
     from inspect import Signature
 
-    from docstring_parser import DocstringParam
+    from docstring_parser import Docstring, DocstringParam
 
 log = logging.getLogger(__name__)
 
@@ -48,11 +48,7 @@ class Parser(ArgumentParser):
 
     exclude_prefixes = ('@', '_')
 
-    def __init__(
-        self,
-        # *args: str,
-        **kwargs: Any,
-    ) -> None:
+    def __init__(self, **kwargs: Any) -> None:
         """Initialize parser.
 
         Parameters
@@ -90,22 +86,18 @@ class Parser(ArgumentParser):
 
         module = self.__get_parent_module()
         if module and module.__doc__:
-            docstring = docstring_parse(module.__doc__)
+            docstring = docparse(module.__doc__)
             if not kwargs.get('description'):
                 kwargs['description'] = docstring.short_description
-
             if 'prog' not in kwargs:
                 kwargs['prog'] = module.__name__.split('.')[0]
-
         if 'version' in kwargs:
             self.prog_version = kwargs.pop('version')
-
         # if 'prefix' in kwargs:
         #     self.prefix = kwargs.pop('prefix')
         # else:
         #     self.prefix = kwargs['prog'].upper()
-        # log.debug(self.prefix)
-
+        # log.debug(str(self.prefix))
         if 'log_level' in kwargs:
             log.setLevel(getattr(logging, kwargs.pop('log_level').upper()))
         if 'log_handler' in kwargs:
@@ -167,16 +159,14 @@ class Parser(ArgumentParser):
 
     @staticmethod
     def __get_description(
-        name: str,
-        docstring: 'DocstringParam',
-    ) -> Optional[str]:
+        name: str, docstring: 'Docstring'
+    ) -> Optional['DocstringParam']:
         """Get argument description from docstring."""
         return next((d for d in docstring.params if d.arg_name == name), None)
 
     @staticmethod
     def __get_keyword_args(
-        signature: 'Signature',
-        docstring: 'DocstringParam',
+        signature: 'Signature', docstring: 'Docstring'
     ) -> List[str]:
         """Get keyward arguments from docstring."""
         return [
@@ -186,10 +176,7 @@ class Parser(ArgumentParser):
         ]
 
     @staticmethod
-    def __generate_parameter(
-        name: str,
-        module: ModuleType,
-    ) -> Parameter:
+    def __generate_parameter(name: str, module: ModuleType) -> Parameter:
         """Generate inpect parameter."""
         parameter = Parameter(
             name,
@@ -199,7 +186,7 @@ class Parser(ArgumentParser):
         )
         return parameter
 
-    def add_commands(
+    def add_commands(  # pylint: disable=too-many-locals,too-many-branches
         self,
         module: ModuleType,
         parser: Optional[ArgumentParser] = None,
@@ -231,7 +218,7 @@ class Parser(ArgumentParser):
         parser.formatter_class = ArgufyHelpFormatter
 
         module_name = module.__name__.split('.')[-1]
-        docstring = docstring_parse(module.__doc__) if module.__doc__ else None
+        docstring = docparse(module.__doc__) if module.__doc__ else None
         excludes = Parser._get_excludes(exclude_prefixes)
 
         # use exsiting subparser or create a new one
@@ -252,7 +239,7 @@ class Parser(ArgumentParser):
         # create subcommand for command
         if command_type == 'subcommand':
             if command:
-                msg = docstring.short_description
+                msg = docstring.short_description if docstring else None
                 subcommand = command.add_parser(
                     module_name.replace('_', '-'),
                     description=msg,
@@ -270,6 +257,7 @@ class Parser(ArgumentParser):
             )
 
         # TODO: separate into method
+        # pylint: disable-next=too-many-nested-blocks
         for name, value in inspect.getmembers(module):
             # TODO: Possible singledispatch candidate
             if not name.startswith(excludes):
@@ -307,9 +295,11 @@ class Parser(ArgumentParser):
                             else:
                                 cmd_name = name
 
-                            msg = docstring_parse(
-                                value.__doc__
-                            ).short_description
+                            msg = (
+                                docparse(value.__doc__).short_description
+                                if value.__doc__
+                                else None
+                            )
                             cmd = command.add_parser(
                                 cmd_name.replace('_', '-'),
                                 description=msg,
@@ -318,7 +308,7 @@ class Parser(ArgumentParser):
                             )
                             cmd.set_defaults(mod=module, fn=value)
                         # add arguments from function
-                        # log.debug(f"command {name} {value} {cmd}")
+                        # log.debug("command %s %s %s", name, value, cmd)
                         self.add_arguments(value, cmd)
 
                 # create arguments from module varibles
@@ -335,7 +325,9 @@ class Parser(ArgumentParser):
                     # TODO: use argparse.SUPPRESS for hidden arguments
                     arguments = self.__clean_args(
                         Argument(
-                            self.__get_description(name, docstring),
+                            self.__get_description(name, docstring)
+                            if docstring
+                            else None,
                             self.__generate_parameter(name, module),
                         )
                     )
@@ -365,14 +357,14 @@ class Parser(ArgumentParser):
             parser = self
 
         # prep object for inspection
-        docstring = docstring_parse(obj.__doc__)
+        docstring = docparse(obj.__doc__)
         signature = inspect.signature(obj)
 
         # populate subcommand with keyword arguments
         for arg in signature.parameters:
             param = signature.parameters[arg]
             description = self.__get_description(arg, docstring)
-            # log.debug(f"param: {param}, {param.kind}")
+            log.debug("param: %s, %s", param, param.kind)
 
             if not param.kind == Parameter.VAR_KEYWORD:
                 log.debug("param annotation: %s", param.annotation)
@@ -383,12 +375,13 @@ class Parser(ArgumentParser):
 
         # populate options
         # log.debug("params %s", params)
-        for arg in self.__get_keyword_args(signature, docstring):
-            description = self.__get_description(arg, docstring)
-            arguments = self.__clean_args(Argument(description))
-            parser.add_argument(f"--{arg.replace('_', '-')}", **arguments)
+        if docstring:
+            for arg in self.__get_keyword_args(signature, docstring):
+                description = self.__get_description(arg, docstring)
+                arguments = self.__clean_args(Argument(docstring=description))
+                parser.add_argument(f"--{arg.replace('_', '-')}", **arguments)
 
-        # log.debug(f"arguments {arguments}")
+        # log.debug("arguments %s", arguments)
         # TODO for any docstring not collected parse here (args, kwargs)
         # log.debug('docstring params', docstring.params)
         return self
@@ -447,10 +440,14 @@ class Parser(ArgumentParser):
 
         # separate namespace from other variables
         signature = inspect.signature(fn)
-        docstring = docstring_parse(fn.__doc__) if fn.__doc__ else None
+        docstring = docparse(fn.__doc__) if fn.__doc__ else None
 
         # inspect non-signature keyword args
-        keywords = self.__get_keyword_args(signature, docstring)
+        keywords = (
+            self.__get_keyword_args(signature, docstring)
+            if docstring
+            else list(signature.parameters)
+        )
         args = [
             {k: vars(ns).pop(k)}
             for k in list(vars(ns).keys()).copy()
