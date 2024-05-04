@@ -8,13 +8,8 @@ on:
 jobs:
   lint:
     runs-on: ubuntu-latest
-    env:
-       PATH: "${HOME}/.local/bin:${PATH}"
     steps:
       - uses: actions/checkout@v4
-        with:
-          ref: "${{ github.event.pull_request.head.sha }}"
-          fetch-depth: 0
       - name: 'Set up Python 3.10'
         uses: actions/setup-python@v5
         with:
@@ -25,18 +20,13 @@ jobs:
           pip install .[build,docs]
       - name: Lint documentation
         run: |
-          invoke doc.lint
-          invoke doc.test
+          python -m invoke doc.lint
+          python -m invoke doc.test
   build:
     runs-on: ubuntu-latest
     needs: lint
-    env:
-       PATH: "${HOME}/.local/bin:${PATH}"
     steps:
       - uses: actions/checkout@v4
-        with:
-          ref: "${{ github.event.pull_request.head.sha }}"
-          fetch-depth: 0
       - name: 'Set up Python 3.10'
         uses: actions/setup-python@v5
         with:
@@ -47,15 +37,12 @@ jobs:
           pip install .[build,docs]
       - name: Perform documentation tests
         run: |
-          invoke doc.coverage
-          invoke doc.build
+          python -m invoke doc.coverage
+          python -m invoke doc.build
   test:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-        with:
-          ref: "${{ github.event.pull_request.head.sha }}"
-          fetch-depth: 0
       - name: 'Set up Python 3.10'
         uses: actions/setup-python@v5
         with:

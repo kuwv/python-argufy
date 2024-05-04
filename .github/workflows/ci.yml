@@ -36,9 +36,6 @@ jobs:
        PATH: "${HOME}/.local/bin:${PATH}"
     steps:
       - uses: actions/checkout@v4
-        with:
-          ref: "${{ github.event.pull_request.head.sha }}"
-          fetch-depth: 0
       - name: 'Set up Python 3.11'
         uses: actions/setup-python@v5
         with:
@@ -47,8 +44,6 @@ jobs:
         run: |
           git config user.name 'autonomous-bot'
           git config user.email 'an.autonomous.bot@gmail.com'
-      - name: Install tar
-        run: sudo apt-get install -y tar
       - name: Install dependencies
         run: |
           pip install --upgrade pip
