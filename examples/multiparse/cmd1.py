@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # :copyright: (c) 2020 by Jesse Johnson.
 # :license: Apache 2.0, see LICENSE for more details.
 """Test parser.
@@ -10,7 +9,6 @@ example_variable: str
 
 """
 
-import json  # noqa
 from typing import Optional
 
 example_variable = 'ex_var'
