@@ -2,9 +2,9 @@
 name: CI Build
 on:
   push:
-    # branches: [main]
-    paths:
-      - 'src/**/*.py'
+    branches: [main]
+    # paths:
+    #   - 'src/**/*.py'
   pull_request:
     branches: [main]
 jobs:
@@ -19,7 +19,7 @@ jobs:
       - name: Install dependencies
         run: |
           pip install --upgrade pip
-          pip install .[dev]
+          pip install '.[dev]'
       - name: Lint
         run: |
           isort --check-only **/*.py
@@ -48,7 +48,7 @@ jobs:
       - name: Install dependencies
         run: |
           pip install --upgrade pip
-          pip install .[build]
+          pip install '.[build]'
       - name: Bump version
         run: |
           version info
@@ -130,7 +130,7 @@ jobs:
       - name: Install dependencies
         run: |
           pip install --upgrade pip
-          pip install .[dev]
+          pip install '.[dev]'
           pip install ./dist/*whl
       - name: Perform tests
         run: pytest --cov=argufy --cov-report=xml tests
