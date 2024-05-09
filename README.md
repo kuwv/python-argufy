@@ -1,7 +1,7 @@
 # python-argufy
 
-[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
-[![Build Status](https://travis-ci.org/kuwv/python-argufy.svg?branch=master)](https://travis-ci.org/kuwv/python-argufy)
+[![license](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
+[![build](https://github.com/kuwv/python-argufy/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/kuwv/python-argufy/actions/workflows/ci.yml?branch=main)
 [![codecov](https://codecov.io/gh/kuwv/python-argufy/branch/master/graph/badge.svg)](https://codecov.io/gh/kuwv/python-argufy)
 
 ## Overview
@@ -20,6 +20,24 @@ effort while enabling inspection.
 
 `pip install argufy`
 
+## Create CLI module with a command and an argument.
+
+```
+def example(argument: bool = False):
+    """Provide an example command.
+
+    Parameters
+    ----------
+    argument: bool, optional
+        Provide an example argument.
+
+    """
+    if argument:
+        print('This is a true argument')
+    else:
+        print('This is a false argument')
+```
+
 ## Create a parser
 
 ```
@@ -34,30 +52,6 @@ def main():
 
 if __name__ == '__main__':
     main()
-```
-
-## Create the command line subcommands and arguments.
-
-```
-"""Example module named CLI."""
-
-def _ignored():
-    """This function is ignored."""
-    pass
-
-def example(argument: bool = False):
-    """Provide an example command.
-
-    Parameters
-    ----------
-    argument: bool, optional
-        Provide an example argument.
-
-    """
-    if argument:
-        print('This is a true argument')
-    else:
-        print('This is a false argument')
 ```
 
 ## Example help message.
