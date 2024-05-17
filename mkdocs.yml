@@ -7,35 +7,47 @@ repo_url: https://github.com/kuwv/python-argufy
 theme:
   name: material
   palette:
-    - scheme: default
+    - media: '(prefers-color-scheme: dark)'
+      scheme: default
       primary: indigo
       accent: indigo
       toggle:
-        icon: material/toggle-switch
         name: Switch to light mode
-    - scheme: slate
+        icon: material/toggle-switch
+    - media: '(prefers-color-scheme: light)'
+      scheme: slate
       primary: blue
       accent: blue
       toggle:
-        icon: material/toggle-switch-off-outline
         name: Switch to dark mode
+        icon: material/toggle-switch-off-outline
   features:
     - search.highlight
-
 markdown_extensions:
   - admonition
   - codehilite
   - pymdownx.critic
-  - pymdownx.superfences
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:mermaid2.fence_mermaid_custom
   - pymdownx.tasklist:
       custom_checkbox: true
-  - pymdownx.tabbed
-
+  - pymdownx.tabbed:
+      alternate_style: true
 plugins:
-  - search
   - mkdocstrings:
       default_handler: python
-
+  - mermaid2:
+      javascript: 'https://unpkg.com/mermaid@10.9.1/dist/mermaid.min.js'
+      arguments:
+        theme: |
+          ^(JSON.parse(__md_get("__palette").index == 1)) ? 'dark' : 'light'
+  - search
+extra_javascript:
+  - js/refresh_on_toggle_dark_light.js
+  - js/responsive_tables.js
 nav:
   - Overview: index.md
   - Getting Started: getting-started.md

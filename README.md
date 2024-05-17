@@ -1,7 +1,7 @@
 # python-argufy
 
 [![license](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
-[![build](https://github.com/kuwv/python-argufy/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/kuwv/python-argufy/actions/workflows/ci.yml?branch=main)
+[![build](https://github.com/kuwv/python-argufy/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/kuwv/python-argufy/actions/workflows/ci.yml)
 [![codecov](https://codecov.io/gh/kuwv/python-argufy/branch/master/graph/badge.svg)](https://codecov.io/gh/kuwv/python-argufy)
 
 ## Overview
